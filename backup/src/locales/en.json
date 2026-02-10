@@ -1,0 +1,27 @@
+{
+  "auth": {
+    "signIn": "Sign In",
+    "signInTitle": "Sign in to continue using the app",
+    "email": "Email",
+    "password": "Password",
+    "signingIn": "Signing in...",
+    "or": "or",
+    "signInWithMicrosoft": "Sign in with Microsoft",
+    "forgetPassword": "Forget password?",
+    "clickHere": "Click here",
+    "loginIssues": "If you have login issues, please contact IT Helpdesk",
+    "contactEmail": "it-support@hcmiu.edu.vn"
+  },
+  "footer": {
+    "iuHomepage": "IU Homepage",
+    "officesAndCenters": "Offices and Centers",
+    "privacyPolicy": "Privacy Policy",
+    "contacts": "Contacts",
+    "officeOfAcademicAffairs": "Office of Academic Affairs",
+    "copyright": "© {{year}} HCMIU-VNU. All rights reserved.",
+    "vietnamese": "Vietnamese",
+    "english": "English",
+    "request": "Request",
+    "tel": "Tel"
+  }
+}
