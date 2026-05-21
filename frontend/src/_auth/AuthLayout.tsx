@@ -5,14 +5,15 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination, Autoplay } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
-import { useTranslation } from "node_modules/react-i18next";
+import { useTranslation } from "react-i18next";
+import { useUserContext } from "@/context/AuthContext";
 
 // === COMPONENT DEFINITION ===
 const AuthLayout = () => {
   // === STATE AND CONSTANTS ===
   const { t, i18n } = useTranslation();
-  const isAuth = false;
-  const [currentSlide, setCurrentSlide] = useState(0);
+  const { isAuthenticated } = useUserContext();
+  const [, setCurrentSlide] = useState(0);
 
   const changeLanguage = (lng: string) => {
     i18n.changeLanguage(lng);
@@ -27,16 +28,16 @@ const AuthLayout = () => {
   ];
 
   // === CONDITIONAL RENDERING ===
-  return isAuth ? (
+  return isAuthenticated ? (
     <Navigate to="/" />
   ) : (
     // === MAIN LAYOUT CONTAINER ===
-    <div className="min-h-screen w-full bg-white flex flex-col">
+    <div className="h-screen w-full bg-white flex flex-col overflow-hidden">
       {/* === MAIN CONTENT SECTION === */}
-      <main className="flex flex-1 w-full">
+      <main className="flex flex-1 w-full min-h-0">
         {/* === LEFT SIDE: AUTH FORM === */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center px-6 bg-gradient-to-r from-[#009cd1] to-[#323393]">
-          <div className="w-full max-w-md">
+        <div className="w-full lg:w-1/2 flex items-center justify-center px-6 bg-gradient-to-r from-[#009cd1] to-[#323393] overflow-auto">
+          <div className="w-full max-w-md overflow-auto">
             <Outlet />
           </div>
         </div>
@@ -200,14 +201,14 @@ const AuthLayout = () => {
                 onClick={() => changeLanguage("vi")}
                 className="flex items-center gap-2 text-white hover:text-[#44af51] transition-colors"
               >
-                <span className="text-3xl">🇻🇳</span>
+                {/* <span className="text-3xl">🇻🇳</span> */}
                 <span className="text-sm">{t("footer.vietnamese")}</span>
               </button>
               <button
                 onClick={() => changeLanguage("en")}
                 className="flex items-center gap-2 text-white hover:text-[#44af51] transition-colors"
               >
-                <span className="text-3xl">🇬🇧</span>
+                {/* <span className="text-3xl">ENG</span> */}
                 <span className="text-sm">{t("footer.english")}</span>
               </button>
             </div>

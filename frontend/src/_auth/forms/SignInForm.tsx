@@ -19,7 +19,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useSignInAccount } from "@/lib/react-query/queriesAndMutations";
 import { useUserContext } from "@/context/AuthContext";
 import { useState } from "react";
-import { useTranslation } from "node_modules/react-i18next";
+import { useTranslation } from "react-i18next";
 
 const SignInForm = () => {
   const { t } = useTranslation();
@@ -31,6 +31,7 @@ const SignInForm = () => {
 
   const form = useForm<z.infer<typeof SigninValidation>>({
     resolver: zodResolver(SigninValidation),
+    mode: "onSubmit",
     defaultValues: {
       email: "",
       Password: "",
@@ -71,9 +72,10 @@ const SignInForm = () => {
             <img src="/assets/images/logo_test2.svg" alt="myIU" />
           </div>
 
-          <p className="text-center text-[#323393] font-medium mb-6">
+          <p className="text-center text-[#323393] font-medium mb-2">
             {t("auth.signInTitle")}
           </p>
+
 
           <form
             onSubmit={form.handleSubmit(onSubmit)}

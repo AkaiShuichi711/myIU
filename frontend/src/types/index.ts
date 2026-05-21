@@ -26,3 +26,23 @@ export type INewUser = {
   username: string;
   Password: string;
 };
+
+export type INewPost = {
+  userId: string;
+  caption: string;
+  location: string;
+  tags?: string;
+  file: FileList | File[];
+  imageUrl?: string;
+  imageId?: string;
+};
+
+export type PaspdatePost = {
+  postId: string;
+  file: FileList | File[];
+  imageUrl?: string;
+  imageId: string;
+  caption?: string;
+  location?: string;
+  tags?: string;
+};

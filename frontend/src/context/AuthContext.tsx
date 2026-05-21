@@ -19,6 +19,10 @@ const INITIAL_STATE = {
   setUser: () => {},
   setIsAuthenticated: () => {},
   checkAuthUser: async () => false as boolean,
+  signIn: async () => {},
+  signOut: async () => {},
+  getProfileData: async () => ({}),
+  getTenantData: async () => ({}),
 };
 
 const AuthContext = createContext<IContextType>(INITIAL_STATE);
@@ -71,6 +75,10 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     isAuthenticated,
     setIsAuthenticated,
     checkAuthUser,
+    signIn: async () => {},
+    signOut: async () => {},
+    getProfileData: async () => ({}),
+    getTenantData: async () => ({}),
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -1,5 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
 import './globals.css';
+import { useEffect } from 'react';
 import AuthLayout from './_auth/AuthLayout';
 import RootLayout from './_root/RootLayout';
 import SignInForm from './_auth/forms/SignInForm';
@@ -18,6 +19,9 @@ import {
 } from './_root/pages';
 
 const App = () => {
+  useEffect(() => {
+    console.log('App mounted');
+  }, []);
   return (
     <main className="flex h-screen">
       <Routes>

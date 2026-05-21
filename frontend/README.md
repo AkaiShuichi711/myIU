@@ -713,3 +713,8 @@ export const checkIsLiked = (likeList: string[], userId: string) => {
 ## <a name="links">🔗 Links</a>
 
 Assets used in the project are [here](https://drive.google.com/file/d/13_7FofRAC3wARqPtAVPi53QNJJRd5RH_/view?usp=sharing)
+
+
+// đổi API locale language, thêm tiếng Nga & belarus - tháo ý tưởng ráp qua cho bên cổng định danh
+
+Verify your remote URL:git remote -vAdd a remote (if none is listed):git remote add origin <your-repository-url>Change a remote (if the URL is wrong):git remote set-url origin <your-repository-url>Push your code:git push -u origin main

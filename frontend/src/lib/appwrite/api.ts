@@ -298,14 +298,14 @@ export async function updatePost(post: PaspdatePost) {
       if (!uploadedFile) throw Error;
 
       // Get file url
-      const fileUrl = await getFilePreview(uploadedFile.$id);
+      const fileUrl = String(await getFilePreview(uploadedFile.$id));
       if (!fileUrl) {
         await deleteFile(uploadedFile.$id);
         throw Error;
       }
       console.log({fileUrl});
 
-      image = {...image, imageUrl: fileUrl, imageId: uploadedFile.$id}
+      image = {...image, imageUrl: String(fileUrl), imageId: uploadedFile.$id}
     }
 
 
