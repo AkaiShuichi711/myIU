@@ -7,25 +7,57 @@ import "swiper/css";
 import "swiper/css/pagination";
 import { useTranslation } from "react-i18next";
 import { useUserContext } from "@/context/AuthContext";
+import Flag from "react-world-flags";
+
+const carouselImages = [
+  "/assets/images/side-img1.svg",
+  "/assets/images/side-img2.jpg",
+  "/assets/images/side-img3.jpg",
+  "/assets/images/side-img5.jpg",
+] as const;
+
+const footerLinks = [
+  "iuHomepage",
+  "officesAndCenters",
+  "privacyPolicy",
+  "contacts",
+  "officeOfAcademicAffairs",
+] as const;
+
+const socialIcons = ["facebook", "instagram", "outlook", "linkedin"] as const;
+
+const languageOptions = [
+  { code: "en" as const, label: "English (US)", flagCode: "gb" },
+  { code: "vi" as const, label: "Tiếng Việt", flagCode: "vn" },
+] as const;
+
+type LanguageCode = (typeof languageOptions)[number]["code"];
+
+const swiperStyle = {
+  "--swiper-pagination-color": "linear-gradient(to right, #009cd1, #323393)",
+  "--swiper-pagination-progressbar-bg-color": "rgba(255, 255, 255, 0.3)",
+  "--swiper-pagination-bottom": "0px",
+} as Record<string, string>;
 
 // === COMPONENT DEFINITION ===
 const AuthLayout = () => {
   // === STATE AND CONSTANTS ===
   const { t, i18n } = useTranslation();
   const { isAuthenticated } = useUserContext();
-  const [, setCurrentSlide] = useState(0);
+  const [isLangOpen, setIsLangOpen] = useState(false);
 
-  const changeLanguage = (lng: string) => {
-    i18n.changeLanguage(lng);
+  const languageFromI18n = i18n.language?.split("-")[0] ?? "en";
+  const currentLanguage = languageOptions.some((option) => option.code === languageFromI18n)
+    ? (languageFromI18n as LanguageCode)
+    : "en";
+
+  const activeLanguage =
+    languageOptions.find((option) => option.code === currentLanguage) ?? languageOptions[0];
+
+  const changeLanguage = async (lng: LanguageCode) => {
+    await i18n.changeLanguage(lng);
     localStorage.setItem("language", lng);
   };
-  const carouselImages = [
-    "/assets/images/side-img1.svg",
-    "/assets/images/side-img2.jpg",
-    "/assets/images/side-img3.jpg",
-    "/assets/images/side-img4.jpg",
-    "/assets/images/side-img5.jpg",
-  ];
 
   // === CONDITIONAL RENDERING ===
   return isAuthenticated ? (
@@ -46,34 +78,19 @@ const AuthLayout = () => {
         {/* THÊM MỚI: Phần carousel chỉ hiện trên desktop (lg:) */}
         {carouselImages.length > 0 && (
           <div className="hidden lg:flex lg:w-1/2 relative overflow-visible bg-gradient-to-br from-[#009cd1]/10 to-[#323393]/20 h-full z-10">
-            {" "}
             {/* THÊM h-full + z-10 để dots không bị che */}
             <Swiper
               modules={[Pagination, Autoplay]}
               spaceBetween={0}
               slidesPerView={1}
-              pagination={{
-                type: "progressbar",
-              }}
-              onSlideChange={(swiper) => setCurrentSlide(swiper.activeIndex)}
-              autoplay={{
-                delay: 400, //1000ms = 1 giây: tốc độ chuyển slide
-                disableOnInteraction: false,
-              }}
+              pagination={{ type: "progressbar" }}
+              autoplay={{ delay: 1000, disableOnInteraction: false }}
               loop={carouselImages.length > 1}
               className="w-full h-full [&_.swiper-pagination-progressbar]:bottom-0"
-              style={
-                {
-                  "--swiper-pagination-color":
-                    "linear-gradient(to right, #009cd1, #323393)", // Gradient cho thanh progress
-                  "--swiper-pagination-progressbar-bg-color":
-                    "rgba(255, 255, 255, 0.3)", // Màu nền thanh progress
-                  "--swiper-pagination-bottom": "0px",
-                } as React.CSSProperties
-              }
+              style={swiperStyle}
             >
               {carouselImages.map((src, index) => (
-                <SwiperSlide key={index}>
+                <SwiperSlide key={src}>
                   <img
                     src={src}
                     alt={`Auth visual slide ${index + 1}`}
@@ -87,134 +104,131 @@ const AuthLayout = () => {
       </main>
 
       {/* === FOOTER SECTION === */}
-      <footer className="w-full bg-black py-4 mt-auto">
-        {/* <footer className="w-full bg-[#323393] py-4 mt-auto"> */}
-        {/* === FOOTER TOP: LINKS AND COPYRIGHT === */}
-        <div className="max-w-8xl mx-auto px-6 py-4 flex flex-col md:flex-row items-center justify-between text-sm text-[#ffffff]">
-          <ul className="flex flex-wrap gap-x-6 gap-y-2 ">
-            <li>
-              <a href="#" className="hover:text-[#44af51] transition-colors">
-                {t("footer.iuHomepage")}
-              </a>
-            </li>
-            <li>
-              <a href="#" className="hover:text-[#44af51] transition-colors">
-                {t("footer.officesAndCenters")}
-              </a>
-            </li>
-            <li>
-              <a href="#" className="hover:text-[#44af51] transition-colors">
-                {t("footer.privacyPolicy")}
-              </a>
-            </li>
-            <li>
-              <a href="#" className="hover:text-[#44af51] transition-colors">
-                {t("footer.officesAndCenters")}
-              </a>
-            </li>
-            <li>
-              <a href="#" className="hover:text-[#44af51] transition-colors">
-                {t("footer.contacts")}
-              </a>
-            </li>
-            <li>
-              <a href="#" className="hover:text-[#44af51] transition-colors">
-                {t("footer.officeOfAcademicAffairs")}
-              </a>
-            </li>
-          </ul>
-          <p>{t("footer.copyright", { year: new Date().getFullYear() })}</p>
+      {/* === FOOTER SECTION === */}
+<footer className="w-full bg-[#0A1128] pb-6 mt-auto border-t border-[#1E293B]">
+  {/* === FOOTER TOP: LINKS AND COPYRIGHT === */}
+  <div className="max-w-8xl mx-auto px-6 py-4 flex flex-col md:flex-row items-center justify-between text-sm text-[#94A3B8]">
+    <ul className="flex flex-wrap gap-x-6 gap-y-2 justify-center md:justify-start">
+      {footerLinks.map((item) => (
+        <li key={item}>
+          <a href="#" className="hover:text-white transition-colors duration-200">
+            {t(`footer.${item}`)}
+          </a>
+        </li>
+      ))}
+    </ul>
+    <p className="mt-4 md:mt-0 text-[#64748B]">{t("footer.copyright", { year: new Date().getFullYear() })}</p>
+  </div>
+
+  {/* === FOOTER BOTTOM: SOCIAL ICONS AND LANGUAGE BUTTONS === */}
+  <div className="max-w-8xl mx-auto px-6">
+    {/* Đường kẻ phân cách tinh tế theo style công nghệ */}
+    <div className="w-full h-px bg-[#1E293B]" />
+    
+    <div className="flex flex-col md:flex-row items-center justify-between mt-4 gap-4">
+      {/* === SOCIAL ICONS & CONTACT INFO === */}
+      <div className="flex flex-col sm:flex-row items-center gap-6 w-full md:w-auto">
+        <div className="flex gap-4">
+          {socialIcons.map((social) => (
+            <a key={social} href="#" className="transition-all duration-200 group">
+              <img
+                src={`/assets/icons/${social}.svg`}
+                alt={social}
+                className="h-6 w-6 transition-all duration-200"
+              />
+            </a>
+          ))}
         </div>
 
-        {/* === FOOTER BOTTOM: SOCIAL ICONS AND LANGUAGE BUTTONS === */}
-        <div className="max-w-8xl mx-auto px-6">
-          <div className="w-full h-px bg-[#009cd1]" />
-          <div className="flex flex-col md:flex-row items-center justify-between">
-            {/* === SOCIAL ICONS COMPONENT === */}
-            <div className="flex gap-4 mt-4">
-              <a href="#" className="transition-colors">
-                <img
-                  src="/assets/icons/facebook.svg"
-                  alt="Office 365"
-                  className="h-5 w-5"
-                  style={{
-                    width: "30px",
-                    height: "30px",
-                    backgroundColor: "#000000",
-                    borderRadius: "20%",
-                  }}
-                />
-              </a>
-              <a href="#" className="transition-colors">
-                <img
-                  src="/assets/icons/instagram.svg"
-                  alt="Office 365"
-                  className="h-5 w-5"
-                  style={{
-                    width: "30px",
-                    height: "30px",
-                    backgroundColor: "#000000",
-                    borderRadius: "20%",
-                  }}
-                />
-              </a>
+        <span className="text-[#94A3B8] text-xs text-center sm:text-left leading-relaxed">
+          <strong className="text-[#009cd1] font-medium">{t("footer.request")}:</strong>{" "}
+          http://cis.hcmiu.edu.vn/gui-yeu-cau
+          <br />
+          <strong className="text-[#009cd1] font-medium">{t("footer.tel")}:</strong>{" "}
+          (08) 37244270 ext.3366
+        </span>
+      </div>
 
-              <a href="#" className="transition-colors">
-                <img
-                  src="/assets/icons/outlook.svg"
-                  alt="Office 365"
-                  className="h-5 w-5"
-                  style={{
-                    width: "30px",
-                    height: "30px",
-                    backgroundColor: "#000000",
-                    borderRadius: "20%",
+      <div className="relative inline-block text-left mt-4 md:mt-0">
+        <button
+          type="button"
+          onClick={() => setIsLangOpen((value) => !value)}
+          className="flex items-center gap-2 p-2 hover:bg-[#1E293B]/50 active:bg-[#1E293B] rounded-lg transition-all duration-200"
+        >
+          <Flag
+            code={activeLanguage.flagCode}
+            className="h-6 w-8 object-cover rounded-[3px] shadow-sm"
+          />
+          <svg
+            className={`w-3.5 h-3.5 text-[#94A3B8] transition-transform duration-200 ${
+              isLangOpen ? "rotate-180" : ""
+            }`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2.5"
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
+        </button>
+
+        {isLangOpen && (
+          <>
+            <div
+              className="fixed inset-0 z-40"
+              onClick={() => setIsLangOpen(false)}
+            />
+
+            <div className="absolute right-0 bottom-full mb-2 w-48 rounded-xl bg-white p-1.5 shadow-xl ring-1 ring-black/5 z-50 animate-in fade-in slide-in-from-bottom-2 duration-150">
+              {languageOptions.map((option) => (
+                <button
+                  key={option.code}
+                  type="button"
+                  onClick={() => {
+                    void changeLanguage(option.code);
+                    setIsLangOpen(false);
                   }}
-                />
-              </a>
-              <a href="#" className=" transition-colors">
-                <img
-                  src="/assets/icons/linkedin.svg"
-                  alt="Office 365"
-                  className="h-5 w-5"
-                  style={{
-                    width: "30px",
-                    height: "30px",
-                    backgroundColor: "#000000",
-                    borderRadius: "20%",
-                  }}
-                />
-              </a>
-              <span className="text-white text-sm ml-4">
-                <span style={{ color: "#009cd1" }}>{t("footer.request")}:</span>{" "}
-                http://cis.hcmiu.edu.vn/gui-yeu-cau
-                <br />
-                <span style={{ color: "#009cd1" }}>
-                  {t("footer.tel")}:
-                </span>{" "}
-                (08) 37244270 ext.3366
-              </span>
+                  className={`flex items-center justify-between w-full px-3 py-2.5 text-sm rounded-lg text-left transition-colors ${
+                    currentLanguage === option.code
+                      ? "bg-[#0A1128]/5 text-[#0A1128] font-semibold"
+                      : "text-gray-700 hover:bg-gray-50"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Flag
+                      code={option.flagCode}
+                      className="h-5 w-7 object-cover rounded-[2px]"
+                    />
+                    <span>{option.label}</span>
+                  </div>
+                  {currentLanguage === option.code && (
+                    <svg
+                      className="w-4 h-4 text-gray-900"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2.5"
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                  )}
+                </button>
+              ))}
             </div>
-            {/* === LANGUAGE BUTTONS COMPONENT === */}
-            <div className="flex gap-4 items-center flex flex-col md:flex-row items-center justify-center md:justify-end mt-4">
-              <button
-                onClick={() => changeLanguage("vi")}
-                className="flex items-center gap-2 text-white hover:text-[#44af51] transition-colors"
-              >
-                {/* <span className="text-3xl">🇻🇳</span> */}
-                <span className="text-sm">{t("footer.vietnamese")}</span>
-              </button>
-              <button
-                onClick={() => changeLanguage("en")}
-                className="flex items-center gap-2 text-white hover:text-[#44af51] transition-colors"
-              >
-                {/* <span className="text-3xl">ENG</span> */}
-                <span className="text-sm">{t("footer.english")}</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </footer>
+          </>
+        )}
+      </div>
+    </div>
+  </div>
+</footer>
     </div>
   );
 };

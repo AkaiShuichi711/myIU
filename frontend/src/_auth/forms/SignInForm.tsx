@@ -2,6 +2,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Link, useNavigate } from "react-router-dom";
+import { useMsal } from "@azure/msal-react";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -18,16 +21,18 @@ import Loader from "@/components/shared/Loader";
 import { useToast } from "@/components/ui/use-toast";
 import { useSignInAccount } from "@/lib/react-query/queriesAndMutations";
 import { useUserContext } from "@/context/AuthContext";
-import { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { loginRequest, graphConfig } from "@/lib/msal/config";
+import { signInWithMicrosoft } from "@/lib/appwrite/api";
 
 const SignInForm = () => {
   const { t } = useTranslation();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { instance } = useMsal();
   const { mutateAsync: signInAccount } = useSignInAccount();
-  const { checkAuthUser, isLoading: isUserLoading } = useUserContext();
+  const { checkAuthUser, isLoading: isUserLoading, setUser, setIsAuthenticated } = useUserContext();
   const [showPassword, setShowPassword] = useState(false);
+  const [isMicrosoftLoading, setIsMicrosoftLoading] = useState(false);
 
   const form = useForm<z.infer<typeof SigninValidation>>({
     resolver: zodResolver(SigninValidation),
@@ -44,7 +49,6 @@ const SignInForm = () => {
     if (!session) {
       return toast({ title: "Sign in failed. Please try again" });
     }
-
     const isLoggedIn = await checkAuthUser();
 
     if (isLoggedIn) {
@@ -55,12 +59,73 @@ const SignInForm = () => {
     }
   }
 
-  const handleOffice365SignIn = () => {
-    toast({
-      title: "Chức năng Office 365 đang được phát triển",
-      description: "Sẽ sớm hỗ trợ đăng nhập bằng tài khoản công ty",
-    });
-    // → Sau này thay bằng logic MSAL loginRedirect()
+  const handleOffice365SignIn = async () => {
+    setIsMicrosoftLoading(true);
+    try {
+      // Login with redirect
+      const response = await instance.loginPopup(loginRequest);
+      
+      if (!response.accessToken) {
+        throw new Error("No access token received");
+      }
+
+      // Get user profile from Microsoft Graph
+      const graphResponse = await fetch(graphConfig.graphMeEndpoint, {
+        headers: {
+          Authorization: `Bearer ${response.accessToken}`,
+        },
+      });
+
+      if (!graphResponse.ok) {
+        throw new Error("Failed to fetch user profile");
+      }
+
+      const msalUser = await graphResponse.json();
+
+      // Create/sync user in Appwrite
+      const appwriteUser = await signInWithMicrosoft(response.accessToken, msalUser, [], []);
+
+      if (!appwriteUser) {
+        throw new Error("Failed to create user in database");
+      }
+
+      // Since Appwrite session may not exist (we used MSAL), set auth context directly
+      try {
+        setUser({
+          id: appwriteUser.$id || appwriteUser.accountId || msalUser.id,
+          name: appwriteUser.name || msalUser.displayName,
+          username: appwriteUser.username || msalUser.mailNickname || msalUser.userPrincipalName?.split('@')[0],
+          email: appwriteUser.email || msalUser.mail || msalUser.userPrincipalName,
+          imageUrl: appwriteUser.imageUrl || '',
+          bio: appwriteUser.bio || '',
+        });
+        setIsAuthenticated(true);
+      } catch (err) {
+        console.warn('Failed to set auth context directly', err);
+      }
+
+      toast({
+        title: "Success",
+        description: `Welcome back, ${msalUser.displayName}!`,
+      });
+      navigate("/");
+    } catch (error: any) {
+      console.error("Office 365 sign in error:", error);
+      
+      if (error.errorCode === "user_cancelled") {
+        toast({
+          title: "Sign in cancelled",
+          description: "You cancelled the Office 365 sign in process.",
+        });
+      } else {
+        toast({
+          title: "Office 365 sign in failed",
+          description: error.message || "Please try again or use email login.",
+        });
+      }
+    } finally {
+      setIsMicrosoftLoading(false);
+    }
   };
 
   return (
@@ -162,19 +227,28 @@ const SignInForm = () => {
             <Button
               type="button"
               onClick={handleOffice365SignIn}
-              className="bg-[#f6f8fa] hover:bg-[#f4f4f4] text-[#323393] hover:text-[#323398] border border-[#323393] h-10 flex items-center justify-center gap-2.5 shadow-sm"
+              disabled={isMicrosoftLoading}
+              className="bg-[#f6f8fa] hover:bg-[#f4f4f4] text-[#323393] hover:text-[#323398] border border-[#323393] h-10 flex items-center justify-center gap-2.5 shadow-sm disabled:opacity-50"
             >
-              <img
-                src="/assets/icons/microsoft-icon.svg"
-                alt="Office 365"
-                className="h-5 w-5"
-              />
-              Sign in with Microsoft
+              {isMicrosoftLoading ? (
+                <div className="flex items-center gap-2">
+                  <Loader /> {t("auth.signingIn")}
+                </div>
+              ) : (
+                <>
+                  <img
+                    src="/assets/icons/microsoft-icon.svg"
+                    alt="Office 365"
+                    className="h-5 w-5"
+                  />
+                  Sign in with Microsoft
+                </>
+              )}
             </Button>
 
             <p className="text-center text-sm text-gray-500 mt-4">
               {t("auth.forgetPassword")}
-              <Link to="/sign-up" className="text-[#009CD1] ml-1">
+              <Link to="/forgot-password" className="text-[#009CD1] ml-1">
                 {t("auth.clickHere")}
               </Link>
             </p>

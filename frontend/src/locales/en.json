@@ -10,7 +10,14 @@
     "forgetPassword": "Forget password?",
     "clickHere": "Click here",
     "loginIssues": "If you have login issues, please contact IT Helpdesk",
-    "contactEmail": "it-support@hcmiu.edu.vn"
+    "contactEmail": "it-support@hcmiu.edu.vn",
+    "forgotPasswordHelp": "If you forget your password, try signing in with Microsoft using the same email address.",
+    "forgotPasswordTitle": "Forgot your password?",
+    "forgotPasswordPageText1": "If your account uses the same Microsoft email, sign in with Microsoft because the password is managed by Azure AD.",
+    "forgotPasswordPageText2": "If Microsoft is temporarily unavailable, you can still use the email/password fields on the sign-in page if you registered a local password.",
+    "forgotPasswordPageText3": "If you are not sure, contact IT Helpdesk or try signing in again with Microsoft.",
+    "backToSignIn": "Back to Sign In",
+    "forgotPasswordHint": "After signing in, use the page above and choose the appropriate method for your account."
   },
   "footer": {
     "iuHomepage": "IU Homepage",
@@ -18,7 +25,7 @@
     "privacyPolicy": "Privacy Policy",
     "contacts": "Contacts",
     "officeOfAcademicAffairs": "Office of Academic Affairs",
-    "copyright": "© {{year}} HCMIU-VNU. All rights reserved.",
+    "copyright": " HCMIU-VNU © {{year}}",
     "vietnamese": "Vietnamese",
     "english": "English",
     "request": "Request",

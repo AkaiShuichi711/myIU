@@ -132,6 +132,30 @@ const ProfilePage = () => {
                         {profile.officeLocation || "N/A"}
                       </p>
                     </div>
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <h3 className="font-semibold text-gray-900 mb-2">Roles</h3>
+                      <p className="text-gray-700">
+                        {profile.roles && profile.roles.length > 0 ? (
+                          profile.roles.join(', ')
+                        ) : (
+                          'N/A'
+                        )}
+                      </p>
+                    </div>
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <h3 className="font-semibold text-gray-900 mb-2">Groups</h3>
+                      <div className="text-gray-700">
+                        {profile.groups && profile.groups.length > 0 ? (
+                          <ul className="list-disc list-inside">
+                            {profile.groups.map((g: any) => (
+                              <li key={g.id}>{g.displayName}</li>
+                            ))}
+                          </ul>
+                        ) : (
+                          'N/A'
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </div>
               ) : (

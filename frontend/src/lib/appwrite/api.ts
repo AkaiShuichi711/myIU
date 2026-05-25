@@ -102,6 +102,71 @@ export async function signOutAccount() {
 }
 
 
+export async function signInWithMicrosoft(
+  accessToken: string,
+  msalUser: any,
+  roles: string[] = [],
+  groups: Array<{ id: string; displayName: string }> = []
+) {
+  try {
+    // Check if user already exists in database
+    const existingUser = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.usersCollectionId,
+      [Query.equal('email', msalUser.mail || msalUser.userPrincipalName)]
+    );
+
+    if (existingUser.documents.length > 0) {
+      // User exists, update roles/groups if changed then return existing user
+      const existing = existingUser.documents[0];
+      const needsUpdate = JSON.stringify(existing.roles || []) !== JSON.stringify(roles) || JSON.stringify(existing.groups || []) !== JSON.stringify(groups);
+      if (needsUpdate) {
+        try {
+          await databases.updateDocument(
+            appwriteConfig.databaseId,
+            appwriteConfig.usersCollectionId,
+            existing.$id,
+            {
+              roles,
+              groups,
+            }
+          );
+        } catch (err) {
+          console.log('Failed to update roles/groups for existing user', err);
+        }
+      }
+
+      return { ...existing, roles, groups } as any;
+    }
+
+    // Create new user in database if not exists
+    const avatarUrl = avatars.getInitials(msalUser.displayName);
+    
+    const newUser = await databases.createDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.usersCollectionId,
+      ID.unique(),
+      {
+        accountId: msalUser.id,
+        name: msalUser.displayName,
+        email: msalUser.mail || msalUser.userPrincipalName,
+        username: msalUser.mailNickname || msalUser.mail?.split('@')[0],
+        imageUrl: avatarUrl,
+        roles,
+        groups,
+        bio: '',
+        authProvider: 'microsoft',
+      }
+    );
+
+    return newUser;
+  } catch (error) {
+    console.log('Error signing in with Microsoft:', error);
+    throw error;
+  }
+}
+
+
 export async function uploadFile(file: File) {
     try {
         const uploadedFile = await storage.createFile(

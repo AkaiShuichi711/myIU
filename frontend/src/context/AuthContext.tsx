@@ -77,7 +77,15 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     checkAuthUser,
     signIn: async () => {},
     signOut: async () => {},
-    getProfileData: async () => ({}),
+    getProfileData: async () => {
+      try {
+        const current = await getCurrentUser();
+        return current;
+      } catch (err) {
+        console.error('getProfileData error', err);
+        return {};
+      }
+    },
     getTenantData: async () => ({}),
   };
 

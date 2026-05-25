@@ -10,7 +10,14 @@
     "forgetPassword": "Quên mật khẩu?",
     "clickHere": "Nhấn vào đây",
     "loginIssues": "Nếu bạn gặp vấn đề đăng nhập, vui lòng liên hệ IT Helpdesk",
-    "contactEmail": "it-support@hcmiu.edu.vn"
+    "contactEmail": "it-support@hcmiu.edu.vn",
+    "forgotPasswordHelp": "Nếu bạn quên mật khẩu, hãy thử đăng nhập bằng Microsoft với cùng địa chỉ email.",
+    "forgotPasswordTitle": "Quên mật khẩu?",
+    "forgotPasswordPageText1": "Nếu tài khoản của bạn dùng email Microsoft giống nhau, hãy đăng nhập bằng Microsoft vì mật khẩu được quản lý bởi Azure AD.",
+    "forgotPasswordPageText2": "Nếu Microsoft tạm thời gặp sự cố, bạn vẫn có thể dùng form email/mật khẩu nếu đã đăng ký mật khẩu nội bộ.",
+    "forgotPasswordPageText3": "Nếu bạn không chắc chắn, hãy liên hệ IT Helpdesk hoặc thử đăng nhập lại bằng Microsoft.",
+    "backToSignIn": "Quay lại Đăng nhập",
+    "forgotPasswordHint": "Sau khi vào lại trang, chọn phương thức phù hợp với tài khoản của bạn."
   },
   "footer": {
     "iuHomepage": "Trang chủ IU",
