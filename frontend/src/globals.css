@@ -4,6 +4,7 @@
 @tailwind components;
 @tailwind utilities;
 
+
 @layer base {
   * {
     @apply box-border list-none p-0 m-0 scroll-smooth;
@@ -219,9 +220,8 @@
 
   /* Left sidebar */
   .leftsidebar {
-    @apply hidden md:flex px-6 py-10 flex-col justify-between min-w-[270px] bg-dark-2;
-  }
-
+  @apply hidden md:flex px-6 py-10 flex-col justify-between min-w-[270px] bg-dark-2; /* <-- Khối nền tối bg-dark-2 này bị thừa ra dính trên đỉnh */
+}
   .leftsidebar-link {
     @apply rounded-lg base-medium hover:bg-primary-500 transition;
   }

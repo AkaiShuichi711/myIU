@@ -1,8 +1,7 @@
-import { zodResolver } from "@hookform/resolvers/zod";
+﻿import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Link, useNavigate } from "react-router-dom";
-import { useMsal } from "@azure/msal-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -12,7 +11,6 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormMessage,
 } from "@/components/ui/form";
 import { Eye, EyeOff, Mail } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -21,18 +19,16 @@ import Loader from "@/components/shared/Loader";
 import { useToast } from "@/components/ui/use-toast";
 import { useSignInAccount } from "@/lib/react-query/queriesAndMutations";
 import { useUserContext } from "@/context/AuthContext";
-import { loginRequest, graphConfig } from "@/lib/msal/config";
-import { signInWithMicrosoft } from "@/lib/appwrite/api";
 
 const SignInForm = () => {
   const { t } = useTranslation();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { instance } = useMsal();
   const { mutateAsync: signInAccount } = useSignInAccount();
-  const { checkAuthUser, isLoading: isUserLoading, setUser, setIsAuthenticated } = useUserContext();
+  const { checkAuthUser } = useUserContext();
   const [showPassword, setShowPassword] = useState(false);
-  const [isMicrosoftLoading, setIsMicrosoftLoading] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<z.infer<typeof SigninValidation>>({
     resolver: zodResolver(SigninValidation),
@@ -43,89 +39,39 @@ const SignInForm = () => {
     },
   });
 
+  const firstError =
+    form.formState.errors.email?.message || form.formState.errors.Password?.message;
+
   async function onSubmit(values: z.infer<typeof SigninValidation>) {
-    const session = await signInAccount(values);
+    setIsLoading(true);
 
-    if (!session) {
-      return toast({ title: "Sign in failed. Please try again" });
-    }
-    const isLoggedIn = await checkAuthUser();
+    try {
+      const session = await signInAccount(values);
 
-    if (isLoggedIn) {
-      form.reset();
-      navigate("/");
-    } else {
+      if (!session) {
+        toast({ title: "Sign in failed. Please try again" });
+        return;
+      }
+
+      const isLoggedIn = await checkAuthUser();
+      if (isLoggedIn) {
+        form.reset();
+        navigate("/");
+      } else {
+        toast({ title: "Sign in failed. Please try again" });
+      }
+    } catch (error) {
       toast({ title: "Sign in failed. Please try again" });
+    } finally {
+      setIsLoading(false);
     }
   }
 
   const handleOffice365SignIn = async () => {
-    setIsMicrosoftLoading(true);
-    try {
-      // Login with redirect
-      const response = await instance.loginPopup(loginRequest);
-      
-      if (!response.accessToken) {
-        throw new Error("No access token received");
-      }
-
-      // Get user profile from Microsoft Graph
-      const graphResponse = await fetch(graphConfig.graphMeEndpoint, {
-        headers: {
-          Authorization: `Bearer ${response.accessToken}`,
-        },
-      });
-
-      if (!graphResponse.ok) {
-        throw new Error("Failed to fetch user profile");
-      }
-
-      const msalUser = await graphResponse.json();
-
-      // Create/sync user in Appwrite
-      const appwriteUser = await signInWithMicrosoft(response.accessToken, msalUser, [], []);
-
-      if (!appwriteUser) {
-        throw new Error("Failed to create user in database");
-      }
-
-      // Since Appwrite session may not exist (we used MSAL), set auth context directly
-      try {
-        setUser({
-          id: appwriteUser.$id || appwriteUser.accountId || msalUser.id,
-          name: appwriteUser.name || msalUser.displayName,
-          username: appwriteUser.username || msalUser.mailNickname || msalUser.userPrincipalName?.split('@')[0],
-          email: appwriteUser.email || msalUser.mail || msalUser.userPrincipalName,
-          imageUrl: appwriteUser.imageUrl || '',
-          bio: appwriteUser.bio || '',
-        });
-        setIsAuthenticated(true);
-      } catch (err) {
-        console.warn('Failed to set auth context directly', err);
-      }
-
-      toast({
-        title: "Success",
-        description: `Welcome back, ${msalUser.displayName}!`,
-      });
-      navigate("/");
-    } catch (error: any) {
-      console.error("Office 365 sign in error:", error);
-      
-      if (error.errorCode === "user_cancelled") {
-        toast({
-          title: "Sign in cancelled",
-          description: "You cancelled the Office 365 sign in process.",
-        });
-      } else {
-        toast({
-          title: "Office 365 sign in failed",
-          description: error.message || "Please try again or use email login.",
-        });
-      }
-    } finally {
-      setIsMicrosoftLoading(false);
-    }
+    setIsLoading(true);
+    const targetOrigin = window.location.origin.replace(/\/+$/, '');
+    const returnTo = `${targetOrigin}/home`;
+    window.location.href = `${targetOrigin}/auth/login?returnTo=${encodeURIComponent(returnTo)}`;
   };
 
   return (
@@ -137,14 +83,14 @@ const SignInForm = () => {
             <img src="/assets/images/logo_test2.svg" alt="myIU" />
           </div>
 
-          <p className="text-center text-[#323393] font-medium mb-2">
+          <p className="text-center text-[#000000] font-BOLD mb-2">
             {t("auth.signInTitle")}
           </p>
 
 
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="flex flex-col gap-4"
+            className="flex flex-col gap-4 mt-6"
           >
             <FormField
               control={form.control}
@@ -155,13 +101,12 @@ const SignInForm = () => {
                     <div className="relative">
                       <Input
                         placeholder={t("auth.email")}
-                        className="h-10 bg-white border border-gray-500 focus:border-[#009cd1] focus:ring-0 pr-10"
+                        className="h-10 bg-white border border-gray-500 hover:border-[#2F88FF] pr-10"
                         {...field}
                       />
                       <Mail className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
                     </div>
                   </FormControl>
-                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -176,7 +121,7 @@ const SignInForm = () => {
                       <Input
                         type={showPassword ? "text" : "password"}
                         placeholder={t("auth.password")}
-                        className="h-10 bg-white border border-gray-500 focus:border-[#009cd1] focus:ring-0 pr-10"
+                        className="h-10 bg-white border border-gray-500 hover:border-[#2F88FF] pr-10"
                         {...field}
                       />
                       <button
@@ -192,17 +137,42 @@ const SignInForm = () => {
                       </button>
                     </div>
                   </FormControl>
-                  <FormMessage />
                 </FormItem>
               )}
             />
 
+            {firstError ? (
+              <div className="min-h-[1.25rem] text-xs text-red-600 overflow-hidden text-ellipsis whitespace-nowrap">
+                {firstError}
+              </div>
+            ) : (
+              <div className="min-h-[0.25rem]" />
+            )}
+
+            <div className="flex items-center justify-between gap-3 text-sm text-[#475569]">
+              <label className="inline-flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(event) => setRememberMe(event.target.checked)}
+                  className="h-4 w-4 rounded border-gray-300 text-[#009cd1] focus:ring-[#009cd1]"
+                />
+                <span>{t("auth.rememberMe")}</span>
+              </label>
+
+              <Link
+                to="/forgot-password"
+                className="text-[#009cd1] hover:text-[#0077b6]"
+              >
+                {t("auth.forgetPassword")}
+              </Link>
+            </div>
             <Button
               type="submit"
-              className="bg-gradient-to-b from-[#009cd1] to-[#323393] text-white h-10 flex items-center justify-center gap-2.5 shadow-sm"
-              disabled={isUserLoading}
+              className="bg-[#0A1128] hover:bg-[#111827] text-white h-10 flex items-center justify-center gap-2.5 shadow-lg border border-white/10"
+              disabled={isLoading}
             >
-              {isUserLoading ? (
+              {isLoading ? (
                 <div className="flex items-center gap-2">
                   <Loader /> {t("auth.signingIn")}
                 </div>
@@ -227,10 +197,10 @@ const SignInForm = () => {
             <Button
               type="button"
               onClick={handleOffice365SignIn}
-              disabled={isMicrosoftLoading}
-              className="bg-[#f6f8fa] hover:bg-[#f4f4f4] text-[#323393] hover:text-[#323398] border border-[#323393] h-10 flex items-center justify-center gap-2.5 shadow-sm disabled:opacity-50"
+              disabled={isLoading}
+              className="bg-[#2F88FF] hover:bg-[#1A5FC8] text-white border border-white/10 h-10 flex items-center justify-center gap-2.5 shadow-lg disabled:opacity-50"
             >
-              {isMicrosoftLoading ? (
+              {isLoading ? (
                 <div className="flex items-center gap-2">
                   <Loader /> {t("auth.signingIn")}
                 </div>
@@ -241,7 +211,7 @@ const SignInForm = () => {
                     alt="Office 365"
                     className="h-5 w-5"
                   />
-                  Sign in with Microsoft
+                  <span>{t("auth.signInWithMicrosoft")}</span>
                 </>
               )}
             </Button>

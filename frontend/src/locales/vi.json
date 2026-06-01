@@ -1,7 +1,7 @@
 {
   "auth": {
     "signIn": "Đăng nhập",
-    "signInTitle": "Đăng nhập để tiếp tục sử dụng ứng dụng",
+    "signInTitle": "Chào mừng đến với myIU - Cổng thông tin Đại học",
     "email": "Email",
     "password": "Mật khẩu",
     "signingIn": "Đang đăng nhập...",
@@ -13,6 +13,7 @@
     "contactEmail": "it-support@hcmiu.edu.vn",
     "forgotPasswordHelp": "Nếu bạn quên mật khẩu, hãy thử đăng nhập bằng Microsoft với cùng địa chỉ email.",
     "forgotPasswordTitle": "Quên mật khẩu?",
+    "rememberMe": "Ghi nhớ đăng nhập",
     "forgotPasswordPageText1": "Nếu tài khoản của bạn dùng email Microsoft giống nhau, hãy đăng nhập bằng Microsoft vì mật khẩu được quản lý bởi Azure AD.",
     "forgotPasswordPageText2": "Nếu Microsoft tạm thời gặp sự cố, bạn vẫn có thể dùng form email/mật khẩu nếu đã đăng ký mật khẩu nội bộ.",
     "forgotPasswordPageText3": "Nếu bạn không chắc chắn, hãy liên hệ IT Helpdesk hoặc thử đăng nhập lại bằng Microsoft.",
@@ -25,10 +26,16 @@
     "privacyPolicy": "Chính sách Bảo mật",
     "contacts": "Liên hệ",
     "officeOfAcademicAffairs": "Văn phòng Giáo vụ",
-    "copyright": "© {{year}} HCMIU-VNU. Tất cả quyền được bảo lưu.",
+    "copyright": "HCMIU-VNU © {{year}}",
     "vietnamese": "Tiếng Việt",
     "english": "Tiếng Anh",
     "request": "Yêu cầu",
     "tel": "Điện thoại"
+  },
+  "footerUrls": {
+    "iuHomepage": "https://hcmiu.edu.vn/",
+    "officesAndCenters": "https://hcmiu.edu.vn/en/offices-and-centers/",
+    "contacts": "https://hcmiu.edu.vn/en/Contact-Us/",
+    "officeOfAcademicAffairs": "https://hcmiu.edu.vn/en/offices-and-centers/office-of-graduate-affairs/"
   }
 }

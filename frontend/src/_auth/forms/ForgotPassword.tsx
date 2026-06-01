@@ -24,11 +24,11 @@ const ForgotPassword = () => {
 
         <div className="mt-8 flex flex-col gap-3">
           <Link to="/sign-in">
-            <Button className="w-full" variant="outline">
+            <Button className="w-full text-[#09090B]" variant="outline">
               {t("auth.backToSignIn")}
             </Button>
           </Link>
-          <p className="text-xs text-[#64748B] text-center">
+          <p className="text-xs text-[#09090B] text-center">
             {t("auth.forgotPasswordHint")}
           </p>
         </div>

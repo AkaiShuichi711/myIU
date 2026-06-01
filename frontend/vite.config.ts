@@ -9,4 +9,28 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  server: {
+    proxy: {
+      "/auth": {
+        target: "http://localhost:8080",
+        changeOrigin: true,
+      },
+      "/signin": {
+        target: "http://localhost:8080",
+        changeOrigin: true,
+      },
+      "/signout": {
+        target: "http://localhost:8080",
+        changeOrigin: true,
+      },
+      "/redirect": {
+        target: "http://localhost:8080",
+        changeOrigin: true,
+      },
+      "/api": {
+        target: "http://localhost:8080",
+        changeOrigin: true,
+      },
+    },
+  },
 })

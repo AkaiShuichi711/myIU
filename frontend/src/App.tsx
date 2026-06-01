@@ -18,13 +18,16 @@ import {
   Saved,
   UpdateProfile,
 } from './_root/pages';
+import TenantPage from './_root/pages/Tenant';
 
 const App = () => {
   useEffect(() => {
     console.log('App mounted');
   }, []);
+
   return (
-    <main className="flex h-screen">
+    // ĐÃ SỬA: Xóa bỏ "flex", dùng w-full h-screen overflow-hidden để layout con bên trong tự quyết định trục tọa độ
+    <main className="w-full h-screen overflow-hidden bg-white flex flex-col">
       <Routes>
         {/* Public Routes */}
         <Route element={<AuthLayout />}>
@@ -36,13 +39,16 @@ const App = () => {
         {/* Private Routes */}
         <Route element={<RootLayout />}>
           <Route index element={<Home />} />
+          <Route path="/home" element={<Home />} />
           <Route path="/explore" element={<Explore />} />
           <Route path="/saved" element={<Saved />} />
           <Route path="/all-users" element={<AllUsers />} />
           <Route path="/create-post" element={<CreatePost />} />
           <Route path="/update-post/:id" element={<EditPost />} />
           <Route path='/posts/:id' element= {<PostDetails />} />
+          <Route path="/profile" element={<Profile />} />
           <Route path="/profile/:id" element={<Profile />} />
+          <Route path="/tenant" element={<TenantPage />} />
           <Route path="/update-profile/:id" element={<UpdateProfile />} />
         </Route>
       </Routes>

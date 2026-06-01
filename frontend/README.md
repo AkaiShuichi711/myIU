@@ -1,33 +1,66 @@
-## 📋 <a name="table">Table of Contents</a>
+# Frontend — myIU
 
-1. 🤖 [Introduction](#introduction)
-2. ⚙️ [Tech Stack](#tech-stack)
-3. 🔋 [Features](#features)
-4. 🤸 [Quick Start](#quick-start)
-5. 🕸️ [Snippets](#snippets)
-6. 🔗 [Links](#links)
-7. 🚀 [More](#more)
+React + Vite frontend with Azure AD OAuth and Appwrite integration.
 
-## 🚨 Tutorial
+## Setup
 
-This repository contains the code corresponding to an in-depth tutorial available on our YouTube channel, <a href="https://www.youtube.com/@javascriptmastery/videos" target="_blank"><b>JavaScript Mastery</b></a>.
+```bash
+npm install
+npm run dev
+```
 
-If you prefer visual learning, this is the perfect resource for you. Follow our tutorial to learn how to build projects like these step-by-step in a beginner-friendly manner!
+Runs on: `http://localhost:5173`
 
-<a href="https://youtu.be/_W3R2VwRyF4?feature=shared" target="_blank"><img src="https://github.com/sujatagunale/EasyRead/assets/151519281/1736fca5-a031-4854-8c09-bc110e3bc16d" /></a>
+## Environment Variables
 
-## <a name="introduction">🤖 Introduction</a>
+Create `.env` from `.env.example`:
+- `VITE_APPWRITE_*` — Appwrite database credentials
+- `VITE_AD_CLIENT_ID`, `VITE_AD_TENANT_ID` — Azure AD OAuth
+- `VITE_REDIRECT_URI` — OAuth callback URL
+- `VITE_OAUTH_BACKEND_URL` — Backend URL (proxied through Vite)
 
-Explore social media with this user-friendly platform that has a nice look and lots of features. Easily create and explore posts, and enjoy a strong authentication system and quick data fetching using React Query for a smooth user experience.
+## Project Structure
 
-If you're getting started and need assistance or face any bugs, join our active Discord community with over 27k+ members. It's a place where people help each other out.
+```
+src/
+  ├── _auth/              # Authentication & sign-in forms
+  ├── _root/              # Main app pages & layouts
+  │   └── pages/          # (Home, Profile, Posts, etc.)
+  ├── components/         # React components
+  │   ├── shared/         # Topbar, Sidebar, Loader
+  │   └── ui/             # Shadcn UI components
+  ├── lib/                # Utilities
+  │   ├── appwrite/       # Appwrite client
+  │   ├── msal/           # Azure AD MSAL config
+  │   ├── react-query/    # API queries & mutations
+  │   ├── validation/     # Form validators
+  │   └── utils.ts        # Helper functions
+  ├── context/            # React Context (Auth)
+  ├── config/             # Configuration (role mapping)
+  ├── locales/            # i18n translations (EN, VI)
+  ├── types/              # TypeScript types
+  └── main.tsx            # App entry point
+```
 
-<a href="https://discord.com/invite/n6EdbFJ" target="_blank"><img src="https://github.com/sujatagunale/EasyRead/assets/151519281/618f4872-1e10-42da-8213-1d69e486d02e" /></a>
+## Key Features
 
-## <a name="tech-stack">⚙️ Tech Stack</a>
+- OAuth login via Azure AD
+- Posts CRUD with Appwrite
+- User profiles & authentication
+- Responsive design with Tailwind CSS
+- Multi-language support (English, Vietnamese)
+- Form validation with React Hook Form + Zod
 
-- React.js
-- Appwrite
+## Authentication Flow
+
+1. User clicks "Sign in with Microsoft"
+2. Frontend redirects to backend OAuth endpoint
+3. Backend handles MSAL flow, user authenticates
+4. Returns to frontend authenticated
+5. Session stored, user can access protected routes
+
+See `_auth/forms/SignInForm.tsx` for implementation details.
+
 - React Query
 - TypeScript
 - Shadcn

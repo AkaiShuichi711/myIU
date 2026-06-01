@@ -29,15 +29,88 @@ const AuthContext = createContext<IContextType>(INITIAL_STATE);
 
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<Passer>(INITIAL_USER);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const navigate = useNavigate();
 
+  const backendUrl = (import.meta.env.VITE_OAUTH_BACKEND_URL || window.location.origin).replace(/\/+$/, '');
+
+  const getBackendUser = async () => {
+    try {
+      const response = await fetch(`${backendUrl}/api/user`, {
+        credentials: 'include',
+      });
+
+      if (!response.ok) return null;
+      return await response.json();
+    } catch (error) {
+      console.log('Backend auth check failed:', error);
+      return null;
+    }
+  };
+
+  const getBackendProfile = async () => {
+    try {
+      const response = await fetch(`${backendUrl}/api/profile`, {
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        const body = await response.text();
+        if (response.status === 400 || response.status === 401) {
+          const returnTo = `${window.location.origin}/profile`;
+          window.location.href = `${backendUrl}/auth/login?returnTo=${encodeURIComponent(returnTo)}`;
+          return;
+        }
+        throw new Error(`Profile request failed: ${response.status} ${body}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.log('Backend profile fetch failed:', error);
+      throw error;
+    }
+  };
+
+  const getBackendTenant = async () => {
+    try {
+      const response = await fetch(`${backendUrl}/api/tenant`, {
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        const body = await response.text();
+        throw new Error(`Tenant request failed: ${response.status} ${body}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.log('Backend tenant fetch failed:', error);
+      throw error;
+    }
+  };
+
   const checkAuthUser = async () => {
     try {
+      setIsLoading(true);
+
+      const backendUser = await getBackendUser();
+      if (backendUser?.id) {
+        setUser({
+          id: backendUser.id,
+          name: backendUser.name || '',
+          username: backendUser.username || '',
+          email: backendUser.email || '',
+          imageUrl: backendUser.imageUrl || '',
+          bio: backendUser.bio || '',
+        });
+        setIsAuthenticated(true);
+        return true;
+      }
+
       const currentAccount = await getCurrentUser();
-      console.log("Auth: ", currentAccount);
+      console.log('Auth: ', currentAccount);
 
       if (currentAccount) {
         setUser({
@@ -51,9 +124,12 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setIsAuthenticated(true);
         return true;
       }
+
+      setIsAuthenticated(false);
       return false;
     } catch (error) {
       console.log(error);
+      setIsAuthenticated(false);
       return false;
     } finally {
       setIsLoading(false);
@@ -61,11 +137,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
-    if (
-      localStorage.getItem("cookiesFallback") === "[]" ||
-      localStorage.getItem("cookiesFallback") === null
-    )
-      navigate("/sign-in");
+    checkAuthUser();
   }, []);
 
   const value: IContextType = {
@@ -78,15 +150,11 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     signIn: async () => {},
     signOut: async () => {},
     getProfileData: async () => {
-      try {
-        const current = await getCurrentUser();
-        return current;
-      } catch (err) {
-        console.error('getProfileData error', err);
-        return {};
-      }
+      return await getBackendProfile();
     },
-    getTenantData: async () => ({}),
+    getTenantData: async () => {
+      return await getBackendTenant();
+    },
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

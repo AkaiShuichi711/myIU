@@ -105,19 +105,39 @@ const AuthLayout = () => {
 
       {/* === FOOTER SECTION === */}
       {/* === FOOTER SECTION === */}
-<footer className="w-full bg-[#0A1128] pb-6 mt-auto border-t border-[#1E293B]">
+<footer className="w-full bg-[#ffffff] pb-6 mt-auto border-t border-[#1E293B]">
   {/* === FOOTER TOP: LINKS AND COPYRIGHT === */}
-  <div className="max-w-8xl mx-auto px-6 py-4 flex flex-col md:flex-row items-center justify-between text-sm text-[#94A3B8]">
+  <div className="max-w-8xl mx-auto px-6 py-4 flex flex-col md:flex-row items-center justify-between text-sm text-[#009cd1]">
     <ul className="flex flex-wrap gap-x-6 gap-y-2 justify-center md:justify-start">
-      {footerLinks.map((item) => (
-        <li key={item}>
-          <a href="#" className="hover:text-white transition-colors duration-200">
-            {t(`footer.${item}`)}
-          </a>
-        </li>
-      ))}
+      {footerLinks.map((item) => {
+        const url = t(`footerUrls.${item}`);
+        const hasUrl = url && url !== `footerUrls.${item}`;
+        return (
+          <li key={item}>
+            {hasUrl ? (
+              <a
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="relative group inline-block px-1 py-1 hover:text-[#009cd1] transition-colors duration-200"
+              >
+                <span className="relative z-10">{t(`footer.${item}`)}</span>
+                <span className="absolute left-1/2 -bottom-2 h-1 w-1 rounded-full bg-[#009cd1] opacity-0 group-hover:opacity-100 transform -translate-x-1/2 transition-opacity duration-200" />
+              </a>
+            ) : (
+              <a
+                href="#"
+                className="relative group inline-block px-1 py-1 hover:text-[#009cd1] transition-colors duration-200"
+              >
+                <span className="relative z-10">{t(`footer.${item}`)}</span>
+                <span className="absolute left-1/2 -bottom-2 h-1 w-1 rounded-full bg-[#009cd1] opacity-0 group-hover:opacity-100 transform -translate-x-1/2 transition-opacity duration-200" />
+              </a>
+            )}
+          </li>
+        );
+      })}
     </ul>
-    <p className="mt-4 md:mt-0 text-[#64748B]">{t("footer.copyright", { year: new Date().getFullYear() })}</p>
+    <p className="mt-4 md:mt-0 text-[#09090B]">{t("footer.copyright", { year: new Date().getFullYear() })}</p>
   </div>
 
   {/* === FOOTER BOTTOM: SOCIAL ICONS AND LANGUAGE BUTTONS === */}
