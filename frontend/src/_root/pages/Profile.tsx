@@ -1,32 +1,45 @@
-import { useUserContext } from "@/context/AuthContext";
-import { ArrowLeft, User, Briefcase, ShieldAlert, GraduationCap, Copy, CheckCheck, ChevronRight } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import {
+  User, Briefcase, Mail, Edit3, ArrowLeft,
+  Loader2, ShieldAlert, Copy, CheckCheck, Grid3x3, List
+} from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { useUserContext } from '@/context/AuthContext';
+import { useGetUserById, useGetUserPostsPaginated } from '@/lib/react-query/queriesAndMutations';
+import { GridPostList, PostCard, Paginator } from '@/components/shared';
+import { getInitials } from '@/lib/utils';
+
+const POSTS_PER_PAGE = 9;
 
 const ProfilePage = () => {
-  const { getProfileData, isAuthenticated } = useUserContext();
-  const [profile, setProfile] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const { user: currentUser, getProfileData, isAuthenticated } = useUserContext();
+  const [graphProfile, setGraphProfile] = useState<any>(null);
+  const [isLoadingGraph, setIsLoadingGraph] = useState(false);
+  const [postView, setPostView] = useState<'grid' | 'feed'>('grid');
   const [copied, setCopied] = useState<string | null>(null);
-  // const { user } = useUserContext();
+  const [postsPage, setPostsPage] = useState(1);
+
+  const { t } = useTranslation();
+  const profileUserId = id || currentUser.id;
+  const isOwnProfile = !id || id === currentUser.id;
+
+  const { data: appwriteUser, isPending: isLoadingUser } = useGetUserById(profileUserId);
+  const { data: userPostsData, isPending: isLoadingPosts } = useGetUserPostsPaginated(profileUserId, postsPage, POSTS_PER_PAGE);
+
+  const isMicrosoftUser = appwriteUser?.authProvider === 'microsoft';
 
   useEffect(() => {
-    if (isAuthenticated) loadProfile();
-  }, [isAuthenticated]);
-
-  const loadProfile = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await getProfileData();
-      setProfile(data);
-    } catch (err) {
-      setError("Failed to load profile data from Microsoft Graph API.");
-      console.error(err);
-    } finally {
-      setLoading(false);
+    if (isOwnProfile && isAuthenticated && isMicrosoftUser) {
+      setIsLoadingGraph(true);
+      getProfileData()
+        .then((data) => setGraphProfile(data))
+        .catch(() => {})
+        .finally(() => setIsLoadingGraph(false));
     }
-  };
+  }, [isOwnProfile, isAuthenticated, isMicrosoftUser]);
 
   const copy = (value: string, key: string) => {
     navigator.clipboard.writeText(value);
@@ -34,290 +47,212 @@ const ProfilePage = () => {
     setTimeout(() => setCopied(null), 1800);
   };
 
-  // Initials avatar
-  const initials = profile?.displayName
-    ? profile.displayName.split(" ").map((w: string) => w[0]).slice(0, 2).join("").toUpperCase()
-    : "?";
+  const handleSetPostView = (view: 'grid' | 'feed') => {
+    setPostView(view);
+    setPostsPage(1);
+  };
 
-  if (!isAuthenticated) {
+  if (isLoadingUser) {
     return (
-      <div style={{ width: "100%", height: "100%", display: "flex" }}>
-        <div style={{
-          width: "40%", minHeight: "100vh", flexShrink: 0,
-          background: "linear-gradient(160deg, #00b4d8 0%, #1E3A5F 40%, #0077b6 100%)",
-          display: "flex", alignItems: "center", justifyContent: "center", padding: "40px",
-        }}>
-          <div style={{ color: "#fff", textAlign: "center" }}>
-            <div style={{ fontSize: "48px", fontWeight: 800, letterSpacing: "-2px", opacity: 0.15, marginBottom: "12px" }}>myIU</div>
-            <p style={{ fontSize: "13px", opacity: 0.7, lineHeight: 1.6 }}>International University<br />Secure Student Portal</p>
-          </div>
-        </div>
-        <div style={{ flex: 1, background: "#f8fafc", display: "flex", alignItems: "center", justifyContent: "center", padding: "40px" }}>
-          <div style={{
-            background: "#fff", borderRadius: "20px", padding: "48px 40px",
-            boxShadow: "0 20px 60px rgba(0,0,0,0.12)", maxWidth: "400px", width: "100%", textAlign: "center",
-          }}>
-            <div style={{
-              width: "56px", height: "56px", borderRadius: "14px",
-              background: "#fff0f0", border: "1px solid #fecaca",
-              display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px",
-            }}>
-              <ShieldAlert size={24} color="#ef4444" />
-            </div>
-            <h3 style={{ color: "#1E3A5F", fontSize: "18px", fontWeight: 700, margin: "0 0 8px" }}>Session Expired</h3>
-            <p style={{ color: "#09090B", fontSize: "14px", lineHeight: 1.6, margin: "0 0 28px" }}>
-              Please sign in with your Microsoft account to securely query identity details.
-            </p>
-            <button onClick={() => (window.location.href = "/sign-in")} style={{
-              width: "100%", padding: "12px",
-              background: "linear-gradient(135deg, #1E3A5F, #0078d4)",
-              border: "none", borderRadius: "12px",
-              color: "#fff", fontWeight: 600, fontSize: "14px", cursor: "pointer",
-            }}>
-              Sign In to Portal
-            </button>
-          </div>
-        </div>
+      <div className="min-h-full bg-[#F8FAFC] dark:bg-slate-900 flex items-center justify-center">
+        <Loader2 size={24} className="animate-spin text-[#009cd1]" />
       </div>
     );
   }
 
+  const displayName = appwriteUser?.name || (isOwnProfile ? currentUser.name : 'Unknown User');
+  const displayEmail = appwriteUser?.email || (isOwnProfile ? currentUser.email : '');
+  const displayBio = appwriteUser?.bio || (isOwnProfile ? currentUser.bio : '');
+  const displayUsername = appwriteUser?.username || (isOwnProfile ? currentUser.username : '');
+  const initials = getInitials(displayName || '?');
+  const posts = userPostsData?.documents ?? [];
+  const totalPosts = userPostsData?.total ?? 0;
+
   return (
-    <div style={{ width: "100%", minHeight: "100vh", display: "flex" }}>
-
-      {/* LEFT CYAN STRIP */}
-      <div style={{
-        width: "6px", flexShrink: 0,
-        // background: "linear-gradient(180deg, #00b4d8 0%, #1E3A5F 50%, #0077b6 100%)",
-        background: "#ffffff", borderBottom: "1px solid #e2e8f0",
-      }} />
-
-      {/* MAIN */}
-      <div style={{ flex: 1, background: "#ffffff", overflowY: "auto" }}>
-
-        {/* TOP BAR */}
-        <div style={{
-          background: "#fff", borderBottom: "1px solid #e2e8f0",
-          padding: "0 32px", height: "60px",
-          display: "flex", alignItems: "center", justifyContent: "space-between",
-          position: "sticky", top: 0, zIndex: 10,
-          boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
-        }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <button onClick={() => (window.location.href = "/home")} style={{
-              display: "flex", alignItems: "center", gap: "6px",
-              background: "none", border: "1px solid #e2e8f0", borderRadius: "8px",
-              padding: "6px 14px", color: "#475569", fontSize: "13px", fontWeight: 500, cursor: "pointer",
-            }}>
-              <ArrowLeft size={14} /> Back to Home
-            </button>
-            <ChevronRight size={14} color="#cbd5e1" />
-            <span style={{ fontSize: "13px", color: "#0f172a" }}>Profile</span>
-          </div>
-
-        </div>
-
-        {/* BODY */}
-        <div style={{ maxWidth: "780px", margin: "0 auto", padding: "32px 24px 60px" }}>
-
-          {/* PROFILE HEADER CARD */}
-          <div style={{
-            background: "#fff", borderRadius: "20px", border: "1px solid #e2e8f0",
-            padding: "24px 28px", marginBottom: "20px",
-            display: "flex", alignItems: "center", gap: "20px", flexWrap: "wrap",
-            boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
-          }}>
-            {/* Avatar */}
-            <div style={{
-              width: "64px", height: "64px", borderRadius: "18px", flexShrink: 0,
-              background: "linear-gradient(135deg, #1E3A5F, #323393)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              color: "#fff", fontWeight: 800, fontSize: "22px",
-              boxShadow: "0 4px 16px rgba(50,51,147,0.25)",
-            }}>
-              {profile?.displayName ? initials : <User size={26} />}
-            </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
-                <GraduationCap size={16} color="#1E3A5F" />
-                <h1 style={{ color: "#1E3A5F", fontSize: "17px", fontWeight: 700, margin: 0 }}>
-                  University Student Profile
-                </h1>
-              </div>
-              <p style={{ color: "#0f172a", fontSize: "12px", margin: 0, fontFamily: "monospace" }}>
-                Microsoft Identity Platform · Graph API Integration
-              </p>
-            </div>
-          </div>
-
-          {/* STATES */}
-          {loading ? (
-            <div style={{
-              background: "#fff", borderRadius: "16px", border: "1px solid #e2e8f0",
-              padding: "60px", textAlign: "center",
-            }}>
-              <div style={{
-                width: "40px", height: "40px", margin: "0 auto 16px",
-                border: "3px solid #e0f2fe", borderTop: "3px solid #1E3A5F",
-                borderRadius: "50%", animation: "spin 0.8s linear infinite",
-              }} />
-              <p style={{ color: "#0f172a", fontSize: "13px", margin: 0 }}>Resolving organizational tokens...</p>
-            </div>
-          ) : error ? (
-            <div style={{
-              background: "#fff", borderRadius: "16px", border: "1px solid #fecaca",
-              padding: "24px", boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
-            }}>
-              <p style={{ color: "#dc2626", fontSize: "14px", margin: "0 0 16px" }}>{error}</p>
-              <button onClick={loadProfile} style={{
-                padding: "8px 18px", background: "#fef2f2", border: "1px solid #fecaca",
-                borderRadius: "8px", color: "#dc2626", fontSize: "13px", fontWeight: 600, cursor: "pointer",
-              }}>Retry Connection</button>
-            </div>
-          ) : profile ? (
-            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-
-              {/* INFO CARD */}
-              <div style={{
-                background: "#fff", borderRadius: "16px", border: "1px solid #e2e8f0",
-                overflow: "hidden", boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
-              }}>
-                <div style={{
-                  padding: "14px 20px", borderBottom: "1px solid #ffffff",
-                  background: "linear-gradient(to right, #f8fafc, #fff)",
-                  display: "flex", alignItems: "center", gap: "10px",
-                }}>
-                  <div style={{
-                    width: "30px", height: "30px", borderRadius: "8px",
-                    background: "#e0f2fe", border: "1px solid #7dd3fc",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                  }}>
-                    <User size={15} color="#0284c7" />
-                  </div>
-                  <span style={{ fontSize: "11px", fontWeight: 700, color: "#09090B", letterSpacing: "0.07em", textTransform: "uppercase" }}>
-                    Identity Information
-                  </span>
-                </div>
-
-                <div style={{ padding: "4px 20px 8px" }}>
-                  {[
-                    { label: "Display Name", value: profile.displayName, id: "dn", mono: false },
-                    { label: "User Principal Name", value: profile.userPrincipalName, id: "upn", mono: true },
-                    { label: "Given Name", value: profile.givenName, id: "gn", mono: false },
-                    { label: "Surname", value: profile.surname, id: "sn", mono: false },
-                  ].map(({ label, value, id, mono }) => (
-                    <div key={id} style={{
-                      display: "flex", alignItems: "center", justifyContent: "space-between",
-                      padding: "11px 0", borderBottom: "1px solid #ffffff", gap: "12px",
-                    }}>
-                      <span style={{ color: "#0f172a", fontSize: "13px", fontWeight: 500, flexShrink: 0, minWidth: "150px" }}>
-                        {label}
-                      </span>
-                      <div style={{ display: "flex", alignItems: "center", gap: "6px", minWidth: 0 }}>
-                        {value ? (
-                          <>
-                            <span style={{
-                              fontFamily: mono ? "'SF Mono','Sans-serif',monospace" : "inherit",
-                              fontSize: "13px", color: "#1E3A5F", fontWeight: mono ? 500 : 600,
-                              background: "transparent",
-                              border: "none",
-                              padding: "0",
-                              borderRadius: "6px",
-                              whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
-                              maxWidth: "340px",
-                            }} title={value}>{value}</span>
-                            <button onClick={() => copy(value, id)} style={{
-                              background: "none", border: "none", cursor: "pointer", padding: "3px",
-                              color: copied === id ? "#10b981" : "#cbd5e1",
-                              display: "flex", alignItems: "center", flexShrink: 0,
-                              transition: "color 0.2s",
-                            }}>
-                              {copied === id ? <CheckCheck size={13} /> : <Copy size={13} />}
-                            </button>
-                          </>
-                        ) : (
-                          <span style={{ color: "#cbd5e1", fontSize: "13px" }}>—</span>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* JOB TITLE CARD */}
-              <div style={{
-                background: "#fff", borderRadius: "16px", border: "1px solid #e2e8f0",
-                overflow: "hidden", boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
-              }}>
-                <div style={{
-                  padding: "14px 20px", borderBottom: "1px solid #ffffff",
-                  background: "linear-gradient(to right, #f8fafc, #fff)",
-                  display: "flex", alignItems: "center", gap: "10px",
-                }}>
-                  <div style={{
-                    width: "30px", height: "30px", borderRadius: "8px",
-                    background: "#ede9fe", border: "1px solid #c4b5fd",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                  }}>
-                    <Briefcase size={15} color="#7c3aed" />
-                  </div>
-                  <span style={{ fontSize: "11px", fontWeight: 700, color: "#09090B", letterSpacing: "0.07em", textTransform: "uppercase" }}>
-                    Organizational Position
-                  </span>
-                </div>
-
-                <div style={{ padding: "4px 20px 8px" }}>
-                  {[
-                    { label: "Job Title", value: profile.jobTitle || "Student / International University", id: "jt", mono: false },
-                    { label: "Mail", value: profile.mail, id: "ml", mono: true },
-                  ].map(({ label, value, id, mono }) => (
-                    <div key={id} style={{
-                      display: "flex", alignItems: "center", justifyContent: "space-between",
-                      padding: "11px 0", borderBottom: "1px solid #ffffff", gap: "12px",
-                    }}>
-                      <span style={{ color: "#0f172a", fontSize: "13px", fontWeight: 500, flexShrink: 0, minWidth: "150px" }}>
-                        {label}
-                      </span>
-                      <div style={{ display: "flex", alignItems: "center", gap: "6px", minWidth: 0 }}>
-                        {value ? (
-                          <>
-                            <span style={{
-                              fontFamily: mono ? "'SF Mono','Sans-serif',monospace" : "inherit",
-                              fontSize: "13px", color: "#1E3A5F", fontWeight: mono ? 500 : 600,
-                              whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "340px",
-                            }} title={value}>{value}</span>
-                            <button onClick={() => copy(value, id)} style={{
-                              background: "none", border: "none", cursor: "pointer", padding: "3px",
-                              color: copied === id ? "#10b981" : "#cbd5e1",
-                              display: "flex", alignItems: "center", flexShrink: 0, transition: "color 0.2s",
-                            }}>
-                              {copied === id ? <CheckCheck size={13} /> : <Copy size={13} />}
-                            </button>
-                          </>
-                        ) : (
-                          <span style={{ color: "#cbd5e1", fontSize: "13px" }}>—</span>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-            </div>
-          ) : (
-            <div style={{
-              background: "#fff", borderRadius: "16px", border: "1px solid #e2e8f0",
-              padding: "60px", textAlign: "center", color: "#0f172a", fontSize: "13px",
-            }}>
-              No active registry parameters metadata returned.
-            </div>
+    <div className="min-h-full bg-[#F8FAFC] dark:bg-slate-900">
+      <div className="sticky top-0 z-10 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-700 px-6 py-3.5">
+        <div className="max-w-3xl mx-auto flex items-center justify-between">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
+          >
+            <ArrowLeft size={16} /> {t('profile.back')}
+          </button>
+          {isOwnProfile && (
+            <Link
+              to={`/update-profile/${currentUser.id}`}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-[#2F398E] dark:text-blue-400 bg-[#2F398E]/8 dark:bg-[#2F398E]/20 hover:bg-[#2F398E]/12 transition-colors"
+            >
+              <Edit3 size={13} /> {t('profile.editProfile')}
+            </Link>
           )}
         </div>
       </div>
 
-      <style>{`
-        @keyframes spin { to { transform: rotate(360deg); } }
-      `}</style>
+      <div className="max-w-3xl mx-auto px-6 py-6 flex flex-col gap-5">
+        {/* Profile card */}
+        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden">
+          <div className="h-24" style={{ background: 'linear-gradient(135deg, #009cd1 0%, #2F398E 100%)' }} />
+
+          <div className="px-6 pb-5">
+            <div className="flex items-end justify-between -mt-8 mb-4">
+              <div
+                className="w-16 h-16 rounded-2xl border-4 border-white dark:border-slate-800 flex items-center justify-center text-white text-xl font-bold shadow-md"
+                style={{ background: 'linear-gradient(135deg, #009cd1, #2F398E)' }}
+              >
+                {appwriteUser?.imageUrl && !String(appwriteUser.imageUrl).includes('avatars') ? (
+                  <img src={appwriteUser.imageUrl} alt={displayName} className="w-full h-full rounded-xl object-cover" />
+                ) : (
+                  initials
+                )}
+              </div>
+            </div>
+
+            <h1 className="text-xl font-bold text-slate-900 dark:text-slate-50">{displayName}</h1>
+            {displayUsername && (
+              <p className="text-sm text-slate-400 dark:text-slate-500">@{displayUsername}</p>
+            )}
+            {displayBio && (
+              <p className="text-sm text-slate-600 dark:text-slate-300 mt-2 leading-relaxed">{displayBio}</p>
+            )}
+
+            <div className="flex flex-wrap gap-x-4 gap-y-1 mt-3 text-xs text-slate-400 dark:text-slate-500">
+              {displayEmail && (
+                <span className="flex items-center gap-1">
+                  <Mail size={11} /> {displayEmail}
+                </span>
+              )}
+              {graphProfile?.jobTitle && (
+                <span className="flex items-center gap-1">
+                  <Briefcase size={11} /> {graphProfile.jobTitle}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Stats */}
+        <div className="grid grid-cols-3 gap-3">
+          {[
+            { label: t('profile.posts'), value: totalPosts },
+            { label: t('profile.liked'), value: appwriteUser?.liked?.length ?? 0 },
+            { label: t('profile.saved'), value: 0 },
+          ].map(({ label, value }) => (
+            <div key={label} className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm p-4 text-center">
+              <p className="text-2xl font-bold text-slate-900 dark:text-slate-50">{value}</p>
+              <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{label}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Microsoft Graph info — own profile + Microsoft account only */}
+        {isOwnProfile && isMicrosoftUser && (
+          <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm">
+            <div className="flex items-center gap-3 px-5 py-4 border-b border-slate-50 dark:border-slate-700">
+              <div className="w-8 h-8 rounded-lg bg-[#009cd1]/10 dark:bg-[#009cd1]/20 flex items-center justify-center">
+                <User size={15} className="text-[#009cd1]" />
+              </div>
+              <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">{t('profile.microsoftIdentity')}</p>
+              {isLoadingGraph && <Loader2 size={13} className="animate-spin text-slate-400 ml-auto" />}
+            </div>
+            <div className="px-5 py-3">
+              {graphProfile ? (
+                [
+                  { label: t('profile.displayName'), value: graphProfile.displayName, id: 'dn' },
+                  { label: t('profile.emailUpn'), value: graphProfile.userPrincipalName, id: 'upn', mono: true },
+                  { label: t('profile.jobTitle'), value: graphProfile.jobTitle, id: 'jt' },
+                  { label: t('profile.mail'), value: graphProfile.mail, id: 'ml', mono: true },
+                ].map(({ label, value, id, mono }) => (
+                  <div key={id} className="flex items-center justify-between py-2.5 border-b border-slate-50 dark:border-slate-700 last:border-0 gap-3">
+                    <span className="text-xs font-medium text-slate-500 dark:text-slate-400 shrink-0 w-28">{label}</span>
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      {value ? (
+                        <>
+                          <span className={`text-xs text-slate-800 dark:text-slate-200 truncate ${mono ? 'font-mono' : 'font-medium'}`} title={value}>
+                            {value}
+                          </span>
+                          <button
+                            onClick={() => copy(value, id)}
+                            className="shrink-0 text-slate-300 dark:text-slate-500 hover:text-slate-500 dark:hover:text-slate-300 transition-colors"
+                          >
+                            {copied === id ? <CheckCheck size={12} className="text-green-500" /> : <Copy size={12} />}
+                          </button>
+                        </>
+                      ) : (
+                        <span className="text-xs text-slate-400 dark:text-slate-500">—</span>
+                      )}
+                    </div>
+                  </div>
+                ))
+              ) : !isLoadingGraph ? (
+                <div className="flex items-center gap-2 py-4 text-xs text-slate-400 dark:text-slate-500">
+                  <ShieldAlert size={14} />
+                  <span>{t('profile.signInHint')}</span>
+                </div>
+              ) : null}
+            </div>
+          </div>
+        )}
+
+        {/* Posts section */}
+        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-slate-50 dark:border-slate-700">
+            <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+              {t('profile.posts')} {totalPosts > 0 && <span className="text-slate-400 dark:text-slate-500 font-normal">({totalPosts})</span>}
+            </p>
+            <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-700 rounded-lg p-1">
+              <button
+                onClick={() => handleSetPostView('grid')}
+                className={`p-1.5 rounded-md transition-all ${postView === 'grid' ? 'bg-white dark:bg-slate-600 shadow-sm text-[#2F398E] dark:text-blue-400' : 'text-slate-400 dark:text-slate-500'}`}
+              >
+                <Grid3x3 size={14} />
+              </button>
+              <button
+                onClick={() => handleSetPostView('feed')}
+                className={`p-1.5 rounded-md transition-all ${postView === 'feed' ? 'bg-white dark:bg-slate-600 shadow-sm text-[#2F398E] dark:text-blue-400' : 'text-slate-400 dark:text-slate-500'}`}
+              >
+                <List size={14} />
+              </button>
+            </div>
+          </div>
+
+          <div className="p-4">
+            {isLoadingPosts ? (
+              <div className="flex justify-center py-10">
+                <Loader2 size={20} className="animate-spin text-[#009cd1]" />
+              </div>
+            ) : posts.length === 0 ? (
+              <div className="flex flex-col items-center py-12 gap-2">
+                <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-700 flex items-center justify-center">
+                  <Grid3x3 size={20} className="text-slate-300 dark:text-slate-500" />
+                </div>
+                <p className="text-sm text-slate-500 dark:text-slate-400">{t('profile.noPosts')}</p>
+                {isOwnProfile && (
+                  <Link
+                    to="/create-post"
+                    className="text-xs text-[#009cd1] hover:underline mt-1"
+                  >
+                    {t('profile.createFirstPost')}
+                  </Link>
+                )}
+              </div>
+            ) : postView === 'grid' ? (
+              <GridPostList posts={posts} showUser={false} />
+            ) : (
+              <div className="flex flex-col gap-4">
+                {posts.map((post: any) => <PostCard key={post.$id} post={post} />)}
+              </div>
+            )}
+            <Paginator
+              page={postsPage}
+              total={totalPosts}
+              pageSize={POSTS_PER_PAGE}
+              onChange={setPostsPage}
+              isLoading={isLoadingPosts}
+            />
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

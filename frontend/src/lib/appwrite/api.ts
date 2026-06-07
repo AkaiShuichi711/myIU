@@ -1,27 +1,12 @@
 import { ID, Query } from 'appwrite';
-import { INewPost, INewUser, PaspdatePost } from '@/types';
+import { INewNotification, INewPost, INewUser, IUpdatePost, IUpdateUser, PaspdatePost } from '@/types';
 import { account, avatars, databases, appwriteConfig, storage } from './config';
-
-// Manual Pagination Because appwrite doesn't have pagination
-// let numOfPosts: number = 2; // have 2 posts
-// let currentPage: number = 0;
-// const limit: number = 10;
-// export let hasNextPage = true;
-
 
 export async function createUserAccount(user: INewUser) {
   try {
-    const newAccount = await account.create(
-      ID.unique(),
-      user.email,
-      user.Password,
-      user.name
-    );
-
+    const newAccount = await account.create(ID.unique(), user.email, user.Password, user.name);
     if (!newAccount) throw Error;
-
     const avatarUrl = avatars.getInitials(user.name);
-
     const newUser = await saveUserToDB({
       accountId: newAccount.$id,
       name: newAccount.name,
@@ -29,14 +14,12 @@ export async function createUserAccount(user: INewUser) {
       username: user.username,
       imageUrl: avatarUrl,
     });
-
     return newUser;
   } catch (error) {
     console.log(error);
     return error;
   }
 }
-
 
 export async function saveUserToDB(user: {
   accountId: string;
@@ -52,45 +35,36 @@ export async function saveUserToDB(user: {
       ID.unique(),
       user
     );
-
     return newUser;
   } catch (err) {
     console.log(err);
   }
 }
 
-
 export async function signInAccount(user: { email: string; Password: string }) {
   try {
     const session = await account.createEmailSession(user.email, user.Password);
-
     return session;
   } catch (err) {
     console.log(err);
   }
 }
 
-
 export async function getCurrentUser() {
   try {
     const currentAccount = await account.get();
-
     if (!currentAccount) throw Error;
-
     const currentUser = await databases.listDocuments(
       appwriteConfig.databaseId,
       appwriteConfig.usersCollectionId,
-      [Query.equal('accountId', currentAccount.$id)],
+      [Query.equal('accountId', currentAccount.$id)]
     );
-
     if (!currentUser) throw Error;
-
     return currentUser.documents[0];
   } catch (error) {
     console.log(error);
   }
 }
-
 
 export async function signOutAccount() {
   try {
@@ -101,7 +75,6 @@ export async function signOutAccount() {
   }
 }
 
-
 export async function signInWithMicrosoft(
   accessToken: string,
   msalUser: any,
@@ -109,7 +82,6 @@ export async function signInWithMicrosoft(
   groups: Array<{ id: string; displayName: string }> = []
 ) {
   try {
-    // Check if user already exists in database
     const existingUser = await databases.listDocuments(
       appwriteConfig.databaseId,
       appwriteConfig.usersCollectionId,
@@ -117,31 +89,26 @@ export async function signInWithMicrosoft(
     );
 
     if (existingUser.documents.length > 0) {
-      // User exists, update roles/groups if changed then return existing user
       const existing = existingUser.documents[0];
-      const needsUpdate = JSON.stringify(existing.roles || []) !== JSON.stringify(roles) || JSON.stringify(existing.groups || []) !== JSON.stringify(groups);
+      const needsUpdate =
+        JSON.stringify(existing.roles || []) !== JSON.stringify(roles) ||
+        JSON.stringify(existing.groups || []) !== JSON.stringify(groups);
       if (needsUpdate) {
         try {
           await databases.updateDocument(
             appwriteConfig.databaseId,
             appwriteConfig.usersCollectionId,
             existing.$id,
-            {
-              roles,
-              groups,
-            }
+            { roles, groups }
           );
         } catch (err) {
           console.log('Failed to update roles/groups for existing user', err);
         }
       }
-
       return { ...existing, roles, groups } as any;
     }
 
-    // Create new user in database if not exists
     const avatarUrl = avatars.getInitials(msalUser.displayName);
-    
     const newUser = await databases.createDocument(
       appwriteConfig.databaseId,
       appwriteConfig.usersCollectionId,
@@ -158,7 +125,6 @@ export async function signInWithMicrosoft(
         authProvider: 'microsoft',
       }
     );
-
     return newUser;
   } catch (error) {
     console.log('Error signing in with Microsoft:', error);
@@ -166,67 +132,206 @@ export async function signInWithMicrosoft(
   }
 }
 
+// ─── USERS ────────────────────────────────────────────────────────────────────
+
+export async function getAllUsers(limit?: number) {
+  try {
+    const queries = [Query.orderDesc('$createdAt')];
+    if (limit) queries.push(Query.limit(limit));
+    const users = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.usersCollectionId,
+      queries
+    );
+    if (!users) throw Error;
+    return users;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function getUsersPaginated(page: number, limit: number) {
+  try {
+    const offset = (page - 1) * limit;
+    const response = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.usersCollectionId,
+      [Query.orderDesc('$createdAt'), Query.limit(limit), Query.offset(offset)]
+    );
+    return { total: response.total, documents: response.documents };
+  } catch (error) {
+    console.error(error);
+    return { total: 0, documents: [] };
+  }
+}
+
+export async function getUserById(userId: string) {
+  try {
+    const user = await databases.getDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.usersCollectionId,
+      userId
+    );
+    if (!user) throw Error;
+    return user;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function updateUser(user: IUpdateUser) {
+  const hasFileToUpdate = user.file.length > 0;
+  try {
+    let image = { imageUrl: user.imageUrl, imageId: user.imageId };
+
+    if (hasFileToUpdate) {
+      const uploadedFile = await uploadFile(user.file[0]);
+      if (!uploadedFile) throw Error;
+      const fileUrl = await getFilePreview(uploadedFile.$id);
+      if (!fileUrl) {
+        await deleteFile(uploadedFile.$id);
+        throw Error;
+      }
+      image = { imageUrl: String(fileUrl), imageId: uploadedFile.$id };
+    }
+
+    const updatedUser = await databases.updateDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.usersCollectionId,
+      user.userId,
+      { name: user.name, bio: user.bio, imageUrl: image.imageUrl, imageId: image.imageId }
+    );
+
+    if (!updatedUser && hasFileToUpdate && image.imageId) {
+      await deleteFile(image.imageId);
+      throw Error;
+    }
+
+    if (user.imageId && hasFileToUpdate) {
+      await deleteFile(user.imageId);
+    }
+
+    return updatedUser;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function getUserPosts(userId: string) {
+  try {
+    const posts = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.postsCollectionId,
+      [Query.equal('creator', userId), Query.orderDesc('$createdAt')]
+    );
+    if (!posts) throw Error;
+    return posts;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function getUserPostsPaginated(userId: string, page: number, limit: number) {
+  try {
+    const offset = (page - 1) * limit;
+    const response = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.postsCollectionId,
+      [Query.equal('creator', userId), Query.orderDesc('$createdAt'), Query.limit(limit), Query.offset(offset)]
+    );
+    return { total: response.total, documents: response.documents };
+  } catch (error) {
+    console.error(error);
+    return { total: 0, documents: [] };
+  }
+}
+
+export async function searchUsers(searchTerm: string) {
+  try {
+    const users = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.usersCollectionId,
+      [Query.search('name', searchTerm)]
+    );
+    if (!users) throw Error;
+    return users;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+// ─── FILES ────────────────────────────────────────────────────────────────────
 
 export async function uploadFile(file: File) {
-    try {
-        const uploadedFile = await storage.createFile(
-            appwriteConfig.storageId,
-            ID.unique(),
-            file
-        );
-        return uploadedFile;
-    } catch (error) {
-        console.log(error);
-    }
+  try {
+    const uploadedFile = await storage.createFile(appwriteConfig.storageId, ID.unique(), file);
+    return uploadedFile;
+  } catch (error) {
+    console.log(error);
+  }
 }
 
-
-export async function getFilePreview(fileId: string){
-    try {
-        const fileUrl = await storage.getFilePreview(
-            appwriteConfig.storageId,
-            fileId,
-            2000,
-            2000,
-            "top",
-            100
-        );
-        return fileUrl;
-    } catch (error) {
-        console.log(error);
-    }
+export async function getFilePreview(fileId: string) {
+  try {
+    const fileUrl = await storage.getFilePreview(
+      appwriteConfig.storageId,
+      fileId,
+      2000,
+      2000,
+      'top',
+      100
+    );
+    return fileUrl;
+  } catch (error) {
+    console.log(error);
+  }
 }
 
+export function getFileViewUrl(fileId: string): string {
+  return storage.getFileView(appwriteConfig.storageId, fileId).toString();
+}
+
+export function getMediaCategory(mimeType: string): string {
+  if (mimeType.startsWith('image/')) return 'image';
+  if (mimeType.startsWith('video/')) return 'video';
+  if (mimeType === 'application/pdf') return 'pdf';
+  if (mimeType.includes('word') || mimeType === 'application/msword') return 'word';
+  if (mimeType.includes('excel') || mimeType === 'application/vnd.ms-excel') return 'excel';
+  if (mimeType.includes('powerpoint') || mimeType === 'application/vnd.ms-powerpoint') return 'ppt';
+  return 'file';
+}
 
 export async function deleteFile(fileId: string) {
-    try {
-        await storage.deleteFile(appwriteConfig.storageId, fileId)
-        return {status: "ok"}
-    } catch (error) {
-        console.log(error);
-    }
+  try {
+    await storage.deleteFile(appwriteConfig.storageId, fileId);
+    return { status: 'ok' };
+  } catch (error) {
+    console.log(error);
+  }
 }
 
+// ─── POSTS ────────────────────────────────────────────────────────────────────
 
 export async function createPost(post: INewPost) {
   try {
-    // Upload file to appwrite storage
-    const uploadedFile = await uploadFile(post.file[0]);
+    const files = post.files || [];
+    if (!files.length) throw Error('No files provided');
 
-    if (!uploadedFile) throw Error;
+    const uploaded = (await Promise.all(files.map((f) => uploadFile(f)))).filter(Boolean) as any[];
+    if (!uploaded.length) throw Error('All uploads failed');
 
-    // Get file url
-    const fileUrl = await getFilePreview(uploadedFile.$id);
-    if (!fileUrl) {
-      await deleteFile(uploadedFile.$id);
-      throw Error;
-    }
-    console.log(fileUrl)
+    const mediaData = await Promise.all(
+      uploaded.map(async (uf, i) => {
+        const mime = files[i]?.type || '';
+        const isImage = mime.startsWith('image/');
+        const url = isImage ? String(await getFilePreview(uf.$id)) : getFileViewUrl(uf.$id);
+        return { id: uf.$id, url, type: getMediaCategory(mime) };
+      })
+    );
 
-    // Convert tags into array
-    const tags = post.tags?.replace(/ /g, '').split(',') || [];
+    const first = mediaData[0];
+    const tags = post.tags?.replace(/ /g, '').split(',').filter(Boolean) || [];
 
-    // Create post
     const newPost = await databases.createDocument(
       appwriteConfig.databaseId,
       appwriteConfig.postsCollectionId,
@@ -234,20 +339,20 @@ export async function createPost(post: INewPost) {
       {
         creator: post.userId,
         caption: post.caption,
-        imageUrl: fileUrl,
-        imageId: uploadedFile.$id,
+        imageUrl: first.url,
+        imageId: first.id,
+        mediaUrls: mediaData.map((m) => m.url),
+        mediaIds: mediaData.map((m) => m.id),
+        mediaTypes: mediaData.map((m) => m.type),
         location: post.location,
-        tags: tags,
+        tags,
       }
     );
 
     if (!newPost) {
-      await deleteFile(uploadedFile.$id);
+      await Promise.all(uploaded.map((uf) => deleteFile(uf.$id)));
       throw Error;
     }
-
-    // increment Post count
-    //numOfPosts++;
 
     return newPost;
   } catch (error) {
@@ -255,146 +360,116 @@ export async function createPost(post: INewPost) {
   }
 }
 
-
-export async function getRecentPosts(){
+export async function getRecentPosts() {
   try {
     const posts = await databases.listDocuments(
       appwriteConfig.databaseId,
       appwriteConfig.postsCollectionId,
       [Query.orderDesc('$createdAt'), Query.limit(20)]
-    )
-    
+    );
     if (!posts) throw Error;
-
     return posts;
   } catch (error) {
     console.log(error);
   }
 }
 
-
-export async function likePost(postId: string, likesArray: string[]){
+export async function likePost(postId: string, likesArray: string[]) {
   try {
     const updatedPost = await databases.updateDocument(
       appwriteConfig.databaseId,
       appwriteConfig.postsCollectionId,
       postId,
-      {
-        likes: likesArray,
-      }
-    )
-
+      { likes: likesArray }
+    );
     if (!updatedPost) throw Error;
-
     return updatedPost;
   } catch (error) {
     console.log(error);
   }
 }
 
-
-export async function savePost(postId: string, userId: string){
+export async function savePost(postId: string, userId: string) {
   try {
     const savedPost = await databases.createDocument(
       appwriteConfig.databaseId,
       appwriteConfig.savesCollectionId,
       ID.unique(),
-      {
-        post: postId,
-        user: userId,
-      }
-    )
-
+      { post: postId, user: userId }
+    );
     if (!savedPost) throw Error;
-
     return savedPost;
   } catch (error) {
     console.log(error);
   }
 }
 
-
-export async function deleteSavedPost(savedRecordId: string){
+export async function deleteSavedPost(savedRecordId: string) {
   try {
-    //console.log("delete", savedRecordId);
     const statusCode = await databases.deleteDocument(
       appwriteConfig.databaseId,
       appwriteConfig.savesCollectionId,
-      savedRecordId,
-    )
-
+      savedRecordId
+    );
     if (!statusCode) throw Error;
-
-    return {status: "ok"};
+    return { status: 'ok' };
   } catch (error) {
     console.log(error);
   }
 }
 
-
-export async function getPostById(postId: string){
+export async function getPostById(postId: string) {
   try {
     const post = await databases.getDocument(
       appwriteConfig.databaseId,
       appwriteConfig.postsCollectionId,
       postId
-    )
-
+    );
     if (!post) throw Error;
-
     return post;
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
 }
 
-
-export async function updatePost(post: PaspdatePost) {
+export async function updatePost(post: IUpdatePost) {
   const hasFileToUpdate = post.file.length > 0;
   try {
-    let image = {
-      imageUrl: post.imageUrl,
-      imageId: post.imageId,
-    }
+    let image = { imageUrl: post.imageUrl, imageId: post.imageId };
 
-    if(hasFileToUpdate) {
-      // Upload file to appwrite storage
+    if (hasFileToUpdate) {
       const uploadedFile = await uploadFile(post.file[0]);
       if (!uploadedFile) throw Error;
-
-      // Get file url
       const fileUrl = String(await getFilePreview(uploadedFile.$id));
       if (!fileUrl) {
         await deleteFile(uploadedFile.$id);
         throw Error;
       }
-      console.log({fileUrl});
-
-      image = {...image, imageUrl: String(fileUrl), imageId: uploadedFile.$id}
+      image = { imageUrl: String(fileUrl), imageId: uploadedFile.$id };
     }
 
+    const tags = post.tags?.replace(/ /g, '').split(',').filter(Boolean) || [];
 
-    // Convert tags into array
-    const tags = post.tags?.replace(/ /g, '').split(',') || [];
-
-    // Create post
+    // FIX: use post.postId instead of ID.unique()
     const updatedPost = await databases.updateDocument(
       appwriteConfig.databaseId,
       appwriteConfig.postsCollectionId,
-      ID.unique(),
+      post.postId,
       {
         caption: post.caption,
         imageUrl: image.imageUrl,
         imageId: image.imageId,
         location: post.location,
-        tags: tags,
+        tags,
       }
     );
 
     if (!updatedPost) {
-      await deleteFile(post.imageId);
+      if (hasFileToUpdate) await deleteFile(image.imageId);
       throw Error;
     }
+
+    if (hasFileToUpdate) await deleteFile(post.imageId);
 
     return updatedPost;
   } catch (error) {
@@ -402,96 +477,278 @@ export async function updatePost(post: PaspdatePost) {
   }
 }
 
-
-export async function deletePost(postId: string, imageId: string){
+export async function deletePost(postId: string, imageId: string) {
   try {
-    //console.log(postId, imageId)
-    if(!postId || !imageId) throw Error;
-
-    console.log('delete post', postId);
+    if (!postId || !imageId) throw Error;
     await databases.deleteDocument(
       appwriteConfig.databaseId,
       appwriteConfig.postsCollectionId,
-      postId,
-    )
-
-    await deleteFile(imageId)
-    
-
-
-    // decrement Post count
-    //numOfPosts--;
-    
-    return {status: "ok"}
+      postId
+    );
+    await deleteFile(imageId);
+    return { status: 'ok' };
   } catch (error) {
     console.log(error);
   }
 }
 
-
-export async function getInfinitePosts({ pageParam = '' } : { pageParam: string}){
-  // limit is 1 to see infinite posts
-  const queries: string[] = [Query.orderDesc('$updatedAt'), Query.limit(10)]
-  
-  // currentPage++;
-
-  // const offset = (currentPage - 1) * limit;
-  // if(offset > numOfPosts) {
-  //   hasNextPage = false;
-  //   throw Error; 
-  // }
-
-  if(pageParam !== ''){
+export async function getInfinitePosts({ pageParam = '' }: { pageParam: string }) {
+  const queries: string[] = [Query.orderDesc('$updatedAt'), Query.limit(9)];
+  if (pageParam !== '') {
     queries.push(Query.cursorAfter(pageParam));
-    //queries.push(Query.offset(offset));
   }
+  const posts = await databases.listDocuments(
+    appwriteConfig.databaseId,
+    appwriteConfig.postsCollectionId,
+    queries
+  );
+  return posts.documents;
+}
 
+export async function searchPosts(searchTerm: string) {
   try {
     const posts = await databases.listDocuments(
       appwriteConfig.databaseId,
       appwriteConfig.postsCollectionId,
-      queries
-    )
-
-    //console.log(posts);
+      [Query.search('caption', searchTerm)]
+    );
     if (!posts) throw Error;
-
     return posts.documents;
   } catch (error) {
     console.log(error);
   }
 }
 
-
-export async function searchPosts(searchTerm: string){
-  try {
-    const posts = await databases.listDocuments(
-      appwriteConfig.databaseId,
-      appwriteConfig.postsCollectionId,
-      [Query.search('caption',  searchTerm)]
-    )
-    
-    if (!posts) throw Error;
-    
-    return posts.documents;
-  } catch (error) {
-    console.log(error);
-  }
-}
-
-
-export async function getSavedPosts(userId: string){
+export async function getSavedPosts(userId: string) {
   try {
     const savedPosts = await databases.listDocuments(
       appwriteConfig.databaseId,
       appwriteConfig.savesCollectionId,
-      [Query.equal('user', userId)]
-    )
-    
+      [Query.equal('user', userId), Query.orderDesc('$createdAt')]
+    );
     if (!savedPosts) throw Error;
-
     return savedPosts.documents;
   } catch (error) {
     console.log(error);
+  }
+}
+
+// ─── USER PRIVACY ─────────────────────────────────────────────────────────────
+
+export async function updateUserPrivacy(userId: string, isPrivate: boolean) {
+  return databases.updateDocument(
+    appwriteConfig.databaseId,
+    appwriteConfig.usersCollectionId,
+    userId,
+    { isPrivate }
+  );
+}
+
+export async function getUserByUsername(username: string) {
+  try {
+    const result = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.usersCollectionId,
+      [Query.equal('username', username), Query.limit(1)]
+    );
+    return result.documents[0] || null;
+  } catch {
+    return null;
+  }
+}
+
+// ─── COMMENTS ─────────────────────────────────────────────────────────────────
+// Appwrite collection: comments
+// Attributes: postId (string), userId (string), authorName (string),
+//             authorImage (string), body (string), taggedUsers (string[])
+
+export async function createComment(data: {
+  postId: string;
+  userId: string;
+  authorName: string;
+  authorImage?: string;
+  body: string;
+  taggedUsers?: string[];
+}) {
+  if (!appwriteConfig.commentsCollectionId) throw new Error('Comments collection not configured');
+  return databases.createDocument(
+    appwriteConfig.databaseId,
+    appwriteConfig.commentsCollectionId,
+    ID.unique(),
+    {
+      postId: data.postId,
+      userId: data.userId,
+      authorName: data.authorName,
+      authorImage: data.authorImage || '',
+      body: data.body,
+      taggedUsers: data.taggedUsers || [],
+    }
+  );
+}
+
+export async function getPostComments(postId: string) {
+  if (!appwriteConfig.commentsCollectionId) return [];
+  try {
+    const result = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.commentsCollectionId,
+      [Query.equal('postId', postId), Query.orderAsc('$createdAt'), Query.limit(100)]
+    );
+    return result.documents;
+  } catch {
+    return [];
+  }
+}
+
+export async function deleteComment(commentId: string) {
+  if (!appwriteConfig.commentsCollectionId) return;
+  return databases.deleteDocument(
+    appwriteConfig.databaseId,
+    appwriteConfig.commentsCollectionId,
+    commentId
+  );
+}
+
+export async function getUserComments(userId: string) {
+  if (!appwriteConfig.commentsCollectionId) return [];
+  try {
+    const result = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.commentsCollectionId,
+      [Query.equal('userId', userId), Query.orderDesc('$createdAt'), Query.limit(50)]
+    );
+    return result.documents;
+  } catch {
+    return [];
+  }
+}
+
+// ─── NOTIFICATIONS ────────────────────────────────────────────────────────────
+// Appwrite collection: notifications
+// Attributes: userId (string), type (string), actorId (string), actorName (string),
+//             postId (string), commentId (string), message (string), read (boolean)
+
+export async function createNotification(notif: INewNotification) {
+  if (!appwriteConfig.notificationsCollectionId) return null;
+  try {
+    return await databases.createDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.notificationsCollectionId,
+      ID.unique(),
+      { ...notif, read: false }
+    );
+  } catch {
+    return null;
+  }
+}
+
+export async function getNotifications(userId: string) {
+  if (!appwriteConfig.notificationsCollectionId) return [];
+  try {
+    const result = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.notificationsCollectionId,
+      [Query.equal('userId', userId), Query.orderDesc('$createdAt'), Query.limit(50)]
+    );
+    return result.documents;
+  } catch {
+    return [];
+  }
+}
+
+export async function markNotificationRead(notificationId: string) {
+  if (!appwriteConfig.notificationsCollectionId) return null;
+  try {
+    return await databases.updateDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.notificationsCollectionId,
+      notificationId,
+      { read: true }
+    );
+  } catch {
+    return null;
+  }
+}
+
+export async function markAllNotificationsRead(userId: string) {
+  if (!appwriteConfig.notificationsCollectionId) return;
+  try {
+    const unread = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.notificationsCollectionId,
+      [Query.equal('userId', userId), Query.equal('read', false), Query.limit(100)]
+    );
+    await Promise.all(
+      unread.documents.map((n) =>
+        databases.updateDocument(
+          appwriteConfig.databaseId,
+          appwriteConfig.notificationsCollectionId,
+          n.$id,
+          { read: true }
+        )
+      )
+    );
+  } catch {
+    /* silent */
+  }
+}
+
+// ─── BLOCKS ───────────────────────────────────────────────────────────────────
+// Appwrite collection: blocks
+// Attributes: blockerId (string), blockedId (string), blockedName (string)
+
+export async function blockUser(blockerId: string, blockedId: string, blockedName: string) {
+  if (!appwriteConfig.blocksCollectionId) throw new Error('Blocks collection not configured');
+  return databases.createDocument(
+    appwriteConfig.databaseId,
+    appwriteConfig.blocksCollectionId,
+    ID.unique(),
+    { blockerId, blockedId, blockedName }
+  );
+}
+
+export async function unblockUser(blockDocId: string) {
+  if (!appwriteConfig.blocksCollectionId) return;
+  return databases.deleteDocument(
+    appwriteConfig.databaseId,
+    appwriteConfig.blocksCollectionId,
+    blockDocId
+  );
+}
+
+export async function getBlockedUsers(blockerId: string) {
+  if (!appwriteConfig.blocksCollectionId) return [];
+  try {
+    const result = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.blocksCollectionId,
+      [Query.equal('blockerId', blockerId), Query.orderDesc('$createdAt')]
+    );
+    return result.documents;
+  } catch {
+    return [];
+  }
+}
+
+// ─── ACTIVITY LOG ─────────────────────────────────────────────────────────────
+
+export async function getUserLikedPosts(userId: string) {
+  try {
+    const result = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.postsCollectionId,
+      [Query.contains('likes', [userId]), Query.orderDesc('$updatedAt'), Query.limit(30)]
+    );
+    return result.documents;
+  } catch {
+    return [];
+  }
+}
+
+export async function getAccountSessions() {
+  try {
+    return await account.listSessions();
+  } catch {
+    return { sessions: [] };
   }
 }

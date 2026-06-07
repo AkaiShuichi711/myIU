@@ -11,6 +11,17 @@ const mainController = require('./controller');
 const cache = require('./utils/cachePlugin');
 const app = express();
 
+// Global process-level error handlers to avoid crashing on uncaught exceptions
+process.on('uncaughtException', (err) => {
+    console.error('Uncaught Exception:', err && err.stack ? err.stack : err);
+    // In production you'd want to restart the process (PM2/systemd) or take recovery steps
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+    // keep process alive for debugging; consider graceful restart in production
+});
+
 // get settings and set up Authentication into app
 const appSettings = require('../appSettings')();
 const msalWrapper = require('./msal-express-wrapper/auth-provider');
@@ -43,7 +54,7 @@ app.use((req, res, next) => {
 // Configure session cookie. For production, set secure:true and proper domain.
 app.use(
     session({
-        secret: process.env.SESSION_SECRET || 'ENTER_YOUR_SECRET_HERE',
+        secret: process.env.SESSION_SECRET,
         resave: false,
         saveUninitialized: false,
         cookie: { secure: false, sameSite: 'lax' },

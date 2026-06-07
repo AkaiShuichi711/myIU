@@ -9,7 +9,7 @@ const ForgotPassword = () => {
     <div className="flex flex-col items-center">
       <div className="bg-white rounded-lg shadow-lg px-8 py-8 w-[409px]">
         <div className="flex justify-center mb-6">
-          <img src="/assets/images/logo_test2.svg" alt="myIU" />
+          <img src="/assets/images/logo_beforesignin.svg" alt="myIU" />
         </div>
 
         <h1 className="text-center text-2xl font-semibold text-[#323393] mb-4">

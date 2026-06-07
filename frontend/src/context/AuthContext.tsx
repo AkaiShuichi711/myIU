@@ -58,11 +58,6 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       if (!response.ok) {
         const body = await response.text();
-        if (response.status === 400 || response.status === 401) {
-          const returnTo = `${window.location.origin}/profile`;
-          window.location.href = `${backendUrl}/auth/login?returnTo=${encodeURIComponent(returnTo)}`;
-          return;
-        }
         throw new Error(`Profile request failed: ${response.status} ${body}`);
       }
 

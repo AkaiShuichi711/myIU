@@ -8,6 +8,10 @@ export const appwriteConfig = {
     savesCollectionId: import.meta.env.VITE_APPWRITE_SAVES_COLLECTION_ID,
     usersCollectionId: import.meta.env.VITE_APPWRITE_USERS_COLLECTION_ID,
     postsCollectionId: import.meta.env.VITE_APPWRITE_POSTS_COLLECTION_ID,
+    // Phase 2 collections – create these in Appwrite Console first
+    notificationsCollectionId: import.meta.env.VITE_APPWRITE_NOTIFICATIONS_COLLECTION_ID ?? '',
+    commentsCollectionId: import.meta.env.VITE_APPWRITE_COMMENTS_COLLECTION_ID ?? '',
+    blocksCollectionId: import.meta.env.VITE_APPWRITE_BLOCKS_COLLECTION_ID ?? '',
 }
 
 export const client = new Client();

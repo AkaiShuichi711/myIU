@@ -80,7 +80,7 @@ const SignInForm = () => {
         {/* CARD */}
         <div className="bg-white rounded-lg shadow-lg px-8 py-8 w-[409px]">
           <div className="flex justify-center mb-6">
-            <img src="/assets/images/logo_test2.svg" alt="myIU" />
+            <img src="/assets/images/logo_beforesignin.svg" alt="myIU" />
           </div>
 
           <p className="text-center text-[#000000] font-BOLD mb-2">

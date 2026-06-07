@@ -5,32 +5,43 @@
 
 const { default: axios } = require('axios');
 
-callAPI = async(endpoint, accessToken) => {
-
+// simple retry wrapper with timeout for external API calls
+const callAPI = async (endpoint, accessToken, opts = {}) => {
     if (!accessToken || accessToken === "") {
-        throw new Error('No tokens found')
+        throw new Error('No tokens found');
     }
-    
-    const options = {
-        headers: {
-            Authorization: `Bearer ${accessToken}`
-        }
-    };
-    
-    console.log('request made to web API at: ' + new Date().toString());
 
-    try {
-        const response = await axios.default.get(endpoint, options);
-        return response.data;
-    } catch(error) {
-        console.log(error);
-        if (error.response && error.response.data) {
-            throw new Error(JSON.stringify(error.response.data));
+    const timeout = opts.timeout || 5000; // default 5s
+    const maxRetries = typeof opts.retries === 'number' ? opts.retries : 2;
+
+    const headers = {
+        Authorization: `Bearer ${accessToken}`,
+    };
+
+    console.log('request made to web API at: ' + new Date().toISOString(), endpoint);
+
+    let attempt = 0;
+    while (attempt <= maxRetries) {
+        try {
+            const response = await axios.get(endpoint, { headers, timeout });
+            return response.data;
+        } catch (error) {
+            attempt += 1;
+            // if last attempt, throw detailed error
+            if (attempt > maxRetries) {
+                console.log('callAPI final error:', error && error.message ? error.message : error);
+                if (error.response && error.response.data) {
+                    throw new Error(JSON.stringify(error.response.data));
+                }
+                throw error;
+            }
+            // simple backoff
+            const backoff = 100 * Math.pow(2, attempt);
+            await new Promise((r) => setTimeout(r, backoff));
         }
-        throw error;
     }
-}
+};
 
 module.exports = {
-    callAPI
+    callAPI,
 };

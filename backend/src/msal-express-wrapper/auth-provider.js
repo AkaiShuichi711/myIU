@@ -356,17 +356,25 @@ class AuthProvider {
      * @param {Function} next: express next 
      */
     isAuthorized = async (req, res, next) => {
+        try {
+            const authHeader = req.headers && req.headers.authorization;
+            if (!authHeader) return res.status(401).send(ErrorMessages.NOT_PERMITTED);
 
-        const accessToken = req.headers.authorization.split(' ')[1];
+            const parts = authHeader.split(' ');
+            if (parts.length !== 2) return res.status(401).send(ErrorMessages.NOT_PERMITTED);
 
-        if (req.headers.authorization) {
-            if (!(await this.tokenValidator.validateAccessToken(accessToken, req.route.path))) {
-                return res.status(401).send(ErrorMessages.NOT_PERMITTED);
-            }
+            const accessToken = parts[1];
 
-            next();
-        } else {
-            res.status(401).send(ErrorMessages.NOT_PERMITTED);
+            // ensure route path is provided to validator; fall back to req.path
+            const protectedRoute = req.route && req.route.path ? req.route.path : req.path;
+
+            const valid = await this.tokenValidator.validateAccessToken(accessToken, protectedRoute);
+            if (!valid) return res.status(401).send(ErrorMessages.NOT_PERMITTED);
+
+            return next();
+        } catch (err) {
+            console.log('isAuthorized error', err);
+            return res.status(401).send(ErrorMessages.NOT_PERMITTED);
         }
     }
 

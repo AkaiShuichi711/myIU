@@ -17,6 +17,8 @@ import {
   Profile,
   Saved,
   UpdateProfile,
+  Settings,
+  Notifications,
 } from './_root/pages';
 import TenantPage from './_root/pages/Tenant';
 
@@ -50,6 +52,8 @@ const App = () => {
           <Route path="/profile/:id" element={<Profile />} />
           <Route path="/tenant" element={<TenantPage />} />
           <Route path="/update-profile/:id" element={<UpdateProfile />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/notifications" element={<Notifications />} />
         </Route>
       </Routes>
       <Toaster />

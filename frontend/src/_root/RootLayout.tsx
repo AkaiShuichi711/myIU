@@ -53,14 +53,12 @@ import { useUserContext } from "@/context/AuthContext";
 import { LeftSidebar, Topbar } from "@/components/shared";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Loader2 } from "lucide-react"; 
+import { Loader2 } from "lucide-react";
 
 const RootLayout = () => {
   const { isAuthenticated, isLoading } = useUserContext();
   const navigate = useNavigate();
   const location = useLocation();
-
-  const hideShell = location.pathname === "/home";
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -70,26 +68,28 @@ const RootLayout = () => {
 
   if (isLoading) {
     return (
-      <div className="h-screen w-full flex items-center justify-center bg-slate-50">
+      <div className="h-screen w-full flex items-center justify-center bg-slate-50 dark:bg-slate-900">
         <Loader2 className="h-8 w-8 animate-spin text-[#009cd1]" />
       </div>
     );
   }
 
-return (
-  // Khung cha bao trọn diện tích trống kéo dọc theo khối đứng của App.tsx
-  <div className="w-full flex-1 flex min-h-0 overflow-hidden bg-[#F8FAFC]">
-    
-    {/* Chỉ gọi duy nhất LeftSidebar trên desktop, Topbar bị triệt tiêu hoàn toàn */}
-    {!hideShell && <LeftSidebar />}
-    
-    {/* Vùng không gian hiển thị các nội dung Dashboard */}
-    <section className="flex-1 h-full overflow-y-auto bg-[#F8FAFC]">
-      <Outlet />
-    </section>
-  </div>
-);
+  return (
+    <div className="w-full h-screen flex flex-col overflow-hidden bg-[#F8FAFC] dark:bg-slate-900 transition-colors duration-200">
+      {/* Topbar */}
+      <Topbar />
 
+      {/* Main content area */}
+      <div className="w-full flex-1 flex min-h-0 overflow-hidden">
+        <LeftSidebar />
+
+        {/* Content area */}
+        <section className="flex-1 h-full overflow-y-auto bg-[#F8FAFC] dark:bg-slate-900 transition-colors duration-200">
+          <Outlet />
+        </section>
+      </div>
+    </div>
+  );
 };
 
 export default RootLayout;

@@ -1,38 +1,41 @@
-const fs = require("fs");
-const cachePath = './src/data/cache.json' // replace this string with the path to your valid cache file.
+const fs = require('fs');
+const path = require('path');
+const { promisify } = require('util');
+const readFile = promisify(fs.readFile);
+const writeFile = promisify(fs.writeFile);
+
+const cachePath = path.resolve(__dirname, '../data/cache.json');
+
+// Simple in-process mutex queue to serialize cache access and avoid concurrent writes
+let writeLock = Promise.resolve();
 
 const beforeCacheAccess = async (cacheContext) => {
-    return new Promise(async (resolve, reject) => {
+    // read file if exists, else create
+    try {
         if (fs.existsSync(cachePath)) {
-            fs.readFile(cachePath, "utf-8", (err, data) => {
-                if (err) {
-                    reject();
-                } else {
-                    cacheContext.tokenCache.deserialize(data);
-                    resolve();
-                }
-            });
+            const data = await readFile(cachePath, 'utf-8');
+            cacheContext.tokenCache.deserialize(data);
         } else {
-            fs.writeFile(cachePath, cacheContext.tokenCache.serialize(), (err) => {
-                if (err) {
-                    reject();
-                }
-            });
+            // initialize file with empty cache
+            const serialized = cacheContext.tokenCache.serialize();
+            await writeFile(cachePath, serialized, 'utf-8');
         }
-    });
+    } catch (err) {
+        console.log('beforeCacheAccess error', err);
+        // allow application to continue; token cache will be empty
+    }
 };
 
 const afterCacheAccess = async (cacheContext) => {
     if (cacheContext.cacheHasChanged) {
-        await fs.writeFile(cachePath, cacheContext.tokenCache.serialize(), (err) => {
-            if (err) {
-                console.log(err);
-            }
-        });
+        // serialize writes using the writeLock promise chain
+        const serialized = cacheContext.tokenCache.serialize();
+        writeLock = writeLock.then(() => writeFile(cachePath, serialized, 'utf-8').catch(err => console.log('cache write error', err)));
+        await writeLock;
     }
 };
 
 module.exports = {
     beforeCacheAccess,
-    afterCacheAccess
+    afterCacheAccess,
 };

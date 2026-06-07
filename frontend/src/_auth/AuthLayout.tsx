@@ -1,6 +1,6 @@
 // === IMPORTS ===
 import { Outlet, Navigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination, Autoplay } from "swiper/modules";
 import "swiper/css";
@@ -45,6 +45,13 @@ const AuthLayout = () => {
   const { t, i18n } = useTranslation();
   const { isAuthenticated } = useUserContext();
   const [isLangOpen, setIsLangOpen] = useState(false);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const hadDark = root.classList.contains('dark');
+    root.classList.remove('dark');
+    return () => { if (hadDark) root.classList.add('dark'); };
+  }, []);
 
   const languageFromI18n = i18n.language?.split("-")[0] ?? "en";
   const currentLanguage = languageOptions.some((option) => option.code === languageFromI18n)
@@ -105,9 +112,9 @@ const AuthLayout = () => {
 
       {/* === FOOTER SECTION === */}
       {/* === FOOTER SECTION === */}
-<footer className="w-full bg-[#ffffff] pb-6 mt-auto border-t border-[#1E293B]">
+<footer className="w-full bg-[#000000] pb-6 mt-auto border-t border-[#1E293B]">
   {/* === FOOTER TOP: LINKS AND COPYRIGHT === */}
-  <div className="max-w-8xl mx-auto px-6 py-4 flex flex-col md:flex-row items-center justify-between text-sm text-[#009cd1]">
+  <div className="max-w-8xl mx-auto px-6 py-4 flex flex-col md:flex-row items-center justify-between text-sm text-[#ffffff]">
     <ul className="flex flex-wrap gap-x-6 gap-y-2 justify-center md:justify-start">
       {footerLinks.map((item) => {
         const url = t(`footerUrls.${item}`);
@@ -137,7 +144,7 @@ const AuthLayout = () => {
         );
       })}
     </ul>
-    <p className="mt-4 md:mt-0 text-[#09090B]">{t("footer.copyright", { year: new Date().getFullYear() })}</p>
+    <p className="mt-4 md:mt-0 text-[#94A3B8]">{t("footer.copyright", { year: new Date().getFullYear() })}</p>
   </div>
 
   {/* === FOOTER BOTTOM: SOCIAL ICONS AND LANGUAGE BUTTONS === */}
