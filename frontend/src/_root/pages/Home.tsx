@@ -1,8 +1,5 @@
 import { Link } from 'react-router-dom';
-import {
-  BookOpen, Bell, FileText, ChevronRight,
-  GraduationCap, Star, Clock, CheckCircle2, XCircle, Loader2,
-} from 'lucide-react';
+import { BookOpen, Bell, FileText, ChevronRight, GraduationCap, Star, Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useUserContext } from '@/context/AuthContext';
 import {
@@ -12,26 +9,9 @@ import {
   useGetFormSubmissionsByUser,
 } from '@/lib/react-query/queriesAndMutations';
 import { isLecturerRole, isAdminRole, formatTimeAgo } from '@/lib/utils';
-
-// ── Mock data ──────────────────────────────────────────────────────────────────
-const MOCK_COURSES = [
-  { $id: 'mc1', code: 'CS301', name: 'Mạng Máy Tính',            coverColor: '#0068FF', semester: 'HK2 2025-2026', isActive: true },
-  { $id: 'mc2', code: 'SE302', name: 'Kiểm Thử Phần Mềm',        coverColor: '#27ae60', semester: 'HK2 2025-2026', isActive: true },
-  { $id: 'mc3', code: 'IT310', name: 'Trí Tuệ Nhân Tạo',         coverColor: '#8e44ad', semester: 'HK2 2025-2026', isActive: true },
-  { $id: 'mc4', code: 'CS201', name: 'Cấu Trúc Dữ Liệu',         coverColor: '#e74c3c', semester: 'HK1 2025-2026', isActive: false },
-];
-
-const MOCK_NOTIFS = [
-  { $id: 'hn1', type: 'form_approved', message: 'Đơn xin miễn học phần của bạn đã được duyệt', read: false, $createdAt: '2026-06-10T09:00:00.000Z', linkTo: '/forms' },
-  { $id: 'hn2', type: 'grade',         message: 'Điểm môn Mạng Máy Tính (CS301) đã được cập nhật', read: false, $createdAt: '2026-06-10T07:30:00.000Z', linkTo: '/courses' },
-  { $id: 'hn3', type: 'course',        message: 'Bạn vừa được đăng ký vào lớp Lập Trình Hướng Đối Tượng', read: true, $createdAt: '2026-06-09T15:00:00.000Z', linkTo: '/courses' },
-];
-
-const MOCK_FORMS = [
-  { $id: 'hf1', formTitle: 'Đơn xin bảo lưu kết quả học tập', status: 'pending',  $createdAt: '2026-06-08T10:00:00.000Z' },
-  { $id: 'hf2', formTitle: 'Đơn xin miễn học phần CS101',      status: 'approved', $createdAt: '2026-06-05T08:00:00.000Z' },
-  { $id: 'hf3', formTitle: 'Đơn xin xét học bổng HK2',         status: 'rejected', $createdAt: '2026-06-01T09:00:00.000Z' },
-];
+import { FORM_STATUS } from '@/constants/ui';
+import { MOCK_COURSES_BASE, MOCK_NOTIFS_HOME, MOCK_FORMS_STUDENT } from '@/constants/mockData';
+import type { SubmissionStatus } from '@/types';
 
 const NOTIF_DOT: Record<string, string> = {
   form_approved: 'bg-green-500',
@@ -40,12 +20,6 @@ const NOTIF_DOT: Record<string, string> = {
   grade:         'bg-[#0068FF]',
   course:        'bg-[#2F398E]',
   system:        'bg-slate-400',
-};
-
-const STATUS_UI: Record<string, { label: string; cls: string; icon: React.ReactNode }> = {
-  pending:  { label: 'Chờ duyệt', cls: 'bg-[#f5832f]/10 text-[#f5832f]',  icon: <Clock size={11} /> },
-  approved: { label: 'Đã duyệt',  cls: 'bg-[#00c578]/10 text-[#00c578]',  icon: <CheckCircle2 size={11} /> },
-  rejected: { label: 'Từ chối',   cls: 'bg-[#ef4e49]/10 text-[#ef4e49]',  icon: <XCircle size={11} /> },
 };
 
 // ── Components ─────────────────────────────────────────────────────────────────
@@ -78,9 +52,9 @@ const Home = () => {
 
   const rawCourses = isLecturer || isAdmin ? lecturerCourses : studentCourses;
   const loadingCourses = isLecturer || isAdmin ? loadingLecturerCourses : loadingStudentCourses;
-  const courses    = (rawCourses  as any[]).length > 0 ? (rawCourses  as any[]) : MOCK_COURSES;
-  const notifs     = (rawNotifs   as any[]).length > 0 ? (rawNotifs   as any[]) : MOCK_NOTIFS;
-  const forms      = (rawForms    as any[]).length > 0 ? (rawForms    as any[]) : MOCK_FORMS;
+  const courses    = (rawCourses  as any[]).length > 0 ? (rawCourses  as any[]) : MOCK_COURSES_BASE;
+  const notifs     = (rawNotifs   as any[]).length > 0 ? (rawNotifs   as any[]) : MOCK_NOTIFS_HOME;
+  const forms      = (rawForms    as any[]).length > 0 ? (rawForms    as any[]) : MOCK_FORMS_STUDENT;
 
   const unreadCount   = notifs.filter((n: any) => !n.read).length;
   const pendingCount  = forms.filter((f: any) => f.status === 'pending').length;
@@ -262,7 +236,8 @@ const Home = () => {
               ) : (
                 <div className="divide-y divide-slate-50 dark:divide-[#0d2137]">
                   {forms.slice(0, 4).map((f: any) => {
-                    const st = STATUS_UI[f.status] ?? STATUS_UI['pending'];
+                    const st = FORM_STATUS[(f.status as SubmissionStatus)] ?? FORM_STATUS.pending;
+                    const StatusIcon = st.Icon;
                     return (
                       <Link
                         key={f.$id}
@@ -274,7 +249,7 @@ const Home = () => {
                           <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">{formatTimeAgo(f.$createdAt)}</p>
                         </div>
                         <span className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold shrink-0 ${st.cls}`}>
-                          {st.icon} {st.label}
+                          <StatusIcon size={11} /> {st.label}
                         </span>
                       </Link>
                     );

@@ -11,16 +11,7 @@ import {
   useGetCoursesByLecturer,
   useGetCoursesByStudent,
 } from '@/lib/react-query/queriesAndMutations';
-import { COVER_GRADIENTS, CIRCUIT_BG_STYLE } from '@/constants/courses';
-
-const MOCK_COURSES_STUDENT: any[] = [
-  { $id: 'mc1', code: 'CS301', name: 'Mạng Máy Tính',         coverColor: '#179BD7', semester: 'HK2 2025-2026', isActive: true,  description: 'Giao thức mạng, mô hình OSI/TCP-IP, định tuyến.' },
-  { $id: 'mc2', code: 'SE302', name: 'Kiểm Thử Phần Mềm',     coverColor: '#27ae60', semester: 'HK2 2025-2026', isActive: true,  description: 'Unit test, integration test, automated testing.' },
-  { $id: 'mc3', code: 'IT310', name: 'Trí Tuệ Nhân Tạo',      coverColor: '#8e44ad', semester: 'HK2 2025-2026', isActive: true,  description: 'AI, machine learning, neural networks.' },
-  { $id: 'mc4', code: 'CS201', name: 'Cấu Trúc Dữ Liệu',      coverColor: '#e74c3c', semester: 'HK1 2025-2026', isActive: false, description: 'Array, LinkedList, Stack, Queue, Tree, Graph.' },
-  { $id: 'mc5', code: 'MT205', name: 'Xác Suất Thống Kê',      coverColor: '#f39c12', semester: 'HK1 2025-2026', isActive: false, description: 'Lý thuyết xác suất, phân phối, kiểm định giả thuyết.' },
-  { $id: 'mc6', code: 'IS401', name: 'An Toàn Thông Tin',      coverColor: '#16a085', semester: 'HK2 2025-2026', isActive: true,  description: 'Mã hóa, bảo mật mạng, ethical hacking cơ bản.' },
-];
+import { MOCK_COURSES_ALL } from '@/constants/mockData';
 
 // ── Course Card ───────────────────────────────────────────────────────────────
 const CourseCard = ({ course, role }: { course: any; role: 'lecturer' | 'student' }) => {
@@ -80,7 +71,7 @@ const CoursesPage = () => {
 
   const isLoading = tab === 'teaching' ? loadingTeaching : loadingLearning;
   const rawCourses = (tab === 'teaching' ? teachingCourses : learningCourses) as any[];
-  const courses = rawCourses.length > 0 ? rawCourses : (tab === 'learning' ? MOCK_COURSES_STUDENT : []);
+  const courses = rawCourses.length > 0 ? rawCourses : (tab === 'learning' ? MOCK_COURSES_ALL : []);
 
   const TAB_DEFS = [
     { id: 'teaching' as const, label: 'Giảng dạy', icon: Briefcase,     count: (teachingCourses as any[]).length, visible: isLecturer },

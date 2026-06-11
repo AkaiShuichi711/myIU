@@ -2,8 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import {
   Home, FileText, Download, Plus, Pencil, Trash2,
-  Loader2, X, Check, GraduationCap, Banknote, Building2, FolderOpen,
-  ExternalLink, Send, Clock, CheckCircle2, XCircle, Inbox, Search,
+  Loader2, X, Check, ExternalLink, Send, Inbox, Search, FolderOpen,
 } from 'lucide-react';
 import { useUserContext } from '@/context/AuthContext';
 import { isAdminRole } from '@/lib/utils';
@@ -15,18 +14,12 @@ import {
   useGetFormSubmissionsByUser,
   useGetFormSubmissionsForApprover,
 } from '@/lib/react-query/queriesAndMutations';
-import type { FormCategory, FormFileType, IFormTemplate, IFormSubmission, SubmissionStatus } from '@/types';
+import type { FormCategory, FormFileType, IFormTemplate, IFormSubmission } from '@/types';
 import FormSubmitModal from '@/components/shared/FormSubmitModal';
-
-// ── Submission status meta ────────────────────────────────────────────────────
-const SUB_STATUS: Record<SubmissionStatus, { label: string; color: string; bg: string; Icon: typeof Clock }> = {
-  pending:  { label: 'Chờ duyệt', color: 'text-[#f5832f]',  bg: 'bg-[#f5832f]/10',  Icon: Clock },
-  approved: { label: 'Đã duyệt',  color: 'text-[#00c578]',  bg: 'bg-[#00c578]/10',  Icon: CheckCircle2 },
-  rejected: { label: 'Từ chối',   color: 'text-[#ef4e49]',  bg: 'bg-[#ef4e49]/10',  Icon: XCircle },
-};
+import { FORM_STATUS, FILE_TYPE_META, FORM_CATEGORIES, INPUT_CLS } from '@/constants/ui';
 
 const SubmissionRow = ({ sub, mode = 'mine' }: { sub: IFormSubmission; mode?: 'mine' | 'review' }) => {
-  const meta = SUB_STATUS[sub.status];
+  const meta = FORM_STATUS[sub.status];
   const StatusIcon = meta.Icon;
   return (
     <Link
@@ -58,22 +51,6 @@ const SubmissionRow = ({ sub, mode = 'mine' }: { sub: IFormSubmission; mode?: 'm
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-const CATEGORIES: { id: FormCategory; label: string; icon: typeof GraduationCap }[] = [
-  { id: 'academic',       label: 'Học vụ',     icon: GraduationCap },
-  { id: 'finance',        label: 'Tài chính',  icon: Banknote },
-  { id: 'administrative', label: 'Hành chính', icon: Building2 },
-  { id: 'other',          label: 'Khác',       icon: FolderOpen },
-];
-
-const FILE_TYPES: { value: FormFileType; label: string; color: string; bg: string }[] = [
-  { value: 'pdf',   label: 'PDF',   color: 'text-[#ef4e49]', bg: 'bg-[#ef4e49]/10' },
-  { value: 'docx',  label: 'DOCX',  color: 'text-[#0068FF]', bg: 'bg-[#0068FF]/10' },
-  { value: 'doc',   label: 'DOC',   color: 'text-[#00adf4]', bg: 'bg-[#00adf4]/10' },
-  { value: 'xlsx',  label: 'XLSX',  color: 'text-[#00c578]', bg: 'bg-[#00c578]/10' },
-  { value: 'ppt',   label: 'PPT',   color: 'text-[#f5832f]', bg: 'bg-[#f5832f]/10' },
-  { value: 'other', label: 'FILE',  color: 'text-[#99a3ad]', bg: 'bg-[#33485c]/10' },
-];
-
 const BLANK_FORM = {
   title: '',
   description: '',
@@ -86,11 +63,9 @@ const BLANK_FORM = {
   createdBy: '',
 };
 
-const inputCls = 'w-full px-3 py-2 text-sm rounded-lg bg-slate-50 dark:bg-slate-700/60 border border-slate-200 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0068FF]/25 focus:border-[#0068FF] transition-all';
-
 // ── File type badge ────────────────────────────────────────────────────────────
 const FileTypeBadge = ({ type }: { type: FormFileType }) => {
-  const meta = FILE_TYPES.find((f) => f.value === type) ?? FILE_TYPES[FILE_TYPES.length - 1];
+  const meta = FILE_TYPE_META[type] ?? FILE_TYPE_META['other'];
   return (
     <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${meta.color} ${meta.bg}`}>
       {meta.label}
@@ -189,38 +164,38 @@ const EditPanel = ({
     <div className="grid grid-cols-2 gap-3">
       <div className="col-span-2">
         <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Tiêu đề *</label>
-        <input value={state.title} onChange={(e) => onChange('title', e.target.value)} placeholder="VD: Đơn xin nghỉ học" className={inputCls} />
+        <input value={state.title} onChange={(e) => onChange('title', e.target.value)} placeholder="VD: Đơn xin nghỉ học" className={INPUT_CLS} />
       </div>
       <div className="col-span-2">
         <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Mô tả (tùy chọn)</label>
-        <input value={state.description} onChange={(e) => onChange('description', e.target.value)} placeholder="Mô tả ngắn về biểu mẫu..." className={inputCls} />
+        <input value={state.description} onChange={(e) => onChange('description', e.target.value)} placeholder="Mô tả ngắn về biểu mẫu..." className={INPUT_CLS} />
       </div>
       <div>
         <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Danh mục</label>
-        <select value={state.category} onChange={(e) => onChange('category', e.target.value as FormCategory)} className={inputCls}>
-          {CATEGORIES.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
+        <select value={state.category} onChange={(e) => onChange('category', e.target.value as FormCategory)} className={INPUT_CLS}>
+          {FORM_CATEGORIES.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
         </select>
       </div>
       <div>
         <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Loại file</label>
-        <select value={state.fileType} onChange={(e) => onChange('fileType', e.target.value as FormFileType)} className={inputCls}>
-          {FILE_TYPES.map((f) => <option key={f.value} value={f.value}>{f.label}</option>)}
+        <select value={state.fileType} onChange={(e) => onChange('fileType', e.target.value as FormFileType)} className={INPUT_CLS}>
+          {Object.entries(FILE_TYPE_META).map(([value, { label }]) => <option key={value} value={value}>{label}</option>)}
         </select>
       </div>
       <div>
         <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Tên file hiển thị *</label>
-        <input value={state.fileName} onChange={(e) => onChange('fileName', e.target.value)} placeholder="VD: don_xin_nghi_hoc.pdf" className={inputCls + ' text-xs'} />
+        <input value={state.fileName} onChange={(e) => onChange('fileName', e.target.value)} placeholder="VD: don_xin_nghi_hoc.pdf" className={INPUT_CLS + ' text-xs'} />
       </div>
       <div>
         <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Thứ tự hiển thị</label>
-        <input type="number" value={state.sortOrder} onChange={(e) => onChange('sortOrder', parseInt(e.target.value) || 0)} className={inputCls} min={0} />
+        <input type="number" value={state.sortOrder} onChange={(e) => onChange('sortOrder', parseInt(e.target.value) || 0)} className={INPUT_CLS} min={0} />
       </div>
       <div className="col-span-2">
         <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
           Link tải file * <span className="text-slate-300 font-normal">(Google Drive, SharePoint, OneDrive...)</span>
         </label>
         <div className="flex gap-2">
-          <input value={state.fileUrl} onChange={(e) => onChange('fileUrl', e.target.value)} placeholder="https://drive.google.com/..." className={inputCls} />
+          <input value={state.fileUrl} onChange={(e) => onChange('fileUrl', e.target.value)} placeholder="https://drive.google.com/..." className={INPUT_CLS} />
           {state.fileUrl && (
             <a href={state.fileUrl} target="_blank" rel="noopener noreferrer" className="px-2.5 rounded-lg border border-slate-200 dark:border-slate-600 flex items-center text-slate-400 hover:text-[#0068FF] transition-colors shrink-0">
               <ExternalLink size={13} />
@@ -366,7 +341,7 @@ const FormsPage = () => {
 
   // ── Derived / filtered data ────────────────────────────────────────────────
   const q = formSearch.trim().toLowerCase();
-  const groupedForms = CATEGORIES.reduce<Record<string, IFormTemplate[]>>((acc, cat) => {
+  const groupedForms = FORM_CATEGORIES.reduce<Record<string, IFormTemplate[]>>((acc, cat) => {
     const items = allForms.filter((f) => {
       const matchCat  = filter === 'all' || filter === cat.id;
       const matchSearch = !q || f.title.toLowerCase().includes(q) || (f.description ?? '').toLowerCase().includes(q);
@@ -494,7 +469,7 @@ const FormsPage = () => {
               >
                 Tất cả
               </button>
-              {CATEGORIES.map(({ id, label, icon: Icon }) => (
+              {FORM_CATEGORIES.map(({ id, label, icon: Icon }) => (
                 <button
                   key={id}
                   onClick={() => setFilter(id)}
@@ -570,7 +545,7 @@ const FormsPage = () => {
               </div>
             ) : (
               <div className="flex flex-col gap-4">
-                {CATEGORIES.filter((c) => groupedForms[c.id]).map(({ id, label, icon: Icon }) => (
+                {FORM_CATEGORIES.filter((c) => groupedForms[c.id]).map(({ id, label, icon: Icon }) => (
                   <div key={id} className="bg-white dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700/60 overflow-hidden">
                     <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60">
                       <Icon size={13} className="text-slate-400 dark:text-slate-500" />

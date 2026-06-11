@@ -10,11 +10,19 @@ import { msalConfig } from "./lib/msal/config";
 // import "./i18n";
 
 const msalInstance = new PublicClientApplication(msalConfig);
-console.log("Booting myIU app — main.tsx");
 
 import "./i18n";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime:          1000 * 60 * 5,  // 5 min — don't refetch fresh data
+      gcTime:             1000 * 60 * 10, // 10 min — keep unused cache
+      retry:              1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <ThemeProvider>

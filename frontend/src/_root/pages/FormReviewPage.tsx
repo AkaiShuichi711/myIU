@@ -2,19 +2,14 @@ import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   ArrowLeft, FileText, Download, CheckCircle2, XCircle,
-  Loader2, Clock, User, AlertTriangle,
+  Loader2, User, AlertTriangle,
 } from 'lucide-react';
 import { useUserContext } from '@/context/AuthContext';
 import { useGetFormSubmissionById, useUpdateFormSubmission } from '@/lib/react-query/queriesAndMutations';
-import type { IFormSubmission, SubmissionStatus } from '@/types';
+import { FORM_STATUS } from '@/constants/ui';
+import type { IFormSubmission } from '@/types';
 
 const BACKEND = (import.meta.env.VITE_OAUTH_BACKEND_URL || window.location.origin).replace(/\/+$/, '');
-
-const STATUS_META: Record<SubmissionStatus, { label: string; color: string; bg: string; icon: typeof Clock }> = {
-  pending:  { label: 'Chờ duyệt', color: 'text-[#f5832f]', bg: 'bg-[#f5832f]/10',  icon: Clock },
-  approved: { label: 'Đã duyệt',  color: 'text-[#00c578]', bg: 'bg-[#00c578]/10',  icon: CheckCircle2 },
-  rejected: { label: 'Từ chối',   color: 'text-[#ef4e49]', bg: 'bg-[#ef4e49]/10',  icon: XCircle },
-};
 
 const buildResultEmail = (submitterName: string, formTitle: string, status: 'approved' | 'rejected', approverName: string, rejectionReason?: string) => `
   <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f8fafc;padding:20px">
@@ -125,10 +120,10 @@ const FormReviewPage = () => {
     );
   }
 
-  const statusMeta = STATUS_META[submission.status];
-  const StatusIcon = statusMeta.icon;
+  const statusMeta = FORM_STATUS[submission.status];
+  const StatusIcon = statusMeta.Icon;
   const isApprover = user.email === submission.approverEmail;
-  const isPending2 = submission.status === 'pending';
+  const isStatusPending = submission.status === 'pending';
   const isSubmitter = user.id === submission.submitterId;
 
   return (
@@ -205,7 +200,7 @@ const FormReviewPage = () => {
         </div>
 
         {/* Approver actions */}
-        {isApprover && isPending2 && !actionDone && (
+        {isApprover && isStatusPending && !actionDone && (
           <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-5">
             <div className="flex items-center gap-2 mb-3">
               <User size={14} className="text-[#0068FF]" />
@@ -260,7 +255,7 @@ const FormReviewPage = () => {
         )}
 
         {/* Non-approver notice */}
-        {!isApprover && !isSubmitter && isPending2 && (
+        {!isApprover && !isSubmitter && isStatusPending && (
           <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-[#f5832f]/10 border border-[#f5832f]/20 text-[#f5832f] text-sm">
             <AlertTriangle size={14} />
             Chỉ <strong className="mx-1">{submission.approverEmail}</strong> mới có thể duyệt yêu cầu này.
