@@ -18,6 +18,7 @@ export type Passer = {
   email: string;
   imageUrl: string;
   bio: string;
+  roles: string[];
 };
 
 export type IUser = {
@@ -131,3 +132,166 @@ export type IBlock = {
 };
 
 export type INewNotification = Omit<INotification, '$id' | '$createdAt' | 'read'>;
+
+// ─── Phase 4 – Forms ──────────────────────────────────────────────────────────
+
+export type FormCategory = 'academic' | 'finance' | 'administrative' | 'other';
+export type FormFileType = 'pdf' | 'docx' | 'xlsx' | 'doc' | 'ppt' | 'other';
+
+export type IFormTemplate = {
+  $id: string;
+  title: string;
+  description?: string;
+  fileUrl: string;
+  fileName: string;
+  fileType: FormFileType;
+  category: FormCategory;
+  sortOrder: number;
+  isActive: boolean;
+  createdBy: string;
+  $createdAt: string;
+  $updatedAt: string;
+};
+
+export type INewFormTemplate = Omit<IFormTemplate, '$id' | '$createdAt' | '$updatedAt'>;
+export type IUpdateFormTemplate = Partial<Omit<IFormTemplate, '$id' | '$createdAt' | '$updatedAt'>> & { id: string };
+
+export type SubmissionStatus = 'pending' | 'approved' | 'rejected';
+
+export type IFormSubmission = {
+  $id: string;
+  submitterId: string;
+  submitterName: string;
+  submitterEmail: string;
+  formTemplateId: string;
+  formTitle: string;
+  uploadedFileId: string;
+  uploadedFileUrl: string;
+  approverEmail: string;
+  approverName: string;
+  status: SubmissionStatus;
+  rejectionReason?: string;
+  $createdAt: string;
+  $updatedAt: string;
+};
+
+export type INewFormSubmission = Omit<IFormSubmission, '$id' | '$createdAt' | '$updatedAt' | 'status' | 'rejectionReason'>;
+export type IUpdateFormSubmission = { id: string; status: SubmissionStatus; rejectionReason?: string };
+
+// ─── Phase 4 – Grades ─────────────────────────────────────────────────────────
+
+export type ICourseGrade = {
+  $id: string;
+  courseId: string;
+  studentId: string;
+  studentName: string;
+  quiz?: number;
+  exercise?: number;
+  lab?: number;
+  midterm?: number;
+  project?: number;
+  final?: number;
+  gradedBy: string;
+  $createdAt: string;
+  $updatedAt: string;
+};
+
+export type IUpsertCourseGrade = {
+  courseId: string;
+  studentId: string;
+  studentName: string;
+  quiz?: number;
+  exercise?: number;
+  lab?: number;
+  midterm?: number;
+  project?: number;
+  final?: number;
+  gradedBy: string;
+};
+
+// ─── Phase 3 – Courses ─────────────────────────────────────────────────────────
+
+export type ICourse = {
+  $id: string;
+  name: string;
+  code: string;
+  semester: string;
+  description?: string;
+  coverColor: string;
+  isActive: boolean;
+  creatorId: string;
+  $createdAt: string;
+};
+
+export type ICourseGroup = {
+  $id: string;
+  courseId: string;
+  lecturerId: string;
+  lecturerName: string;
+  name: string;
+  description?: string;
+  $createdAt: string;
+};
+
+export type IGroupMember = {
+  $id: string;
+  groupId: string;
+  courseId: string;
+  studentId: string;
+  studentName: string;
+  $createdAt: string;
+};
+
+export type ICoursePost = {
+  $id: string;
+  courseId: string;
+  groupId: string;
+  authorId: string;
+  authorName: string;
+  title: string;
+  body?: string;
+  type: 'announcement' | 'material' | 'assignment';
+  attachmentUrls: string[];
+  attachmentNames: string[];
+  isPublished: boolean;
+  dueDate?: string;
+  $createdAt: string;
+  $updatedAt: string;
+};
+
+export type INewCourse = {
+  name: string;
+  code: string;
+  semester: string;
+  description?: string;
+  coverColor: string;
+  creatorId: string;
+};
+
+export type INewCourseGroup = {
+  courseId: string;
+  lecturerId: string;
+  lecturerName: string;
+  name: string;
+  description?: string;
+};
+
+export type INewGroupMember = {
+  groupId: string;
+  courseId: string;
+  studentId: string;
+  studentName: string;
+};
+
+export type INewCoursePost = {
+  courseId: string;
+  groupId: string;
+  authorId: string;
+  authorName: string;
+  title: string;
+  body?: string;
+  type: 'announcement' | 'material' | 'assignment';
+  attachmentUrls?: string[];
+  attachmentNames?: string[];
+  dueDate?: string;
+};

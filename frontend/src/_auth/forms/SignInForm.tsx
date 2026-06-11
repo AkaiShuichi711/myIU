@@ -149,20 +149,20 @@ const SignInForm = () => {
               <div className="min-h-[0.25rem]" />
             )}
 
-            <div className="flex items-center justify-between gap-3 text-sm text-[#475569]">
+            <div className="flex items-center justify-between gap-3 text-sm text-[#0F172A]">
               <label className="inline-flex items-center gap-2">
                 <input
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(event) => setRememberMe(event.target.checked)}
-                  className="h-4 w-4 rounded border-gray-300 text-[#009cd1] focus:ring-[#009cd1]"
+                  className="h-4 w-4 rounded border-gray-300 text-[#0068FF] focus:ring-[#0068FF]"
                 />
                 <span>{t("auth.rememberMe")}</span>
               </label>
 
               <Link
                 to="/forgot-password"
-                className="text-[#009cd1] hover:text-[#0077b6]"
+                className="text-[#0068FF] hover:text-[#0077b6]"
               >
                 {t("auth.forgetPassword")}
               </Link>
@@ -218,7 +218,7 @@ const SignInForm = () => {
 
             <p className="text-center text-sm text-gray-500 mt-4">
               {t("auth.forgetPassword")}
-              <Link to="/forgot-password" className="text-[#009CD1] ml-1">
+              <Link to="/forgot-password" className="text-[#0068FF] ml-1">
                 {t("auth.clickHere")}
               </Link>
             </p>
@@ -227,7 +227,7 @@ const SignInForm = () => {
             <p>{t("auth.loginIssues")}</p>
             <a
               href="mailto:support@pas.vn"
-              className="text-[#009cd1] hover:underline"
+              className="text-[#0068FF] hover:underline"
             >
               {t("auth.contactEmail")}
             </a>

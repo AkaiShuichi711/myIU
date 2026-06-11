@@ -10,6 +10,7 @@ export const INITIAL_USER = {
   email: "",
   imageUrl: "",
   bio: "",
+  roles: [] as string[],
 };
 
 const INITIAL_STATE = {
@@ -99,6 +100,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           email: backendUser.email || '',
           imageUrl: backendUser.imageUrl || '',
           bio: backendUser.bio || '',
+          roles: Array.isArray(backendUser.roles) ? backendUser.roles : [],
         });
         setIsAuthenticated(true);
         return true;
@@ -115,6 +117,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           email: currentAccount.email,
           imageUrl: currentAccount.imageUrl,
           bio: currentAccount.bio,
+          roles: (currentAccount.roles as string[] | undefined) ?? [],
         });
         setIsAuthenticated(true);
         return true;

@@ -10,3 +10,8 @@ export { default as Saved } from "./Saved";
 export { default as UpdateProfile } from "./UpdateProfile";
 export { default as Settings } from "./Settings";
 export { default as Notifications } from "./Notifications";
+export { default as CoursesPage } from "./CoursesPage";
+export { default as CourseDetail } from "./CourseDetail";
+export { default as CreateCoursePage } from "./CreateCoursePage";
+export { default as FormsPage } from "./FormsPage";
+export { default as FormReviewPage } from "./FormReviewPage";

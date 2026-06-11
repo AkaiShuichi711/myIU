@@ -12,6 +12,16 @@ export const appwriteConfig = {
     notificationsCollectionId: import.meta.env.VITE_APPWRITE_NOTIFICATIONS_COLLECTION_ID ?? '',
     commentsCollectionId: import.meta.env.VITE_APPWRITE_COMMENTS_COLLECTION_ID ?? '',
     blocksCollectionId: import.meta.env.VITE_APPWRITE_BLOCKS_COLLECTION_ID ?? '',
+    // Phase 3 – Courses
+    coursesCollectionId:       import.meta.env.VITE_APPWRITE_COURSES_COLLECTION_ID ?? '',
+    courseGroupsCollectionId:  import.meta.env.VITE_APPWRITE_COURSE_GROUPS_COLLECTION_ID ?? '',
+    groupMembersCollectionId:  import.meta.env.VITE_APPWRITE_GROUP_MEMBERS_COLLECTION_ID ?? '',
+    coursePostsCollectionId:   import.meta.env.VITE_APPWRITE_COURSE_POSTS_COLLECTION_ID ?? '',
+    // Phase 4 – Forms
+    formTemplatesCollectionId:   import.meta.env.VITE_APPWRITE_FORM_TEMPLATES_COLLECTION_ID ?? '',
+    formSubmissionsCollectionId: import.meta.env.VITE_APPWRITE_FORM_SUBMISSIONS_COLLECTION_ID ?? '',
+    // Phase 4 – Grades
+    courseGradesCollectionId:    import.meta.env.VITE_APPWRITE_COURSE_GRADES_COLLECTION_ID ?? '',
 }
 
 export const client = new Client();

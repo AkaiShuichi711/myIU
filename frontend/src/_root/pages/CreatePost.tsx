@@ -20,7 +20,7 @@ const postSchema = z.object({
 
 type PostFormValues = z.infer<typeof postSchema>;
 
-const inputCls = "w-full pl-8 pr-3 py-2.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#009cd1]/20 focus:border-[#009cd1] transition-all";
+const inputCls = "w-full pl-8 pr-3 py-2.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#0068FF]/20 focus:border-[#0068FF] transition-all";
 
 const CreatePost = () => {
   const navigate = useNavigate();
@@ -75,8 +75,8 @@ const CreatePost = () => {
     <div className="min-h-full bg-[#F8FAFC] dark:bg-[#0F172A]">
       <div className="bg-white dark:bg-[#0F172A] border-b border-slate-100 dark:border-slate-700 px-6 py-5">
         <div className="max-w-2xl mx-auto flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-[#009cd1]/10 flex items-center justify-center">
-            <PenSquare size={18} className="text-[#009cd1]" />
+          <div className="w-9 h-9 rounded-xl bg-[#0068FF]/10 flex items-center justify-center">
+            <PenSquare size={18} className="text-[#0068FF]" />
           </div>
           <div>
             <h1 className="text-lg font-bold text-slate-900 dark:text-slate-50">{t('createPost.title')}</h1>

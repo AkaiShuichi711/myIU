@@ -19,7 +19,7 @@ interface CommentSectionProps {
 const renderWithMentions = (text: string) =>
   text.split(/(@\w+)/g).map((part, i) =>
     part.startsWith('@') ? (
-      <span key={i} className="text-[#009cd1] font-medium">
+      <span key={i} className="text-[#0068FF] font-medium">
         {part}
       </span>
     ) : (
@@ -108,7 +108,7 @@ const CommentSection = ({ postId, postOwnerId, postOwnerName }: CommentSectionPr
       <div className="px-5 flex flex-col gap-3 max-h-72 overflow-y-auto pb-2">
         {isLoading ? (
           <div className="flex justify-center py-4">
-            <Loader2 size={18} className="animate-spin text-[#009cd1]" />
+            <Loader2 size={18} className="animate-spin text-[#0068FF]" />
           </div>
         ) : comments.length === 0 ? (
           <p className="text-xs text-slate-400 text-center py-4">
@@ -128,7 +128,7 @@ const CommentSection = ({ postId, postOwnerId, postOwnerName }: CommentSectionPr
               <div key={c.$id} className="flex items-start gap-2.5 group">
                 <div
                   className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0 mt-0.5"
-                  style={{ background: 'linear-gradient(135deg, #009cd1, #2F398E)' }}
+                  style={{ background: '#0068FF' }}
                 >
                   {initials}
                 </div>
@@ -159,7 +159,7 @@ const CommentSection = ({ postId, postOwnerId, postOwnerName }: CommentSectionPr
       <form onSubmit={handleSubmit} className="px-5 py-3 border-t border-slate-50 flex items-end gap-2">
         <div
           className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
-          style={{ background: 'linear-gradient(135deg, #009cd1, #2F398E)' }}
+          style={{ background: '#0068FF' }}
         >
           {(user.name || '?').split(' ').map((w) => w[0]).slice(0, 2).join('').toUpperCase()}
         </div>
@@ -170,7 +170,7 @@ const CommentSection = ({ postId, postOwnerId, postOwnerName }: CommentSectionPr
             onMentionedUsers={setMentionedUsers}
             placeholder="Thêm bình luận... dùng @ để tag người"
             rows={1}
-            className="w-full px-3 py-2 text-sm rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#009cd1]/20 focus:border-[#009cd1] transition-all resize-none placeholder:text-slate-400"
+            className="w-full px-3 py-2 text-sm rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#0068FF]/20 focus:border-[#0068FF] transition-all resize-none placeholder:text-slate-400"
           />
         </div>
         <button

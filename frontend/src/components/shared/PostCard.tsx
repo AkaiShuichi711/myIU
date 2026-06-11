@@ -4,6 +4,7 @@ import { Heart, Bookmark, MapPin, MoreHorizontal, Trash2, Edit3, Video, FileText
 import { useUserContext } from '@/context/AuthContext';
 import { useLikePost, useSavePost, useDeleteSavedPost, useDeletePost } from '@/lib/react-query/queriesAndMutations';
 import { formatTimeAgo } from '@/lib/utils';
+import UserAvatar from './UserAvatar';
 
 type PostCardProps = {
   post: any;
@@ -85,7 +86,6 @@ const PostCard = ({ post, savedRecords = [] }: PostCardProps) => {
   const creator = typeof post.creator === 'object' ? post.creator : null;
   const creatorName = creator?.name || 'Unknown';
   const creatorUsername = creator?.username || '';
-  const creatorInitials = creatorName.split(' ').map((w: string) => w[0]).slice(0, 2).join('').toUpperCase();
 
   const likes: string[] = Array.isArray(post.likes) ? post.likes : [];
   const isLiked = likes.includes(user.id);
@@ -129,9 +129,7 @@ const PostCard = ({ post, savedRecords = [] }: PostCardProps) => {
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-4">
         <Link to={creator?.$id ? `/profile/${creator.$id}` : '#'} className="flex items-center gap-3 min-w-0" onClick={(e) => e.stopPropagation()}>
-          <div className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0" style={{ background: 'linear-gradient(135deg, #009cd1, #2F398E)' }}>
-            {creatorInitials || '?'}
-          </div>
+          <UserAvatar name={creatorName} className="w-10 h-10 text-sm" />
           <div className="min-w-0">
             <p className="text-sm font-semibold text-slate-900 dark:text-slate-50 truncate">{creatorName}</p>
             <div className="flex items-center gap-2 text-xs text-slate-400 dark:text-slate-500">
@@ -189,7 +187,7 @@ const PostCard = ({ post, savedRecords = [] }: PostCardProps) => {
           {mediaUrls.length > 1 && (
             <div className="px-5 pt-2 flex items-center gap-1.5">
               {Array.from({ length: Math.min(mediaUrls.length, 5) }).map((_, i) => (
-                <div key={i} className={`h-1 rounded-full transition-all ${i === 0 ? 'w-4 bg-[#009cd1]' : 'w-1.5 bg-slate-200 dark:bg-slate-600'}`} />
+                <div key={i} className={`h-1 rounded-full transition-all ${i === 0 ? 'w-4 bg-[#0068FF]' : 'w-1.5 bg-slate-200 dark:bg-slate-600'}`} />
               ))}
               {mediaUrls.length > 5 && <span className="text-[10px] text-slate-400 dark:text-slate-500 ml-1">+{mediaUrls.length - 5}</span>}
             </div>
@@ -209,7 +207,7 @@ const PostCard = ({ post, savedRecords = [] }: PostCardProps) => {
           {Array.isArray(post.tags) && post.tags.filter(Boolean).length > 0 && (
             <div className="flex flex-wrap gap-1">
               {post.tags.filter(Boolean).map((tag: string) => (
-                <span key={tag} className="text-[#009cd1] font-medium">#{tag}</span>
+                <span key={tag} className="text-[#0068FF] font-medium">#{tag}</span>
               ))}
             </div>
           )}

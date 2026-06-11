@@ -9,6 +9,24 @@ import {
   createUserAccount,
   signInAccount,
   getAllUsers,
+  // Phase 3 – Courses
+  createCourse,
+  getCourseById,
+  getAllCourses,
+  getCoursesByLecturer,
+  getCoursesByStudent,
+  updateCourse,
+  createCourseGroup,
+  getCourseGroups,
+  getLecturerGroupsInCourse,
+  deleteCourseGroup,
+  addGroupMember,
+  getGroupMembers,
+  getStudentGroupsInCourse,
+  removeGroupMember,
+  createCoursePost,
+  getCoursePosts,
+  deleteCoursePost,
   getUsersPaginated,
   getUserById,
   getUserPosts,
@@ -41,10 +59,42 @@ import {
   updateUserPrivacy,
   getUserLikedPosts,
   getAccountSessions,
+  // Phase 4 – Forms
+  getFormTemplates,
+  createFormTemplate,
+  updateFormTemplate,
+  deleteFormTemplate,
+  createFormSubmission,
+  getFormSubmissionsByUser,
+  getFormSubmissionsForApprover,
+  getFormSubmissionById,
+  updateFormSubmission,
+  // Phase 4 – Grades
+  getCourseGrades,
+  getStudentGrade,
+  upsertCourseGrades,
 } from '../appwrite/api';
-import { INewNotification, INewPost, INewUser, IUpdatePost, IUpdateUser } from '@/types';
+import { INewNotification, INewPost, INewUser, IUpdatePost, IUpdateUser, INewCourse, INewCourseGroup, INewGroupMember, INewCoursePost, INewFormTemplate, IUpdateFormTemplate, INewFormSubmission, IUpdateFormSubmission, IUpsertCourseGrade } from '@/types';
 
 export const QUERY_KEYS = {
+  // Phase 4 – Forms
+  GET_FORM_TEMPLATES:             'getFormTemplates',
+  GET_FORM_SUBMISSIONS_BY_USER:   'getFormSubmissionsByUser',
+  GET_FORM_SUBMISSIONS_APPROVER:  'getFormSubmissionsForApprover',
+  GET_FORM_SUBMISSION_BY_ID:      'getFormSubmissionById',
+  // Phase 4 – Grades
+  GET_COURSE_GRADES:              'getCourseGrades',
+  GET_STUDENT_GRADE:              'getStudentGrade',
+  // Phase 3 – Courses
+  GET_COURSES_BY_LECTURER: 'getCoursesByLecturer',
+  GET_COURSES_BY_STUDENT:  'getCoursesByStudent',
+  GET_ALL_COURSES:         'getAllCourses',
+  GET_COURSE_BY_ID:        'getCourseById',
+  GET_COURSE_GROUPS:       'getCourseGroups',
+  GET_LECTURER_GROUPS:     'getLecturerGroupsInCourse',
+  GET_GROUP_MEMBERS:       'getGroupMembers',
+  GET_STUDENT_GROUPS:      'getStudentGroupsInCourse',
+  GET_COURSE_POSTS:        'getCoursePosts',
   GET_CURRENT_USER: 'getCurrentUser',
   GET_USERS: 'getUsers',
   GET_USER_BY_ID: 'getUserById',
@@ -371,3 +421,258 @@ export const useGetAccountSessions = () =>
     queryKey: [QUERY_KEYS.GET_ACCOUNT_SESSIONS],
     queryFn: getAccountSessions,
   });
+
+// ─── COURSES ──────────────────────────────────────────────────────────────────
+
+export const useGetCoursesByLecturer = (userId: string) =>
+  useQuery({
+    queryKey: [QUERY_KEYS.GET_COURSES_BY_LECTURER, userId],
+    queryFn: () => getCoursesByLecturer(userId),
+    enabled: !!userId,
+  });
+
+export const useGetCoursesByStudent = (userId: string) =>
+  useQuery({
+    queryKey: [QUERY_KEYS.GET_COURSES_BY_STUDENT, userId],
+    queryFn: () => getCoursesByStudent(userId),
+    enabled: !!userId,
+  });
+
+export const useGetAllCourses = () =>
+  useQuery({
+    queryKey: [QUERY_KEYS.GET_ALL_COURSES],
+    queryFn: getAllCourses,
+  });
+
+export const useGetCourseById = (courseId: string) =>
+  useQuery({
+    queryKey: [QUERY_KEYS.GET_COURSE_BY_ID, courseId],
+    queryFn: () => getCourseById(courseId),
+    enabled: !!courseId,
+  });
+
+export const useCreateCourse = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: INewCourse) => createCourse(data),
+    onSuccess: (_d, vars) => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_COURSES_BY_LECTURER, vars.creatorId] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_ALL_COURSES] });
+    },
+  });
+};
+
+export const useUpdateCourse = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ courseId, data }: { courseId: string; data: any }) => updateCourse(courseId, data),
+    onSuccess: (_d, vars) => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_COURSE_BY_ID, vars.courseId] });
+    },
+  });
+};
+
+// ─── COURSE GROUPS ────────────────────────────────────────────────────────────
+
+export const useGetCourseGroups = (courseId: string) =>
+  useQuery({
+    queryKey: [QUERY_KEYS.GET_COURSE_GROUPS, courseId],
+    queryFn: () => getCourseGroups(courseId),
+    enabled: !!courseId,
+  });
+
+export const useGetLecturerGroupsInCourse = (courseId: string, lecturerId: string) =>
+  useQuery({
+    queryKey: [QUERY_KEYS.GET_LECTURER_GROUPS, courseId, lecturerId],
+    queryFn: () => getLecturerGroupsInCourse(courseId, lecturerId),
+    enabled: !!courseId && !!lecturerId,
+  });
+
+export const useCreateCourseGroup = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: INewCourseGroup) => createCourseGroup(data),
+    onSuccess: (_d, vars) => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_COURSE_GROUPS, vars.courseId] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_LECTURER_GROUPS, vars.courseId, vars.lecturerId] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_COURSES_BY_LECTURER, vars.lecturerId] });
+    },
+  });
+};
+
+export const useDeleteCourseGroup = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ groupId, courseId }: { groupId: string; courseId: string }) => deleteCourseGroup(groupId),
+    onSuccess: (_d, vars) => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_COURSE_GROUPS, vars.courseId] });
+    },
+  });
+};
+
+// ─── GROUP MEMBERS ────────────────────────────────────────────────────────────
+
+export const useGetGroupMembers = (groupId: string) =>
+  useQuery({
+    queryKey: [QUERY_KEYS.GET_GROUP_MEMBERS, groupId],
+    queryFn: () => getGroupMembers(groupId),
+    enabled: !!groupId,
+  });
+
+export const useGetStudentGroupsInCourse = (courseId: string, studentId: string) =>
+  useQuery({
+    queryKey: [QUERY_KEYS.GET_STUDENT_GROUPS, courseId, studentId],
+    queryFn: () => getStudentGroupsInCourse(courseId, studentId),
+    enabled: !!courseId && !!studentId,
+  });
+
+export const useAddGroupMember = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: INewGroupMember) => addGroupMember(data),
+    onSuccess: (_d, vars) => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_GROUP_MEMBERS, vars.groupId] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_COURSES_BY_STUDENT, vars.studentId] });
+    },
+  });
+};
+
+export const useRemoveGroupMember = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ memberId, groupId }: { memberId: string; groupId: string }) => removeGroupMember(memberId),
+    onSuccess: (_d, vars) => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_GROUP_MEMBERS, vars.groupId] });
+    },
+  });
+};
+
+// ─── COURSE POSTS ─────────────────────────────────────────────────────────────
+
+export const useGetCoursePosts = (courseId: string) =>
+  useQuery({
+    queryKey: [QUERY_KEYS.GET_COURSE_POSTS, courseId],
+    queryFn: () => getCoursePosts(courseId),
+    enabled: !!courseId,
+  });
+
+export const useCreateCoursePost = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: INewCoursePost) => createCoursePost(data),
+    onSuccess: (_d, vars) => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_COURSE_POSTS, vars.courseId] });
+    },
+  });
+};
+
+export const useDeleteCoursePost = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ postId, courseId }: { postId: string; courseId: string }) => deleteCoursePost(postId),
+    onSuccess: (_d, vars) => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_COURSE_POSTS, vars.courseId] });
+    },
+  });
+};
+
+// ─── FORM TEMPLATES ───────────────────────────────────────────────────────────
+
+export const useGetFormTemplates = () =>
+  useQuery({ queryKey: [QUERY_KEYS.GET_FORM_TEMPLATES], queryFn: getFormTemplates });
+
+export const useCreateFormTemplate = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: INewFormTemplate) => createFormTemplate(data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_FORM_TEMPLATES] }),
+  });
+};
+
+export const useUpdateFormTemplate = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: IUpdateFormTemplate) => updateFormTemplate(data),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_FORM_TEMPLATES] }),
+  });
+};
+
+export const useDeleteFormTemplate = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => deleteFormTemplate(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_FORM_TEMPLATES] }),
+  });
+};
+
+// ─── FORM SUBMISSIONS ─────────────────────────────────────────────────────────
+
+export const useCreateFormSubmission = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: INewFormSubmission) => createFormSubmission(data),
+    onSuccess: (_d, vars) => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_FORM_SUBMISSIONS_BY_USER, vars.submitterId] });
+    },
+  });
+};
+
+export const useGetFormSubmissionsByUser = (userId: string) =>
+  useQuery({
+    queryKey: [QUERY_KEYS.GET_FORM_SUBMISSIONS_BY_USER, userId],
+    queryFn: () => getFormSubmissionsByUser(userId),
+    enabled: !!userId,
+  });
+
+export const useGetFormSubmissionsForApprover = (email: string) =>
+  useQuery({
+    queryKey: [QUERY_KEYS.GET_FORM_SUBMISSIONS_APPROVER, email],
+    queryFn: () => getFormSubmissionsForApprover(email),
+    enabled: !!email,
+  });
+
+export const useGetFormSubmissionById = (id: string) =>
+  useQuery({
+    queryKey: [QUERY_KEYS.GET_FORM_SUBMISSION_BY_ID, id],
+    queryFn: () => getFormSubmissionById(id),
+    enabled: !!id,
+  });
+
+export const useUpdateFormSubmission = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: IUpdateFormSubmission) => updateFormSubmission(data),
+    onSuccess: (_d, vars) => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_FORM_SUBMISSION_BY_ID, vars.id] });
+    },
+  });
+};
+
+// ─── Grades ───────────────────────────────────────────────────────────────────
+
+export const useGetCourseGrades = (courseId: string) =>
+  useQuery({
+    queryKey: [QUERY_KEYS.GET_COURSE_GRADES, courseId],
+    queryFn: () => getCourseGrades(courseId),
+    enabled: !!courseId,
+  });
+
+export const useGetStudentGrade = (courseId: string, studentId: string) =>
+  useQuery({
+    queryKey: [QUERY_KEYS.GET_STUDENT_GRADE, courseId, studentId],
+    queryFn: () => getStudentGrade(courseId, studentId),
+    enabled: !!courseId && !!studentId,
+  });
+
+export const useUpsertCourseGrades = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (grades: IUpsertCourseGrade[]) => upsertCourseGrades(grades),
+    onSuccess: (_d, vars) => {
+      if (vars.length > 0) {
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_COURSE_GRADES, vars[0].courseId] });
+        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_STUDENT_GRADE, vars[0].courseId] });
+      }
+    },
+  });
+};

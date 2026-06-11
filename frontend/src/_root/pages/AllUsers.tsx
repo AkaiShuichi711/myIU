@@ -9,7 +9,7 @@ import { Paginator } from '@/components/shared';
 
 const PAGE_SIZE = 12;
 
-const PALETTE = ['#1D4ED8', '#7C3AED', '#0891B2', '#059669', '#B45309', '#DC2626', '#475569', '#2F398E'];
+const PALETTE = ['#1D4ED8', '#7C3AED', '#0891B2', '#059669', '#B45309', '#DC2626', '#0F172A', '#2F398E'];
 const avatarBg = (n: string) => PALETTE[(n?.charCodeAt(0) ?? 65) % PALETTE.length];
 
 const UserCard = ({ user }: { user: any }) => {
@@ -60,11 +60,23 @@ const AllUsers = () => {
   const { data: pagedData, isPending: isLoadingAll } = useGetUsersPaginated(page, PAGE_SIZE);
   const { data: searchData, isFetching: isSearching } = useSearchUsers(debouncedSearch);
 
-  const users = isSearchMode
-    ? (searchData?.documents ?? [])
-    : (pagedData?.documents ?? []);
-  const total = isSearchMode ? users.length : (pagedData?.total ?? 0);
-  const isLoading = isSearchMode ? isSearching : isLoadingAll;
+  // ── MOCK DATA — xóa/comment block này khi Appwrite users collection đã có data ──
+  const MOCK_USERS = [
+    { $id: 'mu1', name: 'Nguyễn Văn An',   username: 'nvan.an',    email: 'ITITIU21001@hcmiu.edu.vn', imageUrl: '', bio: 'IT student @ IU. Love coding & coffee ☕',            roles: ['student'] },
+    { $id: 'mu2', name: 'Trần Thị Bảo',    username: 'tthi.bao',   email: 'ITITIU21002@hcmiu.edu.vn', imageUrl: '', bio: 'Frontend dev in training. React & Tailwind fanboy 💻', roles: ['student'] },
+    { $id: 'mu3', name: 'Lê Văn Cường',    username: 'lvan.cuong', email: 'ITITIU21003@hcmiu.edu.vn', imageUrl: '', bio: 'AI/ML track. Research assistant @ ICT Lab.',            roles: ['student'] },
+    { $id: 'mu4', name: 'Phạm Thị Duyên',  username: 'pthi.duyen', email: 'ITITIU21004@hcmiu.edu.vn', imageUrl: '', bio: 'Embedded Systems & IoT. Building smart things 🔧',     roles: ['student'] },
+    { $id: 'mu5', name: 'Hoàng Minh Đức',  username: 'hminh.duc',  email: 'ITITIU21005@hcmiu.edu.vn', imageUrl: '', bio: 'Cybersecurity major. CTF player. Coffee > sleep.',      roles: ['student'] },
+    { $id: 'mu6', name: 'Vũ Thị Hoa',      username: 'vthi.hoa',   email: 'IBIIU22001@hcmiu.edu.vn',  imageUrl: '', bio: 'Business IT. Love data analytics & Excel wizardry 📊',  roles: ['student'] },
+    { $id: 'mu7', name: 'Ngô Quang Hùng',  username: 'nq.hung',    email: 'faculty.hung@hcmiu.edu.vn', imageUrl: '', bio: 'Lecturer — Networks & Distributed Systems.',           roles: ['faculty'] },
+    { $id: 'mu8', name: 'Lý Thị Kim Lan',  username: 'ltk.lan',    email: 'faculty.lan@hcmiu.edu.vn',  imageUrl: '', bio: 'Lecturer — Software Engineering & Agile.',            roles: ['faculty'] },
+  ];
+  // ── END MOCK ──
+
+  const rawUsers = isSearchMode ? (searchData?.documents ?? []) : (pagedData?.documents ?? []);
+  const users = rawUsers.length > 0 ? rawUsers : MOCK_USERS;
+  const total = isSearchMode ? users.length : (pagedData?.total ?? users.length);
+  const isLoading = isSearchMode ? isSearching : (isLoadingAll && rawUsers.length === 0);
 
   const handleSearch = (value: string) => {
     setSearchTerm(value);
@@ -92,7 +104,7 @@ const AllUsers = () => {
               value={searchTerm}
               onChange={(e) => handleSearch(e.target.value)}
               placeholder={t('people.searchPlaceholder')}
-              className="w-full pl-9 pr-8 py-2.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#009cd1]/20 focus:border-[#009cd1] dark:focus:border-[#009cd1] transition-all"
+              className="w-full pl-9 pr-8 py-2.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#0068FF]/20 focus:border-[#0068FF] dark:focus:border-[#0068FF] transition-all"
             />
             {searchTerm && (
               <button

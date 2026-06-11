@@ -255,72 +255,153 @@
   }
 }
 
-/* ─── DARK MODE — outside @layer so it overrides all Tailwind utilities ─────── */
+/* ─── CSS Design Tokens ────────────────────────────────────────────────────── */
+:root {
+  /* IU Brand */
+  --iu-primary:       #0068FF;
+  --iu-primary-dk:    #0e80b8;
+  --iu-navy:          #2F398E;
+
+  /* Light surfaces */
+  --bg-page:          #F8FAFC;
+  --bg-surface:       #ffffff;
+  --bg-surface-2:     #f1f5f9;
+  --bg-elevated:      #e4e8ec;
+
+  /* Light borders */
+  --border:           #e2e8f0;
+  --border-subtle:    #f1f5f9;
+
+  /* Light text */
+  --text-primary:     #090909;
+  --text-secondary:   #4a4b4d;
+  --text-muted:       #8b8f92;
+  --text-faint:       #ccd1d6;
+
+  /* Semantic */
+  --color-success:    #00c578;
+  --color-error:      #ef4e49;
+  --color-warning:    #f5832f;
+  --color-info:       #00adf4;
+}
+
+/* ─── DARK MODE — Zalo nl (navy) series for premium deep-navy aesthetic ─────── */
 html.dark {
   color-scheme: dark;
+
+  /* Dark surfaces — Zalo nl series */
+  --bg-page:          #001121;   /* nl200 — deepest navy */
+  --bg-surface:       #001a33;   /* nl300 — card / sidebar */
+  --bg-surface-2:     #0d2137;   /* nl200↔nl300 — subtle variant */
+  --bg-elevated:      #33485c;   /* nl400 — hover / elevated */
+
+  /* Dark borders */
+  --border:           #33485c;   /* nl400 */
+  --border-subtle:    #0d2137;
+
+  /* Dark text — nl series */
+  --text-primary:     #e8edf0;   /* just above nl700 */
+  --text-secondary:   #bfc6cc;   /* nl700 */
+  --text-muted:       #99a3ad;   /* nl600 */
+  --text-faint:       #667685;   /* nl500 */
 }
 
 html.dark body {
-  background-color: #0F172A;
-  color: #F1F5F9;
+  background-color: #001121;   /* nl200 */
+  color: #bfc6cc;              /* nl700 */
 }
 
-/* Surfaces */
-html.dark .bg-white { background-color: #1E293B; }
-html.dark .bg-slate-50 { background-color: #0F172A; }
-html.dark .bg-slate-100 { background-color: #1E293B; }
+/* ── Surfaces ────────────────────────────────────────────────────────────────── */
+html.dark .bg-white        { background-color: #001a33; }   /* nl300 */
+html.dark .bg-slate-50     { background-color: #001121; }   /* nl200 */
+html.dark .bg-slate-100    { background-color: #0d2137; }   /* between nl200-nl300 */
+html.dark .bg-slate-200    { background-color: #1a3347; }
+html.dark .bg-slate-700    { background-color: #001a33; }   /* nl300 */
+html.dark .bg-slate-800    { background-color: #001a33; }   /* nl300 */
+html.dark .bg-slate-900    { background-color: #001121; }   /* nl200 */
 
 /* Page bg */
-html.dark .bg-\[#F8FAFC\] { background-color: #0F172A; }
-html.dark .bg-\[#F8FAFC\] * { --page-bg-applied: 1; }
+html.dark .bg-\[#F8FAFC\]  { background-color: #001121; }   /* nl200 */
 
-/* Borders */
-html.dark .border-slate-50  { border-color: #1E293B; }
-html.dark .border-slate-100 { border-color: #334155; }
-html.dark .border-slate-200 { border-color: #334155; }
+/* Sidebar / header explicit bg overrides */
+html.dark .bg-\[#0B1120\]  { background-color: #001a33; }   /* nl300 */
+html.dark .bg-\[#0F172A\]  { background-color: #001121; }   /* nl200 */
+html.dark .bg-\[#0A0F1E\]  { background-color: #001121; }   /* nl200 */
 
-/* Text */
-html.dark .text-slate-900 { color: #F1F5F9; }
-html.dark .text-slate-800 { color: #E2E8F0; }
-html.dark .text-slate-700 { color: #CBD5E1; }
-html.dark .text-slate-600 { color: #94A3B8; }
-html.dark .text-slate-500 { color: #94A3B8; }
-html.dark .text-slate-400 { color: #64748B; }
+/* ── Borders ─────────────────────────────────────────────────────────────────── */
+html.dark .border-slate-50  { border-color: #0d2137; }
+html.dark .border-slate-100 { border-color: #0d2137; }
+html.dark .border-slate-200 { border-color: #33485c; }   /* nl400 */
+html.dark .border-slate-300 { border-color: #33485c; }
+html.dark .border-slate-600 { border-color: #33485c; }
+html.dark .border-slate-700 { border-color: #1a3347; }
+html.dark .border-slate-800 { border-color: #0d2137; }
 
-/* Hover surface */
-html.dark .hover\:bg-slate-50:hover  { background-color: #253450; }
-html.dark .hover\:bg-slate-100:hover { background-color: #1E293B; }
+/* ── Dividers ────────────────────────────────────────────────────────────────── */
+html.dark .divide-slate-50  > :not([hidden]) ~ :not([hidden]) { border-color: #0d2137; }
+html.dark .divide-slate-100 > :not([hidden]) ~ :not([hidden]) { border-color: #0d2137; }
+html.dark .divide-slate-200 > :not([hidden]) ~ :not([hidden]) { border-color: #33485c; }
+html.dark .divide-slate-700 > :not([hidden]) ~ :not([hidden]) { border-color: #0d2137; }
+
+/* ── Text ─────────────────────────────────────────────────────────────────────── */
+html.dark .text-slate-50  { color: #f0f4f8; }
+html.dark .text-slate-100 { color: #e8edf0; }
+html.dark .text-slate-200 { color: #dce3e8; }   /* bright — headings */
+html.dark .text-slate-300 { color: #bfc6cc; }   /* nl700 */
+html.dark .text-slate-900 { color: #e8edf0; }
+html.dark .text-slate-800 { color: #dce3e8; }   /* headings */
+html.dark .text-slate-700 { color: #bfc6cc; }   /* nl700 — body */
+html.dark .text-slate-600 { color: #99a3ad; }   /* nl600 — muted */
+html.dark .text-slate-500 { color: #667685; }   /* nl500 */
+html.dark .text-slate-400 { color: #4d6070; }   /* disabled / placeholder */
+
+/* ── Hover surfaces ───────────────────────────────────────────────────────────── */
+html.dark .hover\:bg-slate-50:hover  { background-color: #0d2137; }
+html.dark .hover\:bg-slate-100:hover { background-color: #0d2137; }
+html.dark .hover\:bg-slate-200:hover { background-color: #1a3347; }
+html.dark .hover\:bg-slate-700:hover { background-color: #0d2137; }
+html.dark .hover\:bg-slate-800:hover { background-color: #0d2137; }
 html.dark .hover\:bg-red-50:hover    { background-color: rgba(239,68,68,0.08); }
 
-/* Inputs */
+/* ── Inputs ──────────────────────────────────────────────────────────────────── */
 html.dark input,
 html.dark textarea {
-  background-color: #1E293B;
-  color: #F1F5F9;
-  border-color: #334155;
+  background-color: #001a33;   /* nl300 */
+  color: #bfc6cc;              /* nl700 */
+  border-color: #33485c;       /* nl400 */
 }
 
 html.dark input::placeholder,
-html.dark textarea::placeholder { color: #64748B; }
+html.dark textarea::placeholder { color: #667685; }   /* nl500 */
 
 html.dark input:focus,
 html.dark textarea:focus {
-  border-color: #009cd1;
+  border-color: #0068FF;
   outline: none;
+  box-shadow: 0 0 0 3px rgba(23,155,215,0.15);
 }
 
-/* Shadows */
-html.dark .shadow-sm  { box-shadow: 0 1px 3px rgba(0,0,0,0.5); }
-html.dark .shadow-lg  { box-shadow: 0 8px 30px rgba(0,0,0,0.6); }
-html.dark .shadow-xl  { box-shadow: 0 16px 48px rgba(0,0,0,0.7); }
-html.dark .shadow-2xl { box-shadow: 0 24px 64px rgba(0,0,0,0.8); }
+/* ── Shadows — deep navy shadows ─────────────────────────────────────────────── */
+html.dark .shadow-sm  { box-shadow: 0 1px 4px rgba(0,17,33,0.6); }
+html.dark .shadow     { box-shadow: 0 2px 8px rgba(0,17,33,0.7); }
+html.dark .shadow-md  { box-shadow: 0 4px 16px rgba(0,17,33,0.8); }
+html.dark .shadow-lg  { box-shadow: 0 8px 32px rgba(0,17,33,0.85); }
+html.dark .shadow-xl  { box-shadow: 0 16px 48px rgba(0,17,33,0.9); }
+html.dark .shadow-2xl { box-shadow: 0 24px 64px rgba(0,17,33,0.95); }
 
-/* Animate-in for dropdown (keep working in dark) */
-html.dark .animate-pulse .bg-slate-100 { background-color: #1E293B; }
+/* ── Skeleton / pulse ────────────────────────────────────────────────────────── */
+html.dark .animate-pulse .bg-slate-100 { background-color: #0d2137; }
 
-/* Scrollbar */
-html.dark .custom-scrollbar::-webkit-scrollbar-track { background: #1E293B; }
-html.dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; }
+/* ── Scrollbar — navy themed ─────────────────────────────────────────────────── */
+html.dark .custom-scrollbar::-webkit-scrollbar-track { background: #001a33; }
+html.dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #33485c; border-radius: 50px; }
+html.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #4d6070; }
+
+/* Global scrollbar in dark */
+html.dark ::-webkit-scrollbar       { width: 5px; height: 5px; }
+html.dark ::-webkit-scrollbar-track { background: #001121; }
+html.dark ::-webkit-scrollbar-thumb { background: #33485c; border-radius: 50px; }
+html.dark ::-webkit-scrollbar-thumb:hover { background: #4d6070; }
 
 @layer components {
   /* SHADCN COMPONENTS */

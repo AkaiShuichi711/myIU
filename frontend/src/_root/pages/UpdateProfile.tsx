@@ -63,7 +63,7 @@ const UpdateProfile = () => {
   if (isLoadingProfile) {
     return (
       <div className="min-h-full bg-[#F8FAFC] flex items-center justify-center">
-        <Loader2 size={24} className="animate-spin text-[#009cd1]" />
+        <Loader2 size={24} className="animate-spin text-[#0068FF]" />
       </div>
     );
   }
@@ -91,7 +91,7 @@ const UpdateProfile = () => {
               <div className="flex items-center gap-5 mb-5">
                 <div
                   className="w-16 h-16 rounded-2xl flex items-center justify-center text-white text-lg font-bold shrink-0"
-                  style={{ background: 'linear-gradient(135deg, #009cd1, #2F398E)' }}
+                  style={{ background: '#0068FF' }}
                 >
                   {profile?.imageUrl && !profile.imageUrl.includes('avatars') ? (
                     <img src={profile.imageUrl} alt={displayName} className="w-full h-full rounded-2xl object-cover" />
@@ -129,7 +129,7 @@ const UpdateProfile = () => {
                     <FormControl>
                       <input
                         {...field}
-                        className="w-full px-3 py-2.5 text-sm rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#009cd1]/20 focus:border-[#009cd1] transition-all"
+                        className="w-full px-3 py-2.5 text-sm rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#0068FF]/20 focus:border-[#0068FF] transition-all"
                       />
                     </FormControl>
                     <FormMessage />
@@ -148,7 +148,7 @@ const UpdateProfile = () => {
                         {...field}
                         rows={3}
                         placeholder="Write a short bio..."
-                        className="w-full px-3 py-2.5 text-sm rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#009cd1]/20 focus:border-[#009cd1] transition-all resize-none placeholder:text-slate-400"
+                        className="w-full px-3 py-2.5 text-sm rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#0068FF]/20 focus:border-[#0068FF] transition-all resize-none placeholder:text-slate-400"
                       />
                     </FormControl>
                     <FormMessage />

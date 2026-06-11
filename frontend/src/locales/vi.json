@@ -42,7 +42,12 @@
     "profile": "Hồ sơ",
     "tenant": "Tenant",
     "settings": "Cài đặt",
-    "editProfile": "Chỉnh sửa hồ sơ"
+    "editProfile": "Chỉnh sửa hồ sơ",
+    "courses": "Môn học",
+    "forms": "Biểu mẫu",
+    "sectionSocial": "Mạng xã hội",
+    "sectionAcademic": "Học thuật",
+    "sectionAccount": "Tài khoản"
   },
   "topbar": {
     "signOut": "Đăng xuất"
@@ -54,6 +59,7 @@
     "officeOfAcademicAffairs": "https://hcmiu.edu.vn/en/offices-and-centers/office-of-graduate-affairs/"
   },
   "home": {
+    "greeting": "Xin chào, {{name}}!",
     "greetingMorning": "Chào buổi sáng",
     "greetingAfternoon": "Chào buổi chiều",
     "greetingEvening": "Chào buổi tối",

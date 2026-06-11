@@ -31,7 +31,7 @@ const PostDetails = () => {
   if (isLoading) {
     return (
       <div className="min-h-full bg-[#F8FAFC] dark:bg-[#0F172A] flex items-center justify-center">
-        <Loader2 size={24} className="animate-spin text-[#009cd1]" />
+        <Loader2 size={24} className="animate-spin text-[#0068FF]" />
       </div>
     );
   }
@@ -40,7 +40,7 @@ const PostDetails = () => {
     return (
       <div className="min-h-full bg-[#F8FAFC] dark:bg-[#0F172A] flex flex-col items-center justify-center gap-4">
         <p className="text-slate-500 dark:text-slate-400 font-medium">Post not found</p>
-        <button onClick={() => navigate(-1)} className="text-sm text-[#009cd1] hover:underline">Go back</button>
+        <button onClick={() => navigate(-1)} className="text-sm text-[#0068FF] hover:underline">Go back</button>
       </div>
     );
   }
@@ -91,7 +91,7 @@ const PostDetails = () => {
     <div className="min-h-full bg-[#F8FAFC] dark:bg-[#0F172A]">
       {/* Back bar */}
       <div className="sticky top-0 z-10 bg-white dark:bg-[#0F172A] border-b border-slate-100 dark:border-slate-700 px-6 py-3.5">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
+        <div className="max-w-5xl mx-auto flex items-center justify-between">
           <button
             onClick={() => navigate(-1)}
             className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
@@ -118,8 +118,8 @@ const PostDetails = () => {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-6 py-6">
-        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden">
+      <div className="max-w-5xl mx-auto px-6 py-4">
+        <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
           <div className="flex flex-col lg:flex-row">
             {/* Left: Image */}
             {post.imageUrl && (
@@ -143,7 +143,7 @@ const PostDetails = () => {
                 >
                   <div
                     className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0"
-                    style={{ background: 'linear-gradient(135deg, #009cd1, #2F398E)' }}
+                    style={{ background: '#0068FF' }}
                   >
                     {creatorInitials}
                   </div>
@@ -169,7 +169,7 @@ const PostDetails = () => {
                 {Array.isArray(post.tags) && post.tags.filter(Boolean).length > 0 && (
                   <div className="flex flex-wrap gap-1.5">
                     {post.tags.filter(Boolean).map((tag: string) => (
-                      <span key={tag} className="px-2.5 py-1 rounded-full text-xs font-medium bg-[#009cd1]/8 dark:bg-[#009cd1]/20 text-[#009cd1]">
+                      <span key={tag} className="px-2.5 py-1 rounded-full text-xs font-medium bg-[#0068FF]/8 dark:bg-[#0068FF]/20 text-[#0068FF]">
                         #{tag}
                       </span>
                     ))}

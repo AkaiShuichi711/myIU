@@ -70,7 +70,7 @@ const MentionInput = ({
   };
 
   const defaultClass =
-    'w-full px-3 py-2.5 text-sm rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#009cd1]/20 focus:border-[#009cd1] transition-all resize-none placeholder:text-slate-400';
+    'w-full px-3 py-2.5 text-sm rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#0068FF]/20 focus:border-[#0068FF] transition-all resize-none placeholder:text-slate-400';
 
   return (
     <div className="relative">
@@ -97,7 +97,7 @@ const MentionInput = ({
               >
                 <div
                   className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
-                  style={{ background: 'linear-gradient(135deg, #009cd1, #2F398E)' }}
+                  style={{ background: '#0068FF' }}
                 >
                   {initials}
                 </div>

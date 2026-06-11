@@ -1,5 +1,5 @@
 import { ID, Query } from 'appwrite';
-import { INewNotification, INewPost, INewUser, IUpdatePost, IUpdateUser, PaspdatePost } from '@/types';
+import { INewNotification, INewPost, INewUser, IUpdatePost, IUpdateUser, PaspdatePost, INewCourse, INewCourseGroup, INewGroupMember, INewCoursePost, INewFormTemplate, IUpdateFormTemplate, INewFormSubmission, IUpdateFormSubmission, IUpsertCourseGrade } from '@/types';
 import { account, avatars, databases, appwriteConfig, storage } from './config';
 
 export async function createUserAccount(user: INewUser) {
@@ -751,4 +751,377 @@ export async function getAccountSessions() {
   } catch {
     return { sessions: [] };
   }
+}
+
+// ─── FORM TEMPLATES ───────────────────────────────────────────────────────────
+
+export async function getFormTemplates() {
+  if (!appwriteConfig.formTemplatesCollectionId) return [];
+  try {
+    const result = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.formTemplatesCollectionId,
+      [Query.equal('isActive', true), Query.orderAsc('sortOrder'), Query.limit(100)]
+    );
+    return result.documents;
+  } catch { return []; }
+}
+
+export async function createFormTemplate(data: INewFormTemplate) {
+  if (!appwriteConfig.formTemplatesCollectionId) throw new Error('Form templates collection not configured');
+  return databases.createDocument(
+    appwriteConfig.databaseId,
+    appwriteConfig.formTemplatesCollectionId,
+    ID.unique(),
+    data
+  );
+}
+
+export async function updateFormTemplate({ id, ...data }: IUpdateFormTemplate) {
+  if (!appwriteConfig.formTemplatesCollectionId) throw new Error('Form templates collection not configured');
+  return databases.updateDocument(
+    appwriteConfig.databaseId,
+    appwriteConfig.formTemplatesCollectionId,
+    id,
+    data
+  );
+}
+
+export async function deleteFormTemplate(id: string) {
+  if (!appwriteConfig.formTemplatesCollectionId) return;
+  return databases.deleteDocument(
+    appwriteConfig.databaseId,
+    appwriteConfig.formTemplatesCollectionId,
+    id
+  );
+}
+
+// ─── FORM SUBMISSIONS ─────────────────────────────────────────────────────────
+// Appwrite collection: form_submissions
+// Fields: submitterId, submitterName, submitterEmail, formTemplateId, formTitle,
+//         uploadedFileId, uploadedFileUrl, approverEmail, approverName,
+//         status (string), rejectionReason (string)
+
+export async function createFormSubmission(data: INewFormSubmission) {
+  if (!appwriteConfig.formSubmissionsCollectionId) return null;
+  try {
+    return await databases.createDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.formSubmissionsCollectionId,
+      ID.unique(),
+      { ...data, status: 'pending' }
+    );
+  } catch (err) { console.error(err); return null; }
+}
+
+export async function getFormSubmissionsByUser(userId: string) {
+  if (!appwriteConfig.formSubmissionsCollectionId) return [];
+  try {
+    const res = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.formSubmissionsCollectionId,
+      [Query.equal('submitterId', userId), Query.orderDesc('$createdAt'), Query.limit(50)]
+    );
+    return res.documents;
+  } catch { return []; }
+}
+
+export async function getFormSubmissionsForApprover(email: string) {
+  if (!appwriteConfig.formSubmissionsCollectionId) return [];
+  try {
+    const res = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.formSubmissionsCollectionId,
+      [Query.equal('approverEmail', email), Query.orderDesc('$createdAt'), Query.limit(50)]
+    );
+    return res.documents;
+  } catch { return []; }
+}
+
+export async function getFormSubmissionById(id: string) {
+  if (!appwriteConfig.formSubmissionsCollectionId) return null;
+  try {
+    return await databases.getDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.formSubmissionsCollectionId,
+      id
+    );
+  } catch { return null; }
+}
+
+export async function updateFormSubmission({ id, status, rejectionReason }: IUpdateFormSubmission) {
+  if (!appwriteConfig.formSubmissionsCollectionId) return null;
+  try {
+    const update: Record<string, string> = { status };
+    if (rejectionReason) update.rejectionReason = rejectionReason;
+    return await databases.updateDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.formSubmissionsCollectionId,
+      id,
+      update
+    );
+  } catch (err) { console.error(err); return null; }
+}
+
+// ─── COURSES ──────────────────────────────────────────────────────────────────
+// Collections: courses, course_groups, group_members, course_posts
+// Appwrite schema – create these 4 collections in the Console before use.
+
+export async function createCourse(data: INewCourse) {
+  if (!appwriteConfig.coursesCollectionId) throw new Error('Courses collection not configured');
+  return databases.createDocument(
+    appwriteConfig.databaseId,
+    appwriteConfig.coursesCollectionId,
+    ID.unique(),
+    { ...data, isActive: true }
+  );
+}
+
+export async function getCourseById(courseId: string) {
+  if (!appwriteConfig.coursesCollectionId) return null;
+  try {
+    return await databases.getDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.coursesCollectionId,
+      courseId
+    );
+  } catch { return null; }
+}
+
+export async function getAllCourses() {
+  if (!appwriteConfig.coursesCollectionId) return [];
+  try {
+    const res = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.coursesCollectionId,
+      [Query.orderDesc('$createdAt'), Query.limit(200)]
+    );
+    return res.documents;
+  } catch { return []; }
+}
+
+export async function updateCourse(courseId: string, data: Partial<INewCourse & { isActive: boolean }>) {
+  if (!appwriteConfig.coursesCollectionId) return null;
+  return databases.updateDocument(
+    appwriteConfig.databaseId,
+    appwriteConfig.coursesCollectionId,
+    courseId,
+    data
+  );
+}
+
+export async function getCoursesByLecturer(userId: string) {
+  if (!appwriteConfig.courseGroupsCollectionId || !userId) return [];
+  try {
+    const groups = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.courseGroupsCollectionId,
+      [Query.equal('lecturerId', userId), Query.limit(200)]
+    );
+    const courseIds = [...new Set(groups.documents.map((g: any) => g.courseId as string))];
+    const courses = await Promise.all(courseIds.map(getCourseById));
+    return courses.filter(Boolean);
+  } catch { return []; }
+}
+
+export async function getCoursesByStudent(userId: string) {
+  if (!appwriteConfig.groupMembersCollectionId || !userId) return [];
+  try {
+    const memberships = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.groupMembersCollectionId,
+      [Query.equal('studentId', userId), Query.limit(200)]
+    );
+    const courseIds = [...new Set(memberships.documents.map((m: any) => m.courseId as string))];
+    const courses = await Promise.all(courseIds.map(getCourseById));
+    return courses.filter(Boolean);
+  } catch { return []; }
+}
+
+// ─── COURSE GROUPS ────────────────────────────────────────────────────────────
+
+export async function createCourseGroup(data: INewCourseGroup) {
+  if (!appwriteConfig.courseGroupsCollectionId) throw new Error('CourseGroups collection not configured');
+  return databases.createDocument(
+    appwriteConfig.databaseId,
+    appwriteConfig.courseGroupsCollectionId,
+    ID.unique(),
+    data
+  );
+}
+
+export async function getCourseGroups(courseId: string) {
+  if (!appwriteConfig.courseGroupsCollectionId) return [];
+  try {
+    const res = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.courseGroupsCollectionId,
+      [Query.equal('courseId', courseId), Query.orderAsc('name'), Query.limit(100)]
+    );
+    return res.documents;
+  } catch { return []; }
+}
+
+export async function getLecturerGroupsInCourse(courseId: string, lecturerId: string) {
+  if (!appwriteConfig.courseGroupsCollectionId) return [];
+  try {
+    const res = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.courseGroupsCollectionId,
+      [Query.equal('courseId', courseId), Query.equal('lecturerId', lecturerId), Query.limit(100)]
+    );
+    return res.documents;
+  } catch { return []; }
+}
+
+export async function deleteCourseGroup(groupId: string) {
+  if (!appwriteConfig.courseGroupsCollectionId) return;
+  return databases.deleteDocument(
+    appwriteConfig.databaseId,
+    appwriteConfig.courseGroupsCollectionId,
+    groupId
+  );
+}
+
+// ─── GROUP MEMBERS ────────────────────────────────────────────────────────────
+
+export async function addGroupMember(data: INewGroupMember) {
+  if (!appwriteConfig.groupMembersCollectionId) throw new Error('GroupMembers collection not configured');
+  return databases.createDocument(
+    appwriteConfig.databaseId,
+    appwriteConfig.groupMembersCollectionId,
+    ID.unique(),
+    data
+  );
+}
+
+export async function getGroupMembers(groupId: string) {
+  if (!appwriteConfig.groupMembersCollectionId) return [];
+  try {
+    const res = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.groupMembersCollectionId,
+      [Query.equal('groupId', groupId), Query.limit(500)]
+    );
+    return res.documents;
+  } catch { return []; }
+}
+
+export async function getStudentGroupsInCourse(courseId: string, studentId: string) {
+  if (!appwriteConfig.groupMembersCollectionId) return [];
+  try {
+    const res = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.groupMembersCollectionId,
+      [Query.equal('courseId', courseId), Query.equal('studentId', studentId), Query.limit(50)]
+    );
+    return res.documents;
+  } catch { return []; }
+}
+
+export async function removeGroupMember(memberId: string) {
+  if (!appwriteConfig.groupMembersCollectionId) return;
+  return databases.deleteDocument(
+    appwriteConfig.databaseId,
+    appwriteConfig.groupMembersCollectionId,
+    memberId
+  );
+}
+
+// ─── COURSE POSTS ─────────────────────────────────────────────────────────────
+
+export async function createCoursePost(data: INewCoursePost) {
+  if (!appwriteConfig.coursePostsCollectionId) throw new Error('CoursePosts collection not configured');
+  return databases.createDocument(
+    appwriteConfig.databaseId,
+    appwriteConfig.coursePostsCollectionId,
+    ID.unique(),
+    {
+      ...data,
+      isPublished: true,
+      attachmentUrls: data.attachmentUrls || [],
+      attachmentNames: data.attachmentNames || [],
+    }
+  );
+}
+
+export async function getCoursePosts(courseId: string) {
+  if (!appwriteConfig.coursePostsCollectionId) return [];
+  try {
+    const res = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.coursePostsCollectionId,
+      [
+        Query.equal('courseId', courseId),
+        Query.equal('isPublished', true),
+        Query.orderDesc('$createdAt'),
+        Query.limit(200),
+      ]
+    );
+    return res.documents;
+  } catch { return []; }
+}
+
+export async function deleteCoursePost(postId: string) {
+  if (!appwriteConfig.coursePostsCollectionId) return;
+  return databases.deleteDocument(
+    appwriteConfig.databaseId,
+    appwriteConfig.coursePostsCollectionId,
+    postId
+  );
+}
+
+// ─── GRADES ───────────────────────────────────────────────────────────────────
+// Collection: course_grades — 1 doc per student per course
+// Fields: courseId, studentId, studentName, quiz, exercise, lab, midterm, project, final, gradedBy
+
+export async function getCourseGrades(courseId: string) {
+  if (!appwriteConfig.courseGradesCollectionId) return [];
+  try {
+    const res = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.courseGradesCollectionId,
+      [Query.equal('courseId', courseId), Query.limit(500)]
+    );
+    return res.documents;
+  } catch { return []; }
+}
+
+export async function getStudentGrade(courseId: string, studentId: string) {
+  if (!appwriteConfig.courseGradesCollectionId) return null;
+  try {
+    const res = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.courseGradesCollectionId,
+      [Query.equal('courseId', courseId), Query.equal('studentId', studentId), Query.limit(1)]
+    );
+    return res.documents[0] ?? null;
+  } catch { return null; }
+}
+
+export async function upsertCourseGrade(data: IUpsertCourseGrade) {
+  if (!appwriteConfig.courseGradesCollectionId) return null;
+  try {
+    // Check if doc already exists for this student+course
+    const existing = await getStudentGrade(data.courseId, data.studentId);
+    const payload: Record<string, unknown> = { ...data };
+    if (existing) {
+      return await databases.updateDocument(
+        appwriteConfig.databaseId,
+        appwriteConfig.courseGradesCollectionId,
+        existing.$id,
+        payload
+      );
+    }
+    return await databases.createDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.courseGradesCollectionId,
+      ID.unique(),
+      payload
+    );
+  } catch (err) { console.error(err); return null; }
+}
+
+export async function upsertCourseGrades(grades: IUpsertCourseGrade[]) {
+  return Promise.all(grades.map(upsertCourseGrade));
 }

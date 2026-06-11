@@ -39,7 +39,7 @@ const GridPostList = ({ posts, showUser = true }: GridPostListProps) => {
             )}
 
             {/* Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col justify-end p-3">
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors duration-200 flex flex-col justify-end p-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3 text-white text-sm">
                   <span className="flex items-center gap-1">
@@ -50,7 +50,7 @@ const GridPostList = ({ posts, showUser = true }: GridPostListProps) => {
                 {showUser && creator && (
                   <div className="flex items-center gap-1.5">
                     <div className="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold"
-                      style={{ background: 'linear-gradient(135deg, #009cd1, #2F398E)' }}>
+                      style={{ background: '#0068FF' }}>
                       {creator.name?.[0]?.toUpperCase() || '?'}
                     </div>
                   </div>

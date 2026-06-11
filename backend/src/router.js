@@ -18,6 +18,8 @@ const getRoutes = (mainController, authProvider, router)=>{
     router.get('/api/user', mainController.apiGetUser);
     router.get('/api/profile', authProvider.getToken, mainController.apiGetProfile);
     router.get('/api/tenant', mainController.apiGetTenant);
+    router.post('/api/email/send', mainController.apiSendEmail);
+    router.get('/api/users/search', mainController.apiSearchUsers);
 
     // fallback 404 for backend API
     router.use((req, res) => res.status(404).json({ error: 'Not found' }));

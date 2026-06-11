@@ -42,7 +42,12 @@
     "profile": "Profile",
     "tenant": "Tenant",
     "settings": "Settings",
-    "editProfile": "Edit profile"
+    "editProfile": "Edit profile",
+    "courses": "Courses",
+    "forms": "Forms",
+    "sectionSocial": "Social",
+    "sectionAcademic": "Academic",
+    "sectionAccount": "Account"
   },
   "topbar": {
     "signOut": "Sign out"
@@ -54,6 +59,7 @@
     "officeOfAcademicAffairs": "https://hcmiu.edu.vn/en/offices-and-centers/office-of-graduate-affairs/"
   },
   "home": {
+    "greeting": "Hello, {{name}}!",
     "greetingMorning": "Good morning",
     "greetingAfternoon": "Good afternoon",
     "greetingEvening": "Good evening",

@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
-import { Search, X, Loader2, LayoutGrid, List } from 'lucide-react';
+import { Search, X, Loader2, LayoutGrid, List, Home } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useGetInfinitePosts, useSearchPosts } from '@/lib/react-query/queriesAndMutations';
 import { PostCard, GridPostList } from '@/components/shared';
 import { useDebounce } from '@/hooks/useDebounce';
 
-const searchInputCls = "w-full pl-9 pr-8 py-2.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#009cd1]/20 focus:border-[#009cd1] transition-all";
+const searchInputCls = "w-full pl-9 pr-8 py-2.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#0068FF]/20 focus:border-[#0068FF] transition-all";
 
 const Explore = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -32,15 +33,30 @@ const Explore = () => {
     }
   }, [inView, hasNextPage, debouncedSearch]);
 
-  const allPosts = (infiniteData?.pages?.flat() ?? []).filter(Boolean);
+  // ── MOCK DATA — xóa/comment block này khi Appwrite posts collection đã có data ──
+  const MOCK_POSTS = [
+    { $id: 'mp1', creator: { $id: 'mu1', name: 'Nguyễn Văn An', imageUrl: '' }, caption: 'Vừa hoàn thành bài lab môn Networks! Cuối cùng cũng hiểu tại sao TCP cần 3-way handshake 🤝', mediaUrls: [], mediaTypes: [], tags: ['networking', 'ititiu', 'lab'], location: 'IU Campus', likes: ['mu2', 'mu3'], $createdAt: '2026-06-09T08:00:00.000Z' },
+    { $id: 'mp2', creator: { $id: 'mu2', name: 'Trần Thị Bảo', imageUrl: '' }, caption: 'Thư viện IU mới refactor xong — clean code, no more spaghetti! 🍝 Ai muốn review PR không?', mediaUrls: [], mediaTypes: [], tags: ['cleancode', 'refactor'], location: 'IU Library', likes: ['mu1', 'mu3', 'mu4'], $createdAt: '2026-06-08T14:30:00.000Z' },
+    { $id: 'mp3', creator: { $id: 'mu3', name: 'Lê Văn Cường', imageUrl: '' }, caption: 'GPA kỳ này: 3.8/4.0 🔥 Cảm ơn thầy cô và các bạn trong nhóm học! Semester cuối rồi, cố thôi.', mediaUrls: [], mediaTypes: [], tags: ['gpa', 'academic', 'senior'], location: '', likes: ['mu1', 'mu2', 'mu4', 'mu5'], $createdAt: '2026-06-07T10:00:00.000Z' },
+    { $id: 'mp4', creator: { $id: 'mu4', name: 'Phạm Thị Duyên', imageUrl: '' }, caption: 'Demo hackathon IU 2026 đã xong! Team mình làm app hỗ trợ sinh viên khuyết tật tiếp cận tài liệu 📚 Wish us luck!', mediaUrls: [], mediaTypes: [], tags: ['hackathon', 'accessibility', 'iu2026'], location: 'Hall B', likes: ['mu1', 'mu2', 'mu3'], $createdAt: '2026-06-06T16:00:00.000Z' },
+    { $id: 'mp5', creator: { $id: 'mu5', name: 'Hoàng Minh Đức', imageUrl: '' }, caption: 'Có ai học Embedded Systems không cho tôi hỏi cái oscilloscope reading với? Debug cả buổi không ra 😭', mediaUrls: [], mediaTypes: [], tags: ['embedded', 'hardware', 'help'], location: 'Lab 4F', likes: ['mu2'], $createdAt: '2026-06-05T09:30:00.000Z' },
+  ];
+  // ── END MOCK ──
+
+  const realPosts = (infiniteData?.pages?.flat() ?? []).filter(Boolean);
+  const allPosts = realPosts.length > 0 ? realPosts : MOCK_POSTS;
   const isSearchMode = debouncedSearch.trim().length > 0;
   const posts = isSearchMode ? (searchResults ?? []).filter(Boolean) : allPosts;
-  const isLoading = !isSearchMode && isLoadingFeed;
+  const isLoading = !isSearchMode && isLoadingFeed && realPosts.length === 0;
 
   return (
     <div className="min-h-full bg-[#F8FAFC] dark:bg-[#0F172A]">
       <div className="sticky top-0 z-10 bg-white dark:bg-[#0F172A] border-b border-slate-100 dark:border-slate-700 px-6 py-4">
-        <div className="max-w-3xl mx-auto flex items-center gap-3">
+        <div className="max-w-5xl mx-auto flex flex-col gap-2">
+          <Link to="/home" className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-[#0068FF] transition-colors font-mono w-fit">
+            <Home size={11} /> HOME
+          </Link>
+          <div className="flex items-center gap-3">
           <div className="relative flex-1">
             <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
             <input
@@ -76,10 +92,11 @@ const Explore = () => {
               <LayoutGrid size={16} />
             </button>
           </div>
+          </div>
         </div>
       </div>
 
-      <div className="max-w-3xl mx-auto px-6 py-6">
+      <div className="max-w-5xl mx-auto px-6 py-4">
         {isSearchMode && (
           <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">
             {isSearching
@@ -91,7 +108,7 @@ const Explore = () => {
         {isLoading && (
           <div className="flex flex-col gap-5">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 overflow-hidden animate-pulse">
+              <div key={i} className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden animate-pulse">
                 <div className="p-5 flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700" />
                   <div className="flex-1 space-y-2">
@@ -110,7 +127,7 @@ const Explore = () => {
 
         {!isLoading && posts.length === 0 && (
           <div className="flex flex-col items-center justify-center py-24 text-center">
-            <div className="w-16 h-16 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-4">
+            <div className="w-16 h-16 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-4">
               <Search size={24} className="text-slate-300 dark:text-slate-600" />
             </div>
             <p className="text-slate-500 dark:text-slate-400 font-semibold">
@@ -137,7 +154,7 @@ const Explore = () => {
         {!isSearchMode && (
           <div ref={loadMoreRef} className="py-8 flex justify-center">
             {isFetchingNextPage && (
-              <Loader2 size={20} className="animate-spin text-[#009cd1]" />
+              <Loader2 size={20} className="animate-spin text-[#0068FF]" />
             )}
             {!hasNextPage && posts.length > 0 && (
               <p className="text-xs text-slate-400 dark:text-slate-500">{t('explore.seenAll')}</p>

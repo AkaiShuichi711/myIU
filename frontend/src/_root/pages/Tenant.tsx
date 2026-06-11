@@ -47,13 +47,13 @@ const TenantPage = () => {
     heading:   isDark ? '#F1F5F9' : '#0f172a',
     label:     isDark ? '#94A3B8' : '#0F172A',
     value:     isDark ? '#93C5FD' : '#1e3a5f',
-    muted:     isDark ? '#475569' : '#cbd5e1',
-    sectionHdr:isDark ? '#1E293B' : 'linear-gradient(to right, #f8fafc, #fff)',
+    muted:     isDark ? '#0F172A' : '#cbd5e1',
+    sectionHdr:isDark ? '#1E293B' : '#f8fafc',
     sectionTxt:isDark ? '#CBD5E1' : '#09090B',
     topBarBg:  isDark ? '#1E293B' : '#fff',
     shadow:    isDark ? '0 1px 4px rgba(0,0,0,0.4)' : '0 1px 4px rgba(0,0,0,0.05)',
     btnBorder: isDark ? '#334155' : '#e2e8f0',
-    btnColor:  isDark ? '#94A3B8' : '#475569',
+    btnColor:  isDark ? '#94A3B8' : '#0F172A',
   };
 
   const Row = ({ label, value, id, mono = true }: { label: string; value?: string; id: string; mono?: boolean }) => (
@@ -134,7 +134,7 @@ const TenantPage = () => {
         </p>
         <button onClick={() => (window.location.href = "/sign-in")} style={{
           width: "100%", padding: "12px",
-          background: "linear-gradient(135deg, #009cd1, #0078d4)",
+          background: "#0068FF",
           border: "none", borderRadius: "12px",
           color: "#fff", fontWeight: 600, fontSize: "14px", cursor: "pointer",
         }}>
@@ -149,7 +149,7 @@ const TenantPage = () => {
       <div style={{ width: "100%", height: "100%", display: "flex" }}>
         <div style={{
           width: "40%", minHeight: "100vh", flexShrink: 0,
-          background: "linear-gradient(160deg, #00b4d8 0%, #009cd1 40%, #0077b6 100%)",
+          background: "#0068FF",
           display: "flex", alignItems: "center", justifyContent: "center", padding: "40px",
         }}>
           <div style={{ color: "#fff", textAlign: "center" }}>
@@ -227,7 +227,7 @@ const TenantPage = () => {
             <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
               <div style={{
                 width: "48px", height: "48px", borderRadius: "14px",
-                background: isDark ? "#0C2F4A" : "linear-gradient(135deg, #e0f2fe, #bae6fd)",
+                background: isDark ? "#0C2F4A" : "#e0f2fe",
                 border: `1px solid ${isDark ? "#0369A1" : "#7dd3fc"}`,
                 display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
               }}>
@@ -257,7 +257,7 @@ const TenantPage = () => {
             <div style={{ background: c.cardBg, borderRadius: "16px", border: `1px solid ${c.border}`, padding: "60px", textAlign: "center" }}>
               <div style={{
                 width: "40px", height: "40px", margin: "0 auto 16px",
-                border: `3px solid ${isDark ? "#1E3A5F" : "#e0f2fe"}`, borderTop: "3px solid #009cd1",
+                border: `3px solid ${isDark ? "#1E3A5F" : "#e0f2fe"}`, borderTop: "3px solid #0068FF",
                 borderRadius: "50%", animation: "spin 0.8s linear infinite",
               }} />
               <p style={{ color: c.label, fontSize: "13px", margin: 0 }}>{t('tenant.fetching')}</p>
@@ -289,7 +289,7 @@ const TenantPage = () => {
                 ].map((r) => <Row key={r.id} {...r} />)}
               </Section>
 
-              <Section title={t('tenant.identityMetadata')} accent="#009cd1"
+              <Section title={t('tenant.identityMetadata')} accent="#0068FF"
                 icon={<ShieldCheck size={15} color="#0284c7" />}>
                 <Row label={t('tenant.provider')}     value={tenant.issuer}      id="issuer" />
                 <Row label={t('tenant.displayName')}  value={tenant.displayName} id="dname"  mono={false} />
@@ -311,7 +311,7 @@ const TenantPage = () => {
               </Section>
 
               {tenant.graphProfile && (
-                <Section title={t('tenant.graphProfile')} accent="#009cd1"
+                <Section title={t('tenant.graphProfile')} accent="#0068FF"
                   icon={<User size={15} color="#0284c7" />}>
                   {[
                     { label: t('tenant.displayName'),   value: tenant.graphProfile.displayName,       id: "gdn",  mono: false },
@@ -323,7 +323,7 @@ const TenantPage = () => {
               )}
 
               {tenant.armTenant && (
-                <Section title={t('tenant.armResponse')} accent="#009cd1"
+                <Section title={t('tenant.armResponse')} accent="#0068FF"
                   icon={<Network size={15} color="#0284c7" />}>
                   <div style={{ marginTop: "10px", borderRadius: "12px", overflow: "hidden", border: `1px solid ${c.border}` }}>
                     <div style={{
