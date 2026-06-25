@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { BookOpen, Bell, FileText, ChevronRight, GraduationCap, Star, Loader2 } from 'lucide-react';
+import { BookOpen, Bell, FileText, ChevronRight, GraduationCap, Star, Loader2, ArrowUpRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useUserContext } from '@/context/AuthContext';
 import {
@@ -10,33 +10,31 @@ import {
 } from '@/lib/react-query/queriesAndMutations';
 import { isLecturerRole, isAdminRole, formatTimeAgo } from '@/lib/utils';
 import { FORM_STATUS } from '@/constants/ui';
-import { MOCK_COURSES_BASE, MOCK_NOTIFS_HOME, MOCK_FORMS_STUDENT } from '@/constants/mockData';
 import type { SubmissionStatus } from '@/types';
 
 const NOTIF_DOT: Record<string, string> = {
   form_approved: 'bg-green-500',
   form_rejected: 'bg-red-400',
   form_pending:  'bg-amber-400',
-  grade:         'bg-[#0068FF]',
+  grade:         'bg-[#1e51f9]',
   course:        'bg-[#2F398E]',
   system:        'bg-slate-400',
 };
 
-// ── Components ─────────────────────────────────────────────────────────────────
-const SectionHeader = ({ icon, title, to }: { icon: React.ReactNode; title: string; to: string }) => (
-  <div className="flex items-center justify-between mb-3">
-    <div className="flex items-center gap-2">
-      <span className="w-0.5 h-3.5 rounded-full bg-[#0068FF] shrink-0" />
-      {icon}
-      <span className="text-sm font-bold text-slate-700 dark:text-[#bfc6cc]">{title}</span>
-    </div>
-    <Link to={to} className="flex items-center gap-0.5 text-[11px] font-semibold text-[#0068FF] hover:text-[#3aaee0] transition-colors">
-      Xem tất cả <ChevronRight size={12} />
+// ── Section header — ir.vng style ─────────────────────────────────────────
+const SectionHeader = ({ title, to }: { title: string; to: string }) => (
+  <div className="flex items-center justify-between mb-4">
+    <h2 className="text-[15px] font-bold text-slate-900 dark:text-[#e8edf0] tracking-tight">{title}</h2>
+    <Link
+      to={to}
+      className="flex items-center gap-1 text-[12px] font-semibold text-[#1e51f9] hover:opacity-80 transition-opacity"
+    >
+      Xem tất cả <ArrowUpRight size={12} />
     </Link>
   </div>
 );
 
-// ── Main ──────────────────────────────────────────────────────────────────────
+// ── Main ──────────────────────────────────────────────────────────────────
 const Home = () => {
   const { user } = useUserContext();
   const { t } = useTranslation();
@@ -50,168 +48,173 @@ const Home = () => {
   const { data: rawNotifs = [],       isPending: loadingNotifs          } = useGetNotifications(user.id);
   const { data: rawForms = [],        isPending: loadingForms           } = useGetFormSubmissionsByUser(user.id);
 
-  const rawCourses = isLecturer || isAdmin ? lecturerCourses : studentCourses;
+  const rawCourses    = isLecturer || isAdmin ? lecturerCourses : studentCourses;
   const loadingCourses = isLecturer || isAdmin ? loadingLecturerCourses : loadingStudentCourses;
-  // MOCK: fallback khi API /api/courses, /api/notifications, /api/forms chưa trả data
-  const courses    = (rawCourses  as any[]).length > 0 ? (rawCourses  as any[]) : MOCK_COURSES_BASE;
-  const notifs     = (rawNotifs   as any[]).length > 0 ? (rawNotifs   as any[]) : MOCK_NOTIFS_HOME;
-  const forms      = (rawForms    as any[]).length > 0 ? (rawForms    as any[]) : MOCK_FORMS_STUDENT;
+  const courses = rawCourses as any[];
+  const notifs  = rawNotifs  as any[];
+  const forms   = rawForms   as any[];
 
   const unreadCount   = notifs.filter((n: any) => !n.read).length;
   const pendingCount  = forms.filter((f: any) => f.status === 'pending').length;
   const activeCourses = courses.filter((c: any) => c.isActive !== false).length;
 
   const firstName = user.name?.trim().split(/\s+/).at(-1) ?? user.name;
-
   const now = new Date();
   const dateStr = now.toLocaleDateString('vi-VN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
+  const roleLabel = isAdmin ? 'Quản trị viên' : isLecturer ? 'Giảng viên' : 'Sinh viên';
+
   return (
-    <div className="min-h-full bg-[#F8FAFC] dark:bg-[#19191a]">
-      {/* ── Hero header ─────────────────────────────────────────────────────── */}
-      <div className="bg-white border-b border-slate-100 dark:border-[#0d2137] px-6 py-5">
-        <div className="max-w-5xl mx-auto flex items-center justify-between gap-4 flex-wrap">
+    <div className="min-h-full bg-[#F4F6F8] dark:bg-[#19191a]">
+
+      {/* ── Hero banner ────────────────────────────────────────────────────── */}
+      <div className="bg-white dark:bg-[#1e2028] border-b border-[#E0E4EB] dark:border-[#33485c]">
+        <div className="max-w-5xl mx-auto px-6 py-6 flex items-end justify-between gap-6">
+          {/* Greeting */}
           <div>
-            <p className="text-xs text-slate-400 dark:text-[#4d6070] capitalize tracking-wide">{dateStr}</p>
-            <h1 className="text-xl font-bold text-slate-900 dark:text-[#e8edf0] mt-0.5">
+            <p className="text-[11px] text-slate-400 dark:text-[#4d6070] uppercase tracking-[0.12em] font-semibold mb-1">
+              {dateStr}
+            </p>
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-[#e8edf0] leading-tight">
               {t('home.greeting', { name: firstName })}
             </h1>
-            <p className="text-sm text-slate-500 dark:text-[#DCE3E8] mt-0.5">
-              {isAdmin ? 'Quản trị viên' : isLecturer ? 'Giảng viên' : 'Sinh viên'} — myIU Portal
+            <p className="text-sm text-slate-500 dark:text-[#99a3ad] mt-0.5">
+              {roleLabel} — myIU Portal
             </p>
           </div>
 
-          {/* Quick stats */}
-          <div className="flex gap-2.5 flex-wrap">
+          {/* Stats */}
+          <div className="flex items-stretch gap-0 shrink-0">
             {[
-              { icon: <BookOpen size={14} className="text-[#0068FF]" />, value: activeCourses, label: 'Khóa học',  color: '#0068FF' },
-              { icon: <Bell size={14} className="text-[#f5832f]" />,     value: unreadCount,   label: 'Thông báo', color: '#f5832f' },
-              { icon: <FileText size={14} className="text-[#2F398E]" />, value: pendingCount,  label: 'Chờ duyệt', color: '#2F398E' },
-            ].map(({ icon, value, label, color }) => (
+              { value: activeCourses, label: 'Khóa học đang học',   sub: 'môn học' },
+              { value: unreadCount,   label: 'Thông báo chưa đọc',  sub: 'thông báo' },
+              { value: pendingCount,  label: 'Biểu mẫu chờ duyệt',  sub: 'biểu mẫu' },
+            ].map(({ value, label, sub }, i) => (
               <div
                 key={label}
-                className="flex items-center gap-2.5 px-3.5 py-2 rounded-xl border"
-                style={{ backgroundColor: `${color}0d`, borderColor: `${color}20` }}
+                className="flex flex-col py-1"
+                style={{
+                  paddingLeft: i === 0 ? 0 : 20,
+                  paddingRight: i === 2 ? 0 : 20,
+                  borderLeft: i > 0 ? '1px solid #E0E4EB' : undefined,
+                }}
               >
-                {icon}
-                <div>
-                  <p className="text-base font-bold leading-none" style={{ color }}>{value}</p>
-                  <p className="text-[10px] text-slate-500 dark:text-[#4d6070] mt-0.5">{label}</p>
-                </div>
+                <p className="text-[11px] text-slate-400 dark:text-[#4d6070] font-medium mb-0.5 whitespace-nowrap">{label}</p>
+                <p className="text-2xl font-extrabold text-slate-900 dark:text-[#e8edf0] leading-none tracking-tight">
+                  {value}
+                </p>
+                <p className="text-[11px] text-[#1e51f9] font-semibold mt-0.5">{sub}</p>
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-6 py-5 grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-5">
+      {/* ── Content ────────────────────────────────────────────────────────── */}
+      <div className="max-w-5xl mx-auto px-6 py-6 grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
 
-        {/* ── LEFT: Courses ──────────────────────────────────────────────────── */}
-        <div className="flex flex-col gap-5">
+        {/* ── LEFT: Courses + Grades ──────────────────────────────────────── */}
+        <div className="flex flex-col gap-6">
+
+          {/* Courses */}
           <div>
-            <SectionHeader
-              icon={<BookOpen size={15} className="text-[#0068FF]" />}
-              title="Khóa học đang học"
-              to="/courses"
-            />
-
+            <SectionHeader title="Khóa học đang học" to="/courses" />
             {loadingCourses ? (
-              <div className="flex justify-center py-8"><Loader2 size={20} className="animate-spin text-[#0068FF]" /></div>
+              <div className="flex justify-center py-10">
+                <Loader2 size={20} className="animate-spin text-[#1e51f9]" />
+              </div>
+            ) : courses.length === 0 ? (
+              <div className="bg-white dark:bg-[#1e2028] rounded-2xl border border-[#E0E4EB] dark:border-[#33485c] flex flex-col items-center py-10 gap-2">
+                <BookOpen size={24} className="text-slate-200 dark:text-[#33485c]" />
+                <p className="text-sm text-slate-400">Chưa có khóa học nào</p>
+              </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {courses.slice(0, 4).map((course: any) => {
-                  return (
-                    <Link
-                      key={course.$id}
-                      to={`/courses/${course.$id}`}
-                      className="group bg-white dark:bg-[#19191a] rounded-xl border border-slate-200 dark:border-[#33485c]/50 overflow-hidden hover:border-[#0B2275]/50 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[#0B2275]/8 transition-all duration-200"
-                    >
-                      <div className="h-16 relative bg-[#0B2275]">
-                        <div className="absolute inset-0 flex items-center px-3">
-                          <span className="font-mono text-lg font-black text-white tracking-widest">{course.code}</span>
-                        </div>
+                {courses.slice(0, 4).map((course: any) => (
+                  <Link
+                    key={course.$id}
+                    to={`/courses/${course.$id}`}
+                    className="group bg-white dark:bg-[#1e2028] rounded-2xl border border-[#E0E4EB] dark:border-[#33485c] overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
+                  >
+                    {/* Color bar */}
+                    <div
+                      className="h-1.5 w-full"
+                      style={{ background: course.coverColor ?? '#1e51f9' }}
+                    />
+                    <div className="p-4">
+                      <div className="flex items-start justify-between mb-2">
+                        <span
+                          className="font-mono text-[10px] font-black tracking-widest px-1.5 py-0.5 rounded"
+                          style={{
+                            background: `${course.coverColor ?? '#1e51f9'}15`,
+                            color: course.coverColor ?? '#1e51f9',
+                          }}
+                        >
+                          {course.code}
+                        </span>
                         {!course.isActive && (
-                          <span className="absolute top-1.5 right-2 text-[9px] font-bold bg-black/30 text-white/60 px-1.5 py-0.5 rounded">Kết thúc</span>
+                          <span className="text-[9px] font-bold uppercase text-slate-400 border border-slate-200 dark:border-[#33485c] px-1.5 py-0.5 rounded">
+                            Kết thúc
+                          </span>
                         )}
                       </div>
-                      <div className="px-3 py-2.5">
-                        <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 truncate leading-snug">{course.name}</p>
-                        <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 flex items-center gap-1">
-                          <GraduationCap size={10} /> {course.semester}
-                        </p>
-                      </div>
-                    </Link>
-                  );
-                })}
+                      <p className="text-[13px] font-semibold text-slate-800 dark:text-[#dce3e8] leading-snug line-clamp-2 group-hover:text-[#1e51f9] transition-colors">
+                        {course.name}
+                      </p>
+                      <p className="text-[11px] text-slate-400 dark:text-[#4d6070] mt-1.5 flex items-center gap-1">
+                        <GraduationCap size={10} /> {course.semester}
+                      </p>
+                    </div>
+                  </Link>
+                ))}
               </div>
             )}
           </div>
 
-          {/* ── Grades placeholder ─────────────────────────────────────────── */}
+          {/* Grades */}
           <div>
-            <SectionHeader
-              icon={<Star size={15} className="text-amber-500" />}
-              title="Điểm gần đây"
-              to="/courses"
-            />
-            {/* MOCK: hardcoded grades — thay bằng GET /api/grades?studentId=... khi có */}
-            <div className="bg-white dark:bg-[#19191a] rounded-xl border border-slate-200 dark:border-[#33485c]/50 divide-y divide-slate-50 dark:divide-[#0d2137]">
-              {[
-                { subject: 'Mạng Máy Tính (CS301)',         component: 'Giữa kỳ', score: 8.5, max: 10, color: '#0068FF' },
-                { subject: 'Kiểm Thử Phần Mềm (SE302)',     component: 'Bài tập', score: 9.0, max: 10, color: '#27ae60' },
-                { subject: 'Trí Tuệ Nhân Tạo (IT310)',      component: 'Lab',     score: 7.5, max: 10, color: '#8e44ad' },
-              ].map((g) => (
-                <div key={g.subject} className="flex items-center gap-4 px-4 py-3">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-slate-700 dark:text-slate-200 truncate">{g.subject}</p>
-                    <p className="text-[11px] text-slate-400 dark:text-slate-500">{g.component}</p>
-                  </div>
-                  <div className="flex items-center gap-3 shrink-0">
-                    <div className="w-28 hidden sm:block">
-                      <div className="h-1.5 bg-slate-100 dark:bg-[#33485c]/40 rounded-full overflow-hidden">
-                        <div className="h-full rounded-full" style={{ width: `${(g.score / g.max) * 100}%`, background: g.color }} />
-                      </div>
-                    </div>
-                    <span className="text-sm font-bold text-slate-800 dark:text-slate-100 w-10 text-right">
-                      {g.score}<span className="text-xs font-normal text-slate-400">/{g.max}</span>
-                    </span>
-                  </div>
-                </div>
-              ))}
-              <div className="px-4 py-2.5">
-                <Link to="/courses" className="text-xs text-[#0068FF] hover:underline">Xem toàn bộ điểm →</Link>
-              </div>
+            <SectionHeader title="Điểm gần đây" to="/courses" />
+            <div className="bg-white dark:bg-[#1e2028] rounded-2xl border border-[#E0E4EB] dark:border-[#33485c] flex flex-col items-center py-10 gap-2">
+              <Star size={22} className="text-slate-200 dark:text-[#33485c]" />
+              <p className="text-sm text-slate-400">Chưa có điểm nào</p>
+              <Link to="/courses" className="text-xs text-[#1e51f9] hover:underline mt-0.5">
+                Vào khóa học để xem điểm →
+              </Link>
             </div>
           </div>
         </div>
 
-        {/* ── RIGHT: Notifications + Forms ───────────────────────────────────── */}
-        <div className="flex flex-col gap-5">
+        {/* ── RIGHT: Notifications + Forms ───────────────────────────────── */}
+        <div className="flex flex-col gap-6">
 
           {/* Notifications */}
           <div>
             <SectionHeader
-              icon={<Bell size={15} className="text-amber-500" />}
               title={`Thông báo${unreadCount > 0 ? ` (${unreadCount})` : ''}`}
               to="/notifications"
             />
-            <div className="bg-white dark:bg-[#19191a] rounded-xl border border-slate-200 dark:border-[#33485c]/50 overflow-hidden">
+            <div className="bg-white dark:bg-[#1e2028] rounded-2xl border border-[#E0E4EB] dark:border-[#33485c] overflow-hidden">
               {loadingNotifs ? (
-                <div className="flex justify-center py-8"><Loader2 size={18} className="animate-spin text-[#0068FF]" /></div>
+                <div className="flex justify-center py-10">
+                  <Loader2 size={18} className="animate-spin text-[#1e51f9]" />
+                </div>
               ) : notifs.length === 0 ? (
-                <p className="text-xs text-slate-400 text-center py-8">Không có thông báo</p>
+                <div className="flex flex-col items-center py-10 gap-2">
+                  <Bell size={20} className="text-slate-200 dark:text-[#33485c]" />
+                  <p className="text-xs text-slate-400">Không có thông báo</p>
+                </div>
               ) : (
-                <div className="divide-y divide-slate-50 dark:divide-[#0d2137]">
-                  {notifs.slice(0, 4).map((n: any) => (
+                <div className="divide-y divide-[#F4F6F8] dark:divide-[#243447]">
+                  {notifs.slice(0, 5).map((n: any) => (
                     <Link
                       key={n.$id}
                       to={n.linkTo || '/notifications'}
-                      className={`flex items-start gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-[#0d2137] transition-colors ${!n.read ? 'bg-[#0068FF]/4 dark:bg-[#0068FF]/6' : ''}`}
+                      className={`flex items-start gap-3 px-4 py-3 hover:bg-[#F4F6F8] dark:hover:bg-[#0d2137] transition-colors ${!n.read ? 'bg-[#1e51f9]/3' : ''}`}
                     >
-                      <span className={`w-2 h-2 rounded-full shrink-0 mt-1.5 ${NOTIF_DOT[n.type] ?? 'bg-slate-300'}`} />
+                      <span className={`w-1.5 h-1.5 rounded-full shrink-0 mt-[5px] ${NOTIF_DOT[n.type] ?? 'bg-slate-300'}`} />
                       <div className="min-w-0 flex-1">
-                        <p className="text-xs text-slate-700 dark:text-slate-200 leading-relaxed line-clamp-2">{n.message}</p>
-                        <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">{formatTimeAgo(n.$createdAt)}</p>
+                        <p className="text-[12.5px] text-slate-700 dark:text-[#bfc6cc] leading-relaxed line-clamp-2">{n.message}</p>
+                        <p className="text-[10px] text-slate-400 dark:text-[#4d6070] mt-0.5">{formatTimeAgo(n.$createdAt)}</p>
                       </div>
                     </Link>
                   ))}
@@ -222,21 +225,22 @@ const Home = () => {
 
           {/* Forms */}
           <div>
-            <SectionHeader
-              icon={<FileText size={15} className="text-[#2F398E]" />}
-              title="Biểu mẫu của tôi"
-              to="/forms"
-            />
-            <div className="bg-white dark:bg-[#19191a] rounded-xl border border-slate-200 dark:border-[#33485c]/50 overflow-hidden">
+            <SectionHeader title="Biểu mẫu của tôi" to="/forms" />
+            <div className="bg-white dark:bg-[#1e2028] rounded-2xl border border-[#E0E4EB] dark:border-[#33485c] overflow-hidden">
               {loadingForms ? (
-                <div className="flex justify-center py-8"><Loader2 size={18} className="animate-spin text-[#0068FF]" /></div>
+                <div className="flex justify-center py-10">
+                  <Loader2 size={18} className="animate-spin text-[#1e51f9]" />
+                </div>
               ) : forms.length === 0 ? (
-                <div className="flex flex-col items-center py-8 gap-2">
+                <div className="flex flex-col items-center py-10 gap-2">
+                  <FileText size={20} className="text-slate-200 dark:text-[#33485c]" />
                   <p className="text-xs text-slate-400">Chưa có biểu mẫu nào</p>
-                  <Link to="/forms" className="text-xs text-[#0068FF] hover:underline">Nộp biểu mẫu →</Link>
+                  <Link to="/forms" className="text-xs text-[#1e51f9] hover:underline mt-0.5">
+                    Nộp biểu mẫu →
+                  </Link>
                 </div>
               ) : (
-                <div className="divide-y divide-slate-50 dark:divide-[#0d2137]">
+                <div className="divide-y divide-[#F4F6F8] dark:divide-[#243447]">
                   {forms.slice(0, 4).map((f: any) => {
                     const st = FORM_STATUS[(f.status as SubmissionStatus)] ?? FORM_STATUS.pending;
                     const StatusIcon = st.Icon;
@@ -244,14 +248,14 @@ const Home = () => {
                       <Link
                         key={f.$id}
                         to="/forms"
-                        className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-[#0d2137] transition-colors"
+                        className="flex items-center gap-3 px-4 py-3 hover:bg-[#F4F6F8] dark:hover:bg-[#0d2137] transition-colors"
                       >
                         <div className="min-w-0 flex-1">
-                          <p className="text-xs font-medium text-slate-700 dark:text-slate-200 truncate">{f.formTitle}</p>
-                          <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">{formatTimeAgo(f.$createdAt)}</p>
+                          <p className="text-[12.5px] font-medium text-slate-700 dark:text-[#bfc6cc] truncate">{f.formTitle}</p>
+                          <p className="text-[10px] text-slate-400 dark:text-[#4d6070] mt-0.5">{formatTimeAgo(f.$createdAt)}</p>
                         </div>
                         <span className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold shrink-0 ${st.cls}`}>
-                          <StatusIcon size={11} /> {st.label}
+                          <StatusIcon size={10} /> {st.label}
                         </span>
                       </Link>
                     );

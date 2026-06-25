@@ -22,9 +22,10 @@ const ProfilePage = () => {
   const profileUserId = id || currentUser.id;
   const isOwnProfile = !id || id === currentUser.id;
 
-  const { data: appwriteUser, isPending: isLoadingUser } = useGetUserById(profileUserId);
+  const { data: profileData, isPending: isLoadingUser } = useGetUserById(profileUserId);
 
-  const isMicrosoftUser = appwriteUser?.authProvider === 'microsoft';
+  // authProvider comes from the API response now that UserDTO includes it
+  const isMicrosoftUser = profileData?.authProvider === 'microsoft';
 
   useEffect(() => {
     if (isOwnProfile && isAuthenticated && isMicrosoftUser) {
@@ -42,27 +43,34 @@ const ProfilePage = () => {
     setTimeout(() => setCopied(null), 1800);
   };
 
-  if (isLoadingUser) {
+  if (isLoadingUser && !profileData) {
     return (
       <div className="min-h-full bg-[#F8FAFC] dark:bg-slate-900 flex items-center justify-center">
-        <Loader2 size={24} className="animate-spin text-[#0068FF]" />
+        <Loader2 size={24} className="animate-spin text-[#1e51f9]" />
       </div>
     );
   }
 
-  const displayName = appwriteUser?.name || (isOwnProfile ? currentUser.name : 'Unknown User');
-  const displayEmail = appwriteUser?.email || (isOwnProfile ? currentUser.email : '');
-  const displayBio = appwriteUser?.bio || (isOwnProfile ? currentUser.bio : '');
-  const displayUsername = appwriteUser?.username || (isOwnProfile ? currentUser.username : '');
+  const displayName  = profileData?.name  || (isOwnProfile ? currentUser.name  : 'Unknown User');
+  const displayEmail = profileData?.email || (isOwnProfile ? currentUser.email : '');
+  const displayBio   = profileData?.bio   || (isOwnProfile ? currentUser.bio   : '');
+  const displayUsername = profileData?.username || (isOwnProfile ? currentUser.username : '');
   const initials = getInitials(displayName || '?');
-  // Derive role from Appwrite document (synced from Azure AD on sign-in)
-  const profileRoles: string[] = (appwriteUser?.roles as string[] | undefined) ?? [];
+
+  const profileRoles: string[] = Array.isArray(profileData?.roles)
+    ? (profileData!.roles as string[])
+    : [];
   const isProfileAdmin    = isAdminRole(profileRoles);
   const isProfileLecturer = !isProfileAdmin && isLecturerRole(profileRoles);
   const isProfileStudent  = !isProfileAdmin && !isProfileLecturer;
 
+  // Determine whether to show the avatar image
+  const avatarUrl = profileData?.imageUrl || (isOwnProfile ? currentUser.imageUrl : '');
+  const showAvatar = !!avatarUrl && avatarUrl.trim() !== '';
+
   return (
     <div className="min-h-full bg-[#F8FAFC] dark:bg-slate-900">
+      {/* Top nav bar */}
       <div className="sticky top-0 z-10 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-700 px-6 py-3.5">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <button
@@ -85,22 +93,32 @@ const ProfilePage = () => {
       <div className="max-w-5xl mx-auto px-6 py-4 flex flex-col gap-3">
         {/* Profile card */}
         <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
-          <div className="h-20" style={{ background: '#0068FF' }} />
+          {/* Cover */}
+          <div className="h-20" style={{ background: 'linear-gradient(135deg, #1e51f9 0%, #2F398E 100%)' }} />
 
-          <div className="px-5 pb-4">
-            <div className="flex items-end justify-between -mt-7 mb-3">
+          <div className="px-5 pb-5">
+            <div className="flex items-end justify-between -mt-7 mb-4">
+              {/* Avatar */}
               <div
-                className="w-16 h-16 rounded-2xl border-4 border-white dark:border-slate-800 flex items-center justify-center text-white text-xl font-bold shadow-md"
-                style={{ background: '#0068FF' }}
+                className="w-16 h-16 rounded-2xl border-4 border-white dark:border-slate-800 flex items-center justify-center text-white text-xl font-bold shadow-md overflow-hidden"
+                style={{ background: '#1e51f9' }}
               >
-                {appwriteUser?.imageUrl && !String(appwriteUser.imageUrl).includes('avatars') ? (
-                  <img src={appwriteUser.imageUrl} alt={displayName} className="w-full h-full rounded-xl object-cover" />
+                {showAvatar ? (
+                  <img
+                    src={avatarUrl}
+                    alt={displayName}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }}
+                  />
                 ) : (
-                  initials
+                  <span>{initials}</span>
                 )}
               </div>
             </div>
 
+            {/* Name + role badges */}
             <div className="flex items-center gap-2 flex-wrap">
               <h1 className="text-xl font-bold text-slate-900 dark:text-slate-50">{displayName}</h1>
               {isProfileAdmin && (
@@ -109,7 +127,7 @@ const ProfilePage = () => {
                 </span>
               )}
               {isProfileLecturer && (
-                <span className="flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
+                <span className="flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300">
                   <BookOpen size={10} /> Giảng viên
                 </span>
               )}
@@ -119,11 +137,15 @@ const ProfilePage = () => {
                 </span>
               )}
             </div>
+
             {displayUsername && (
               <p className="text-sm text-slate-400 dark:text-slate-500 mt-0.5">@{displayUsername}</p>
             )}
+
             {displayBio && (
-              <p className="text-sm text-slate-600 dark:text-slate-300 mt-2 leading-relaxed">{displayBio}</p>
+              <p className="text-sm text-slate-600 dark:text-slate-300 mt-2 leading-relaxed max-w-lg">
+                {displayBio}
+              </p>
             )}
 
             <div className="flex flex-wrap gap-x-4 gap-y-1 mt-3 text-xs text-slate-400 dark:text-slate-500">
@@ -145,14 +167,14 @@ const ProfilePage = () => {
         {isOwnProfile && isMicrosoftUser && (
           <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
             <div className="flex items-center gap-3 px-5 py-4 border-b border-slate-50 dark:border-slate-700">
-              <div className="w-8 h-8 rounded-lg bg-[#0068FF]/10 dark:bg-[#0068FF]/20 flex items-center justify-center">
-                <User size={15} className="text-[#0068FF]" />
+              <div className="w-8 h-8 rounded-lg bg-[#1e51f9]/10 dark:bg-[#1e51f9]/20 flex items-center justify-center">
+                <User size={15} className="text-[#1e51f9]" />
               </div>
               <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">{t('profile.microsoftIdentity')}</p>
               {isLoadingGraph && <Loader2 size={13} className="animate-spin text-slate-400 ml-auto" />}
             </div>
             <div className="px-5 py-3">
-              {graphProfile ? (
+              {graphProfile && Object.keys(graphProfile).length > 0 ? (
                 [
                   { label: t('profile.displayName'), value: graphProfile.displayName, id: 'dn' },
                   { label: t('profile.emailUpn'), value: graphProfile.userPrincipalName, id: 'upn', mono: true },
@@ -189,7 +211,6 @@ const ProfilePage = () => {
             </div>
           </div>
         )}
-
       </div>
     </div>
   );

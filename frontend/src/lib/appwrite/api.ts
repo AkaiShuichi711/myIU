@@ -4,7 +4,7 @@ import type {
   INewNotification, INewPost, INewUser, IUpdatePost, IUpdateUser,
   INewCourse, INewCourseGroup, INewGroupMember, INewCoursePost,
   INewFormTemplate, IUpdateFormTemplate, INewFormSubmission,
-  IUpdateFormSubmission, IUpsertCourseGrade,
+  IUpdateFormSubmission, IUpsertCourseGrade, INewSupportTicket,
 } from '@/types';
 
 // ─── AUTH ─────────────────────────────────────────────────────────────────────
@@ -376,7 +376,23 @@ export async function getBlockedUsers(_blockerId: string) {
 }
 
 export async function getAccountSessions() {
-  return { sessions: [] };
+  try {
+    const res = await api.get<any>('/api/sessions');
+    const sessions = res?.data ?? res ?? [];
+    return { sessions: Array.isArray(sessions) ? sessions : [] };
+  } catch { return { sessions: [] }; }
+}
+
+export async function revokeSession(id: string) {
+  return api.delete(`/api/sessions/${id}`);
+}
+
+export async function revokeOtherSessions() {
+  return api.delete('/api/sessions/others');
+}
+
+export async function sessionHeartbeat() {
+  try { await api.put('/api/sessions/heartbeat'); } catch { /* ignore */ }
 }
 
 // ─── FORM TEMPLATES ───────────────────────────────────────────────────────────
@@ -549,4 +565,27 @@ export async function upsertCourseGrade(data: IUpsertCourseGrade) {
 
 export async function upsertCourseGrades(grades: IUpsertCourseGrade[]) {
   return Promise.all(grades.map(upsertCourseGrade));
+}
+
+// ─── FORM SUBMISSION FILE UPLOAD ─────────────────────────────────────────────
+
+export async function uploadFormSubmissionFile(submissionId: string, file: File): Promise<string | null> {
+  try {
+    return await upload(`/api/forms/submissions/${submissionId}/upload`, file);
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+}
+
+// ─── SUPPORT ──────────────────────────────────────────────────────────────────
+
+export async function createSupportTicket(data: INewSupportTicket) {
+  return norm(await api.post<any>('/api/support', data));
+}
+
+export async function getMySupportTickets() {
+  try {
+    return normList(await api.get<any[]>('/api/support/mine'));
+  } catch { return []; }
 }

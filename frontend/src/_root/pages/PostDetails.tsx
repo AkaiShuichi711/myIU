@@ -31,7 +31,7 @@ const PostDetails = () => {
   if (isLoading) {
     return (
       <div className="min-h-full bg-[#F8FAFC] dark:bg-[#19191a] flex items-center justify-center">
-        <Loader2 size={24} className="animate-spin text-[#0068FF]" />
+        <Loader2 size={24} className="animate-spin text-[#1e51f9]" />
       </div>
     );
   }
@@ -40,7 +40,7 @@ const PostDetails = () => {
     return (
       <div className="min-h-full bg-[#F8FAFC] dark:bg-[#19191a] flex flex-col items-center justify-center gap-4">
         <p className="text-slate-500 dark:text-slate-400 font-medium">Post not found</p>
-        <button onClick={() => navigate(-1)} className="text-sm text-[#0068FF] hover:underline">Go back</button>
+        <button onClick={() => navigate(-1)} className="text-sm text-[#1e51f9] hover:underline">Go back</button>
       </div>
     );
   }
@@ -143,7 +143,7 @@ const PostDetails = () => {
                 >
                   <div
                     className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0"
-                    style={{ background: '#0068FF' }}
+                    style={{ background: '#1e51f9' }}
                   >
                     {creatorInitials}
                   </div>
@@ -169,7 +169,7 @@ const PostDetails = () => {
                 {Array.isArray(post.tags) && post.tags.filter(Boolean).length > 0 && (
                   <div className="flex flex-wrap gap-1.5">
                     {post.tags.filter(Boolean).map((tag: string) => (
-                      <span key={tag} className="px-2.5 py-1 rounded-full text-xs font-medium bg-[#0068FF]/8 dark:bg-[#0068FF]/20 text-[#0068FF]">
+                      <span key={tag} className="px-2.5 py-1 rounded-full text-xs font-medium bg-[#1e51f9]/8 dark:bg-[#1e51f9]/20 text-[#1e51f9]">
                         #{tag}
                       </span>
                     ))}

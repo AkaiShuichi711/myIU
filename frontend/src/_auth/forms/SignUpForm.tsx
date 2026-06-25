@@ -77,7 +77,7 @@ const SignUpForm = () => {
         <h2 className="h3-bold md:h2-bold pt-5 sm:pt-12">
           Create a new account
         </h2>
-        <p className="text-light-3 small-medPasm md:base-regular mt-2">
+        <p className="text-slate-500 small-medium md:base-regular mt-2">
           to use myIU, please enter your account details
         </p>
 
@@ -147,11 +147,11 @@ const SignUpForm = () => {
             )}
           </Button>
 
-          <p className="text-small-regular text-light-2 text-center mt-2">
+          <p className="text-small-regular text-slate-500 text-center mt-2">
             Already have an account?
             <Link
               to="/sign-in"
-              className="text-[#0068ff] text-small-semibold ml-1"
+              className="text-[#1e51f9] text-small-semibold ml-1"
             >
               {" "}
               Log in

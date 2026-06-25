@@ -15,3 +15,4 @@ export { default as CourseDetail } from "./CourseDetail";
 export { default as CreateCoursePage } from "./CreateCoursePage";
 export { default as FormsPage } from "./FormsPage";
 export { default as FormReviewPage } from "./FormReviewPage";
+export { default as SupportPage } from "./SupportPage";

@@ -59,6 +59,8 @@ import {
   updateUserPrivacy,
   getUserLikedPosts,
   getAccountSessions,
+  revokeSession,
+  revokeOtherSessions,
   // Phase 4 – Forms
   getFormTemplates,
   createFormTemplate,
@@ -73,8 +75,11 @@ import {
   getCourseGrades,
   getStudentGrade,
   upsertCourseGrades,
+  // Support
+  createSupportTicket,
+  getMySupportTickets,
 } from '../appwrite/api';
-import { INewNotification, INewPost, INewUser, IUpdatePost, IUpdateUser, INewCourse, INewCourseGroup, INewGroupMember, INewCoursePost, INewFormTemplate, IUpdateFormTemplate, INewFormSubmission, IUpdateFormSubmission, IUpsertCourseGrade } from '@/types';
+import { INewNotification, INewPost, INewUser, IUpdatePost, IUpdateUser, INewCourse, INewCourseGroup, INewGroupMember, INewCoursePost, INewFormTemplate, IUpdateFormTemplate, INewFormSubmission, IUpdateFormSubmission, IUpsertCourseGrade, INewSupportTicket } from '@/types';
 
 export const QUERY_KEYS = {
   // Phase 4 – Forms
@@ -85,6 +90,7 @@ export const QUERY_KEYS = {
   // Phase 4 – Grades
   GET_COURSE_GRADES:              'getCourseGrades',
   GET_STUDENT_GRADE:              'getStudentGrade',
+  GET_MY_SUPPORT_TICKETS:         'getMySupportTickets',
   // Phase 3 – Courses
   GET_COURSES_BY_LECTURER: 'getCoursesByLecturer',
   GET_COURSES_BY_STUDENT:  'getCoursesByStudent',
@@ -167,8 +173,8 @@ export const useUpdateUser = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (user: IUpdateUser) => updateUser(user),
-    onSuccess: (data: any) => {
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_USER_BY_ID, data?.$id] });
+    onSuccess: (_data: any, vars: IUpdateUser) => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_USER_BY_ID, vars.userId] });
     },
   });
 };
@@ -421,6 +427,22 @@ export const useGetAccountSessions = () =>
     queryKey: [QUERY_KEYS.GET_ACCOUNT_SESSIONS],
     queryFn: getAccountSessions,
   });
+
+export const useRevokeSession = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (sessionId: string) => revokeSession(sessionId),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_ACCOUNT_SESSIONS] }),
+  });
+};
+
+export const useRevokeOtherSessions = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: revokeOtherSessions,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_ACCOUNT_SESSIONS] }),
+  });
+};
 
 // ─── COURSES ──────────────────────────────────────────────────────────────────
 
@@ -676,3 +698,21 @@ export const useUpsertCourseGrades = () => {
     },
   });
 };
+
+// ─── Support ──────────────────────────────────────────────────────────────────
+
+export const useCreateSupportTicket = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: INewSupportTicket) => createSupportTicket(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_MY_SUPPORT_TICKETS] });
+    },
+  });
+};
+
+export const useGetMySupportTickets = () =>
+  useQuery({
+    queryKey: [QUERY_KEYS.GET_MY_SUPPORT_TICKETS],
+    queryFn: getMySupportTickets,
+  });

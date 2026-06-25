@@ -7,7 +7,7 @@ import { useGetInfinitePosts, useSearchPosts } from '@/lib/react-query/queriesAn
 import { PostCard, GridPostList } from '@/components/shared';
 import { useDebounce } from '@/hooks/useDebounce';
 
-const searchInputCls = "w-full pl-9 pr-8 py-2.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#0068FF]/20 focus:border-[#0068FF] transition-all";
+const searchInputCls = "w-full pl-9 pr-8 py-2.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#1e51f9]/20 focus:border-[#1e51f9] transition-all";
 
 const Explore = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -33,18 +33,8 @@ const Explore = () => {
     }
   }, [inView, hasNextPage, debouncedSearch]);
 
-  // ── MOCK DATA — xóa/comment block này khi Appwrite posts collection đã có data ──
-  const MOCK_POSTS = [
-    { $id: 'mp1', creator: { $id: 'mu1', name: 'Nguyễn Văn An', imageUrl: '' }, caption: 'Vừa hoàn thành bài lab môn Networks! Cuối cùng cũng hiểu tại sao TCP cần 3-way handshake 🤝', mediaUrls: [], mediaTypes: [], tags: ['networking', 'ititiu', 'lab'], location: 'IU Campus', likes: ['mu2', 'mu3'], $createdAt: '2026-06-09T08:00:00.000Z' },
-    { $id: 'mp2', creator: { $id: 'mu2', name: 'Trần Thị Bảo', imageUrl: '' }, caption: 'Thư viện IU mới refactor xong — clean code, no more spaghetti! 🍝 Ai muốn review PR không?', mediaUrls: [], mediaTypes: [], tags: ['cleancode', 'refactor'], location: 'IU Library', likes: ['mu1', 'mu3', 'mu4'], $createdAt: '2026-06-08T14:30:00.000Z' },
-    { $id: 'mp3', creator: { $id: 'mu3', name: 'Lê Văn Cường', imageUrl: '' }, caption: 'GPA kỳ này: 3.8/4.0 🔥 Cảm ơn thầy cô và các bạn trong nhóm học! Semester cuối rồi, cố thôi.', mediaUrls: [], mediaTypes: [], tags: ['gpa', 'academic', 'senior'], location: '', likes: ['mu1', 'mu2', 'mu4', 'mu5'], $createdAt: '2026-06-07T10:00:00.000Z' },
-    { $id: 'mp4', creator: { $id: 'mu4', name: 'Phạm Thị Duyên', imageUrl: '' }, caption: 'Demo hackathon IU 2026 đã xong! Team mình làm app hỗ trợ sinh viên khuyết tật tiếp cận tài liệu 📚 Wish us luck!', mediaUrls: [], mediaTypes: [], tags: ['hackathon', 'accessibility', 'iu2026'], location: 'Hall B', likes: ['mu1', 'mu2', 'mu3'], $createdAt: '2026-06-06T16:00:00.000Z' },
-    { $id: 'mp5', creator: { $id: 'mu5', name: 'Hoàng Minh Đức', imageUrl: '' }, caption: 'Có ai học Embedded Systems không cho tôi hỏi cái oscilloscope reading với? Debug cả buổi không ra 😭', mediaUrls: [], mediaTypes: [], tags: ['embedded', 'hardware', 'help'], location: 'Lab 4F', likes: ['mu2'], $createdAt: '2026-06-05T09:30:00.000Z' },
-  ];
-  // ── END MOCK ──
-
   const realPosts = (infiniteData?.pages?.flat() ?? []).filter(Boolean);
-  const allPosts = realPosts.length > 0 ? realPosts : MOCK_POSTS;
+  const allPosts = realPosts;
   const isSearchMode = debouncedSearch.trim().length > 0;
   const posts = isSearchMode ? (searchResults ?? []).filter(Boolean) : allPosts;
   const isLoading = !isSearchMode && isLoadingFeed && realPosts.length === 0;
@@ -53,7 +43,7 @@ const Explore = () => {
     <div className="min-h-full bg-[#F8FAFC] dark:bg-[#19191a]">
       <div className="sticky top-0 z-10 bg-white dark:bg-[#19191a] border-b border-slate-100 dark:border-slate-700 px-6 py-4">
         <div className="max-w-5xl mx-auto flex flex-col gap-2">
-          <Link to="/home" className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-[#0068FF] transition-colors font-mono w-fit">
+          <Link to="/home" className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-[#1e51f9] transition-colors font-mono w-fit">
             <Home size={11} /> HOME
           </Link>
           <div className="flex items-center gap-3">
@@ -154,7 +144,7 @@ const Explore = () => {
         {!isSearchMode && (
           <div ref={loadMoreRef} className="py-8 flex justify-center">
             {isFetchingNextPage && (
-              <Loader2 size={20} className="animate-spin text-[#0068FF]" />
+              <Loader2 size={20} className="animate-spin text-[#1e51f9]" />
             )}
             {!hasNextPage && posts.length > 0 && (
               <p className="text-xs text-slate-400 dark:text-slate-500">{t('explore.seenAll')}</p>

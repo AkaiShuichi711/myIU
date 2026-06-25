@@ -16,7 +16,7 @@ const TYPE_META: Record<string, { icon: React.ReactNode; color: string }> = {
   form_approved: { icon: <FileText size={15} className="text-[#00c578]" />,  color: 'bg-[#00c578]/12' },
   form_rejected: { icon: <FileText size={15} className="text-[#ef4e49]" />,  color: 'bg-[#ef4e49]/12' },
   form_pending:  { icon: <FileText size={15} className="text-[#f5832f]" />,  color: 'bg-[#f5832f]/12' },
-  grade:         { icon: <Star size={15} className="text-[#0068FF]" />,      color: 'bg-[#0068FF]/10' },
+  grade:         { icon: <Star size={15} className="text-[#1e51f9]" />,      color: 'bg-[#1e51f9]/10' },
   course:        { icon: <BookOpen size={15} className="text-[#2F398E]" />,  color: 'bg-[#2F398E]/10' },
   system:        { icon: <GraduationCap size={15} className="text-[#99a3ad]" />, color: 'bg-[#33485c]/15' },
 };
@@ -30,15 +30,7 @@ const Notifications = () => {
   const { mutate: markRead } = useMarkNotificationRead();
   const { mutate: markAll, isPending: isMarkingAll } = useMarkAllNotificationsRead();
 
-  // MOCK: fallback khi API /api/notifications chưa trả data — xóa block này sau khi có data thật
-  const MOCK_NOTIFS = [
-    { $id: 'nn1', userId: user.id, type: 'form_approved', actorId: 'sys', actorName: 'Phòng Đào Tạo', linkTo: '/forms', message: 'Phòng Đào Tạo đã duyệt đơn xin miễn học phần của bạn',       read: false, $createdAt: '2026-06-10T09:00:00.000Z' },
-    { $id: 'nn2', userId: user.id, type: 'grade',         actorId: 'sys', actorName: 'Hệ thống',       linkTo: '/courses', message: 'Hệ thống vừa cập nhật điểm môn Mạng Máy Tính (CS301)',   read: false, $createdAt: '2026-06-10T07:30:00.000Z' },
-    { $id: 'nn3', userId: user.id, type: 'course',        actorId: 'sys', actorName: 'Hệ thống',       linkTo: '/courses', message: 'Bạn vừa được đăng ký vào lớp Lập Trình Hướng Đối Tượng', read: false, $createdAt: '2026-06-09T15:00:00.000Z' },
-    { $id: 'nn4', userId: user.id, type: 'form_rejected', actorId: 'sys', actorName: 'Phòng Đào Tạo', linkTo: '/forms', message: 'Phòng Đào Tạo đã từ chối đơn xin bảo lưu — vui lòng bổ sung hồ sơ', read: true, $createdAt: '2026-06-09T08:00:00.000Z' },
-    { $id: 'nn5', userId: user.id, type: 'system',        actorId: 'sys', actorName: 'myIU Portal',    linkTo: '', message: 'Lịch thi HK2 2025-2026 đã được công bố. Kiểm tra ngay trên Courses.',  read: true, $createdAt: '2026-06-08T08:00:00.000Z' },
-  ]; // END MOCK
-  const allNotifs = (rawNotifs as any[]).length > 0 ? (rawNotifs as any[]) : MOCK_NOTIFS;
+  const allNotifs = rawNotifs as any[];
 
   const notifications = allNotifs.filter((n) => filter === 'all' || !n.read);
   const unreadCount = allNotifs.filter((n) => !n.read).length;
@@ -53,9 +45,7 @@ const Notifications = () => {
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-[#2F398E]/10 flex items-center justify-center">
-              <Bell size={16} className="text-[#2F398E]" />
-            </div>
+            <Bell size={18} className="text-[#2F398E] dark:text-blue-400" />
             <h1 className="text-base font-bold text-slate-900 dark:text-slate-50">
               {t('notifications.title')}
               {unreadCount > 0 && (
@@ -70,7 +60,7 @@ const Notifications = () => {
             <button
               onClick={() => markAll(user.id)}
               disabled={isMarkingAll}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-[#0068FF] bg-[#0068FF]/8 border border-[#0068FF]/20 hover:bg-[#0068FF]/12 transition-colors disabled:opacity-60"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-[#1e51f9] bg-[#1e51f9]/8 border border-[#1e51f9]/20 hover:bg-[#1e51f9]/12 transition-colors disabled:opacity-60"
             >
               {isMarkingAll ? <Loader2 size={12} className="animate-spin" /> : <CheckCheck size={13} />}
               {t('notifications.markAllRead')}
@@ -102,7 +92,7 @@ const Notifications = () => {
         <div className="bg-white dark:bg-[#19191a] rounded-xl border border-slate-200 dark:border-[#33485c]/50 overflow-hidden">
           {isPending ? (
             <div className="flex justify-center py-16">
-              <Loader2 size={24} className="animate-spin text-[#0068FF]" />
+              <Loader2 size={24} className="animate-spin text-[#1e51f9]" />
             </div>
           ) : notifications.length === 0 ? (
             <div className="flex flex-col items-center py-20 gap-3 text-center">
@@ -123,7 +113,7 @@ const Notifications = () => {
 
                 const content = (
                   <div
-                    className={`flex items-start gap-3 px-5 py-4 hover:bg-slate-50 dark:hover:bg-[#0d2137] transition-colors cursor-pointer ${!n.read ? 'bg-[#0068FF]/4 dark:bg-[#0068FF]/6' : ''}`}
+                    className={`flex items-start gap-3 px-5 py-4 hover:bg-slate-50 dark:hover:bg-[#0d2137] transition-colors cursor-pointer ${!n.read ? 'bg-[#1e51f9]/4 dark:bg-[#1e51f9]/6' : ''}`}
                     onClick={() => handleClick(n)}
                   >
                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${meta.color}`}>
@@ -135,7 +125,7 @@ const Notifications = () => {
                       <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">{formatTimeAgo(n.$createdAt)}</p>
                     </div>
 
-                    {!n.read && <span className="w-2.5 h-2.5 rounded-full bg-[#0068FF] shrink-0 mt-1.5" />}
+                    {!n.read && <span className="w-2.5 h-2.5 rounded-full bg-[#1e51f9] shrink-0 mt-1.5" />}
                   </div>
                 );
 

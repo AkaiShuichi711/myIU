@@ -26,9 +26,6 @@ import {
 import type { ICourseGrade, IUpsertCourseGrade } from '@/types';
 import { formatTimeAgo, isLecturerRole, isAdminRole } from '@/lib/utils';
 import { INPUT_CLS } from '@/constants/courses';
-import {
-  MOCK_COURSE_MAP, MOCK_POSTS_FALLBACK, MOCK_GROUPS_FALLBACK, MOCK_STUDENTS,
-} from '@/constants/mockData';
 import UserAvatar from '@/components/shared/UserAvatar';
 
 type Tab = 'feed' | 'materials' | 'assignments' | 'members' | 'grades';
@@ -37,9 +34,9 @@ type PostType = 'announcement' | 'material' | 'assignment';
 const TYPE_META: Record<PostType, { label: string; color: string; border: string; bg: string; icon: typeof Megaphone }> = {
   announcement: {
     label: 'THÔNG BÁO',
-    color: 'text-[#0068FF]',
-    border: 'border-l-[3px] border-[#0068FF]',
-    bg: 'bg-[#0068FF]/6 dark:bg-[#0068FF]/10',
+    color: 'text-[#1e51f9]',
+    border: 'border-l-[3px] border-[#1e51f9]',
+    bg: 'bg-[#1e51f9]/6 dark:bg-[#1e51f9]/10',
     icon: Megaphone,
   },
   material: {
@@ -151,7 +148,7 @@ const GroupPanel = ({ group, courseId, isLecturer, onDeleteGroup }: any) => {
       <div className="flex items-center justify-between px-4 py-3 bg-slate-50 dark:bg-slate-800/60">
         <button
           onClick={() => setExpanded((v) => !v)}
-          className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:text-[#0068FF] transition-colors"
+          className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:text-[#1e51f9] transition-colors"
         >
           {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
           <span className="font-mono">{group.name}</span>
@@ -162,7 +159,7 @@ const GroupPanel = ({ group, courseId, isLecturer, onDeleteGroup }: any) => {
             <>
               <button
                 onClick={() => { setExpanded(true); setShowAddMember((v) => !v); }}
-                className="text-[11px] text-slate-500 dark:text-slate-400 hover:text-[#0068FF] transition-colors flex items-center gap-1"
+                className="text-[11px] text-slate-500 dark:text-slate-400 hover:text-[#1e51f9] transition-colors flex items-center gap-1"
               >
                 <UserPlus size={12} /> Thêm SV
               </button>
@@ -193,7 +190,7 @@ const GroupPanel = ({ group, courseId, isLecturer, onDeleteGroup }: any) => {
               <button
                 onClick={handleAddMember}
                 disabled={isAdding}
-                className="px-3 py-2 rounded-lg text-xs font-semibold text-white bg-[#0068FF] hover:bg-[#0087b3] transition-colors shrink-0 disabled:opacity-60"
+                className="px-3 py-2 rounded-lg text-xs font-semibold text-white bg-[#1e51f9] hover:bg-[#0087b3] transition-colors shrink-0 disabled:opacity-60"
               >
                 {isAdding ? <Loader2 size={12} className="animate-spin" /> : 'Thêm'}
               </button>
@@ -233,8 +230,7 @@ const GroupPanel = ({ group, courseId, isLecturer, onDeleteGroup }: any) => {
   );
 };
 
-// MOCK: cấu trúc thành phần điểm — thay bằng GET /api/courses/{id}/grade-components khi có endpoint
-const MOCK_COMPONENTS = [
+const GRADE_COMPONENTS = [
   { key: 'quiz',     label: 'Quizzes',  weight: 10 },
   { key: 'exercise', label: 'Exercise', weight: 10 },
   { key: 'lab',      label: 'Lab',      weight: 15 },
@@ -244,7 +240,7 @@ const MOCK_COMPONENTS = [
 ];
 
 function calcGpa(scores: Record<string, number>) {
-  return MOCK_COMPONENTS.reduce((sum, c) => sum + (scores[c.key] ?? 0) * c.weight / 100, 0);
+  return GRADE_COMPONENTS.reduce((sum, c) => sum + (scores[c.key] ?? 0) * c.weight / 100, 0);
 }
 function gradeLabel(g: number) {
   if (g >= 9.0) return 'A';
@@ -279,11 +275,9 @@ const CourseDetail = () => {
   const { data: myLecturerGroups = [] } = useGetLecturerGroupsInCourse(id, user.id);
   const { data: myStudentGroups  = [] } = useGetStudentGroupsInCourse(id, user.id);
 
-  // MOCK: dùng dữ liệu giả lập khi course/groups/posts chưa có trong DB
-  const isMockCourse = !rawCourse && !isLoadingCourse && !!MOCK_COURSE_MAP[id];
-  const course = (rawCourse ?? MOCK_COURSE_MAP[id]) as any;
-  const groups = (rawGroups as any[]).length > 0 ? rawGroups : (isMockCourse ? MOCK_GROUPS_FALLBACK : []);
-  const allPosts = (rawPosts as any[]).length > 0 ? rawPosts : (isMockCourse ? MOCK_POSTS_FALLBACK : []);
+  const course   = rawCourse as any;
+  const groups   = rawGroups as any[];
+  const allPosts = rawPosts  as any[];
 
   const { mutate: createPost,  isPending: isCreatingPost  } = useCreateCoursePost();
   const { mutate: deletePost  } = useDeleteCoursePost();
@@ -292,8 +286,8 @@ const CourseDetail = () => {
 
   const roles: string[] = (user as any).roles ?? [];
   const isLecturerByRole = isLecturerRole(roles) || isAdminRole(roles);
-  const isLecturer  = (myLecturerGroups as any[]).length > 0 || (isMockCourse && isLecturerByRole);
-  const isStudent   = (myStudentGroups  as any[]).length > 0 || (isMockCourse && !isLecturerByRole);
+  const isLecturer  = (myLecturerGroups as any[]).length > 0 || isLecturerByRole;
+  const isStudent   = (myStudentGroups  as any[]).length > 0 || !isLecturerByRole;
   const myStudentId = isStudent ? (myStudentGroups as any[])[0]?.studentId ?? user.id : user.id;
 
   // Grades
@@ -301,11 +295,8 @@ const CourseDetail = () => {
   const { data: myGradeRaw } = useGetStudentGrade(tab === 'grades' && isStudent && !isLecturer ? id : '', myStudentId);
   const { mutate: saveGrades, isPending: isSavingGrades } = useUpsertCourseGrades();
 
-  // Real grades with mock fallback
-  // ── MOCK GRADES — xóa/comment 2 dòng khi collection course_grades đã có data ──
-  const allGrades = (gradesRaw.length > 0 ? gradesRaw : isLecturer ? MOCK_STUDENTS.map((s) => ({ ...s.scores, courseId: id, studentId: s.id, studentName: s.name, gradedBy: user.id, $id: s.id, $createdAt: '', $updatedAt: '' })) : []) as unknown as ICourseGrade[];
-  const myGrade   = (myGradeRaw ?? (isStudent && !isLecturer ? { ...MOCK_STUDENTS[1].scores, courseId: id, studentId: myStudentId, studentName: user.name, gradedBy: '', $id: '', $createdAt: '', $updatedAt: '' } : null)) as unknown as ICourseGrade | null;
-  // ── END MOCK GRADES ──
+  const allGrades = gradesRaw as unknown as ICourseGrade[];
+  const myGrade   = (myGradeRaw ?? null) as unknown as ICourseGrade | null;
 
   // Local edit state for the grade table (lecturer only)
   const [editedScores, setEditedScores] = useState<Record<string, Record<string, number>>>({});
@@ -393,7 +384,7 @@ const CourseDetail = () => {
       <div className="sticky top-0 z-10 bg-white dark:bg-[#19191a] border-b border-slate-200 dark:border-slate-800 px-6 py-3">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Link to="/courses" className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-[#0068FF] transition-colors font-mono">
+            <Link to="/courses" className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-[#1e51f9] transition-colors font-mono">
               <ArrowLeft size={12} /> MÔN HỌC
             </Link>
             <span className="text-slate-300 dark:text-slate-700 text-[11px]">/</span>
@@ -402,7 +393,7 @@ const CourseDetail = () => {
           {isLecturer && (
             <button
               onClick={() => setShowCreatePost((v) => !v)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-[#0068FF] hover:bg-[#0087b3] transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-[#1e51f9] hover:bg-[#0087b3] transition-colors"
             >
               <Plus size={12} /> Tạo bài đăng
             </button>
@@ -433,14 +424,14 @@ const CourseDetail = () => {
               onClick={() => setTab(tid)}
               className={`px-4 py-2.5 text-xs font-semibold border-b-2 transition-all ${
                 tab === tid
-                  ? 'border-[#0068FF] text-[#0068FF]'
+                  ? 'border-[#1e51f9] text-[#1e51f9]'
                   : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
               }`}
             >
               {label}
               {count !== undefined && count > 0 && (
                 <span className={`ml-1.5 px-1.5 py-0.5 rounded-full text-[9px] font-bold ${
-                  tab === tid ? 'bg-[#0068FF]/12 text-[#0068FF]' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
+                  tab === tid ? 'bg-[#1e51f9]/12 text-[#1e51f9]' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
                 }`}>{count}</span>
               )}
             </button>
@@ -539,7 +530,7 @@ const CourseDetail = () => {
               <button
                 onClick={handleCreatePost}
                 disabled={isCreatingPost || !postForm.title.trim()}
-                className="px-4 py-2 rounded-lg text-xs font-semibold text-white bg-[#0068FF] hover:bg-[#0087b3] transition-colors disabled:opacity-60 flex items-center gap-1.5"
+                className="px-4 py-2 rounded-lg text-xs font-semibold text-white bg-[#1e51f9] hover:bg-[#0087b3] transition-colors disabled:opacity-60 flex items-center gap-1.5"
               >
                 {isCreatingPost ? <Loader2 size={12} className="animate-spin" /> : null}
                 Đăng bài
@@ -591,7 +582,7 @@ const CourseDetail = () => {
                   </h3>
                   <button
                     onClick={() => setShowCreateGroup((v) => !v)}
-                    className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400 hover:text-[#0068FF] transition-colors"
+                    className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400 hover:text-[#1e51f9] transition-colors"
                   >
                     <Plus size={12} /> Thêm nhóm
                   </button>
@@ -614,7 +605,7 @@ const CourseDetail = () => {
                     <button
                       onClick={handleCreateGroup}
                       disabled={isCreatingGroup || !groupForm.name.trim()}
-                      className="px-3 py-2 rounded-lg text-xs font-semibold text-white bg-[#0068FF] hover:bg-[#0087b3] transition-colors shrink-0 disabled:opacity-60"
+                      className="px-3 py-2 rounded-lg text-xs font-semibold text-white bg-[#1e51f9] hover:bg-[#0087b3] transition-colors shrink-0 disabled:opacity-60"
                     >
                       {isCreatingGroup ? <Loader2 size={12} className="animate-spin" /> : 'Tạo'}
                     </button>
@@ -658,10 +649,10 @@ const CourseDetail = () => {
                 <p className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Cấu trúc điểm</p>
               </div>
               <div className="flex flex-wrap gap-2">
-                {MOCK_COMPONENTS.map((c) => (
+                {GRADE_COMPONENTS.map((c) => (
                   <div key={c.key} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600">
                     <span className="text-xs font-semibold text-slate-700 dark:text-slate-200">{c.label}</span>
-                    <span className="text-[10px] font-bold text-[#0068FF] bg-[#0068FF]/10 px-1.5 py-0.5 rounded-full">{c.weight}%</span>
+                    <span className="text-[10px] font-bold text-[#1e51f9] bg-[#1e51f9]/10 px-1.5 py-0.5 rounded-full">{c.weight}%</span>
                   </div>
                 ))}
               </div>
@@ -684,7 +675,7 @@ const CourseDetail = () => {
                         <tr className="bg-slate-50 dark:bg-slate-700/40">
                           <th className="px-3 py-2.5 text-left font-semibold text-slate-500 dark:text-slate-400 min-w-[40px]">#</th>
                           <th className="px-3 py-2.5 text-left font-semibold text-slate-500 dark:text-slate-400 min-w-[160px]">Họ tên / MSSV</th>
-                          {MOCK_COMPONENTS.map((c) => (
+                          {GRADE_COMPONENTS.map((c) => (
                             <th key={c.key} className="px-2 py-2.5 text-center font-semibold text-slate-500 dark:text-slate-400 min-w-[72px]">
                               <div>{c.label}</div>
                               <div className="text-[9px] text-slate-400 font-normal">{c.weight}%</div>
@@ -711,7 +702,7 @@ const CourseDetail = () => {
                                 <p className="font-medium text-slate-700 dark:text-slate-200">{st.studentName}</p>
                                 <p className="text-[10px] text-slate-400 font-mono">{st.studentId}</p>
                               </td>
-                              {MOCK_COMPONENTS.map((c) => {
+                              {GRADE_COMPONENTS.map((c) => {
                                 const val = editedScores[st.studentId]?.[c.key] ?? (scores[c.key as keyof typeof scores] ?? 0);
                                 return (
                                   <td key={c.key} className="px-2 py-2 text-center">
@@ -726,7 +717,7 @@ const CourseDetail = () => {
                                           [st.studentId]: { ...(prev[st.studentId] ?? scores), [c.key]: v },
                                         }));
                                       }}
-                                      className="w-14 text-center text-xs px-1 py-1 rounded-md bg-slate-50 dark:bg-slate-700/60 border border-slate-200 dark:border-slate-600 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-[#0068FF]/40 focus:border-[#0068FF]"
+                                      className="w-14 text-center text-xs px-1 py-1 rounded-md bg-slate-50 dark:bg-slate-700/60 border border-slate-200 dark:border-slate-600 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-[#1e51f9]/40 focus:border-[#1e51f9]"
                                     />
                                   </td>
                                 );
@@ -740,7 +731,7 @@ const CourseDetail = () => {
                                   return (
                                     <span className={`px-1.5 py-0.5 rounded text-[10px] font-black ${
                                       g >= 8.5 ? 'bg-[#00c578]/12 text-[#00c578]'
-                                      : g >= 7.0 ? 'bg-[#0068FF]/12 text-[#0068FF]'
+                                      : g >= 7.0 ? 'bg-[#1e51f9]/12 text-[#1e51f9]'
                                       : g >= 5.5 ? 'bg-[#f5832f]/12 text-[#f5832f]'
                                       : 'bg-[#ef4e49]/12 text-[#ef4e49]'
                                     }`}>{gradeLabel(g)}</span>
@@ -755,7 +746,7 @@ const CourseDetail = () => {
                         <tfoot>
                           <tr className="bg-slate-50 dark:bg-slate-700/30 border-t-2 border-slate-200 dark:border-slate-600">
                             <td colSpan={2} className="px-3 py-2 text-[10px] font-bold text-slate-400 uppercase">Trung bình lớp</td>
-                            {MOCK_COMPONENTS.map((c) => {
+                            {GRADE_COMPONENTS.map((c) => {
                               const avg = allGrades.reduce((s, st) => {
                                 const v = editedScores[st.studentId]?.[c.key] ?? (st[c.key as keyof ICourseGrade] as number ?? 0);
                                 return s + v;
@@ -766,7 +757,7 @@ const CourseDetail = () => {
                                 </td>
                               );
                             })}
-                            <td className="px-3 py-2 text-center text-[11px] font-bold text-[#0068FF]">
+                            <td className="px-3 py-2 text-center text-[11px] font-bold text-[#1e51f9]">
                               {(allGrades.reduce((s, st) => {
                                 const merged = { quiz: st.quiz ?? 0, exercise: st.exercise ?? 0, lab: st.lab ?? 0, midterm: st.midterm ?? 0, project: st.project ?? 0, final: st.final ?? 0, ...(editedScores[st.studentId] ?? {}) };
                                 return s + calcGpa(merged);
@@ -801,7 +792,7 @@ const CourseDetail = () => {
                           }));
                         saveGrades(payload, { onSuccess: () => setEditedScores({}) });
                       }}
-                      className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold text-white bg-[#0068FF] hover:bg-[#0087b3] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold text-white bg-[#1e51f9] hover:bg-[#0087b3] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {isSavingGrades ? <><Loader2 size={11} className="animate-spin" /> Đang lưu…</> : 'Lưu điểm'}
                     </button>
@@ -825,11 +816,11 @@ const CourseDetail = () => {
                   <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60">
                     <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Điểm của bạn — {myGrade.studentId}</p>
                     <span className={`px-2 py-0.5 rounded text-[11px] font-black ${
-                      gpa >= 8.5 ? 'bg-[#00c578]/12 text-[#00c578]' : gpa >= 7.0 ? 'bg-[#0068FF]/12 text-[#0068FF]' : gpa >= 5.5 ? 'bg-[#f5832f]/12 text-[#f5832f]' : 'bg-[#ef4e49]/12 text-[#ef4e49]'
+                      gpa >= 8.5 ? 'bg-[#00c578]/12 text-[#00c578]' : gpa >= 7.0 ? 'bg-[#1e51f9]/12 text-[#1e51f9]' : gpa >= 5.5 ? 'bg-[#f5832f]/12 text-[#f5832f]' : 'bg-[#ef4e49]/12 text-[#ef4e49]'
                     }`}>{gradeLabel(gpa)} — {gpa.toFixed(2)}</span>
                   </div>
                   <div className="divide-y divide-slate-50 dark:divide-slate-700/40">
-                    {MOCK_COMPONENTS.map((c) => {
+                    {GRADE_COMPONENTS.map((c) => {
                       const score = scores[c.key as keyof typeof scores];
                       const weighted = score * c.weight / 100;
                       return (
@@ -841,7 +832,7 @@ const CourseDetail = () => {
                           <div className="flex-1">
                             <div className="flex items-center gap-2">
                               <div className="flex-1 h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
-                                <div className="h-full bg-[#0068FF] rounded-full transition-all" style={{ width: `${score * 10}%` }} />
+                                <div className="h-full bg-[#1e51f9] rounded-full transition-all" style={{ width: `${score * 10}%` }} />
                               </div>
                               <span className="text-sm font-bold text-slate-800 dark:text-slate-100 w-8 text-right">{score}</span>
                             </div>
@@ -858,7 +849,7 @@ const CourseDetail = () => {
                     <div className="flex items-center gap-3">
                       <span className="text-lg font-black text-slate-800 dark:text-slate-100">{gpa.toFixed(2)}<span className="text-sm font-normal text-slate-400"> / 10</span></span>
                       <span className={`px-2.5 py-1 rounded-lg text-sm font-black ${
-                        gpa >= 8.5 ? 'bg-[#00c578]/15 text-[#00c578]' : gpa >= 7.0 ? 'bg-[#0068FF]/15 text-[#0068FF]' : gpa >= 5.5 ? 'bg-[#f5832f]/15 text-[#f5832f]' : 'bg-[#ef4e49]/15 text-[#ef4e49]'
+                        gpa >= 8.5 ? 'bg-[#00c578]/15 text-[#00c578]' : gpa >= 7.0 ? 'bg-[#1e51f9]/15 text-[#1e51f9]' : gpa >= 5.5 ? 'bg-[#f5832f]/15 text-[#f5832f]' : 'bg-[#ef4e49]/15 text-[#ef4e49]'
                       }`}>{gradeLabel(gpa)}</span>
                     </div>
                   </div>

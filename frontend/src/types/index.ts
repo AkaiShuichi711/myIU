@@ -295,3 +295,24 @@ export type INewCoursePost = {
   attachmentNames?: string[];
   dueDate?: string;
 };
+
+export type INewSupportTicket = {
+  service: string;
+  need: string;
+  description: string;
+  attachmentUrl?: string;
+};
+
+export type SupportTicketDTO = {
+  id: string;
+  submitterId: string;
+  submitterName: string;
+  submitterEmail: string;
+  service: string;
+  need: string;
+  description: string;
+  attachmentUrl: string | null;
+  status: 'open' | 'in_progress' | 'resolved' | 'closed';
+  response: string | null;
+  createdAt: string;
+};

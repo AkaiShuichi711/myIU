@@ -1,7 +1,7 @@
 import { IContextType, Passer } from "@/types";
 import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { api, setToken, clearToken, getToken, norm } from "@/lib/api/client";
+import { api, setToken, clearToken, getToken, norm, setAuthProvider, getAuthProvider, clearAuthProvider } from "@/lib/api/client";
 
 export const INITIAL_USER = {
   id: "",
@@ -76,6 +76,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const res = await api.post<any>('/api/auth/login', { email, password });
     if (res?.token) {
       setToken(res.token);
+      setAuthProvider('local');
       setUser({
         id: res.id,
         name: res.name || '',
@@ -89,11 +90,22 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const TENANT = 'a7380202-eb54-415a-9b66-4d9806cfab42';
+  const MS_LOGOUT = `https://login.microsoftonline.com/${TENANT}/oauth2/v2.0/logout`
+    + `?post_logout_redirect_uri=${encodeURIComponent('http://localhost:5173/sign-in')}`;
+
   const signOut = async () => {
+    const provider = getAuthProvider();
     clearToken();
+    clearAuthProvider();
     setUser(INITIAL_USER);
     setIsAuthenticated(false);
-    navigate('/sign-in');
+    if (provider === 'microsoft') {
+      // Clear Microsoft SSO session so next login shows the Microsoft page
+      window.location.href = MS_LOGOUT;
+    } else {
+      navigate('/sign-in');
+    }
   };
 
   const value: IContextType = {

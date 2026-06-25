@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   User, Network, Bell, Settings, BookOpen, FileText, Home,
+  ChevronLeft, ChevronRight, GraduationCap, Headset,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useUserContext } from '@/context/AuthContext';
@@ -23,6 +25,7 @@ const NAV_SECTIONS = [
       { labelKey: 'nav.profile',        route: '/profile',       icon: User },
       { labelKey: 'nav.tenant',         route: '/tenant',        icon: Network },
       { labelKey: 'nav.settings',       route: '/settings',      icon: Settings },
+      { labelKey: 'nav.support',         route: '/support',        icon: Headset },
     ],
   },
 ] as const;
@@ -32,34 +35,74 @@ const LeftSidebar = () => {
   const { user } = useUserContext();
   const { t } = useTranslation();
 
+  const [collapsed, setCollapsed] = useState(() =>
+    localStorage.getItem('myiu-sidebar-collapsed') === 'true'
+  );
+
+  function toggleCollapse() {
+    setCollapsed(v => {
+      localStorage.setItem('myiu-sidebar-collapsed', String(!v));
+      return !v;
+    });
+  }
+
   const { data: notifs = [] } = useGetNotifications(user.id);
   const unreadCount = (notifs as any[]).filter((n) => !n.read).length;
 
-  return (
-    <aside className="w-full max-w-[220px] border-r border-slate-200 dark:border-[#33485c]/50 bg-white dark:bg-[#19191a] hidden md:flex flex-col shrink-0 h-full transition-colors duration-200">
+  const displayName = user?.name
+    ? user.name.trim().split(/\s+/).slice(-2).join(' ')
+    : 'User';
 
-      {/* Brand bar */}
-      {/* <div className="flex items-center gap-2.5 px-4 py-3 border-b border-slate-100 dark:border-slate-800/80"> */}
-      {/* <div
-          className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 shadow-sm"
-          style={{ background: 'linear-gradient(135deg,#0068FF,#2F398E)' }}
+  return (
+    <aside
+      className="hidden md:flex flex-col shrink-0 h-full overflow-hidden bg-white dark:bg-[#19191a] border-r border-[#E0E4EB] dark:border-[#33485c]"
+      style={{
+        width: collapsed ? '52px' : '220px',
+        transition: 'width 0.18s ease',
+      }}
+    >
+      {/* ── Logo bar ─────────────────────────────────────────────── */}
+      <div
+        className="flex items-center shrink-0 border-b border-[#E0E4EB] dark:border-[#33485c]"
+        style={{
+          padding: collapsed ? '12px 0' : '12px 14px',
+          justifyContent: collapsed ? 'center' : 'flex-start',
+          gap: collapsed ? 0 : '10px',
+          height: '52px',
+        }}
+      >
+        <div
+          className="w-[28px] h-[28px] flex items-center justify-center text-white shrink-0"
+          style={{ background: '#1e51f9', borderRadius: '6px' }}
         >
           <GraduationCap size={14} className="text-white" />
-        </div> */}
-      {/* <div className="min-w-0">
-          <p className="text-[13px] font-black text-slate-900 dark:text-slate-50 leading-none tracking-tight">myIU</p>
-          <p className="text-[9px] font-mono font-bold text-slate-400 dark:text-[#0068FF]/70 leading-none mt-0.5 tracking-[0.12em] uppercase">Portal v3</p>
-        </div> */}
-      {/* </div> */}
+        </div>
+        {!collapsed && (
+          <div className="overflow-hidden whitespace-nowrap">
+            <p className="text-[13px] font-bold text-slate-900 dark:text-[#e6edf3] leading-none tracking-tight">myIU</p>
+            <p className="text-[9px] mt-0.5 tracking-[0.14em] uppercase font-semibold text-slate-400 dark:text-[#4d6070]">Portal</p>
+          </div>
+        )}
+      </div>
 
-      {/* Navigation */}
-      <nav className="flex flex-col flex-1 px-2 py-2.5 gap-3.5 overflow-y-auto">
+      {/* ── Navigation ───────────────────────────────────────────── */}
+      <nav className="flex-1 py-3 overflow-y-auto overflow-x-hidden" style={{ scrollbarWidth: 'none' }}>
         {NAV_SECTIONS.map((section, si) => (
-          <div key={si} className="flex flex-col gap-0.5">
-            {section.sectionKey && (
-              <p className="px-2 mb-0.5 text-[9px] font-bold tracking-[0.14em] uppercase text-slate-400 dark:text-[#4d6070] select-none">
+          <div key={si} className={si > 0 ? 'mt-3' : ''}>
+
+            {/* Section label — expanded */}
+            {!collapsed && (
+              <p
+                className="mb-1 text-[9px] font-bold tracking-[0.16em] uppercase select-none text-slate-400 dark:text-[#4d6070]"
+                style={{ padding: '0 10px' }}
+              >
                 {t(section.sectionKey as string)}
               </p>
+            )}
+
+            {/* Section divider — collapsed */}
+            {collapsed && si > 0 && (
+              <div className="bg-[#E0E4EB] dark:bg-[#33485c]" style={{ height: '1px', margin: '6px 8px' }} />
             )}
 
             {section.links.map((link) => {
@@ -76,29 +119,57 @@ const LeftSidebar = () => {
                 <Link
                   key={link.route}
                   to={link.route}
-                  className={`relative flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium transition-all duration-150 group ${isActive
-                      ? 'bg-[#0068FF]/8 dark:bg-[#0068FF]/15 text-[#0068FF]'
-                      : 'text-[#19191a] dark:text-[#bfc6cc]'
-                    }`}
+                  title={collapsed ? t(link.labelKey as string) : undefined}
+                  className="relative flex items-center transition-all duration-100"
+                  style={{
+                    padding: collapsed ? '7px 0' : '7px 10px',
+                    justifyContent: collapsed ? 'center' : 'flex-start',
+                    gap: collapsed ? 0 : '9px',
+                    background: isActive ? 'rgba(0,104,255,0.07)' : 'transparent',
+                    margin: '1px 4px',
+                    borderRadius: '6px',
+                  }}
+                  onMouseEnter={e => {
+                    if (!isActive) (e.currentTarget as HTMLElement).style.background = 'rgba(0,104,255,0.05)';
+                  }}
+                  onMouseLeave={e => {
+                    (e.currentTarget as HTMLElement).style.background = isActive ? 'rgba(0,104,255,0.07)' : 'transparent';
+                  }}
                 >
                   {/* Left accent bar */}
                   {isActive && (
-                    <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-[18px] rounded-r-full bg-[#0068FF]" />
+                    <span
+                      className="absolute left-0 top-1/2 -translate-y-1/2"
+                      style={{ width: '3px', height: '16px', background: '#1e51f9', borderRadius: '0 3px 3px 0' }}
+                    />
                   )}
 
-                  <Icon
-                    size={15}
-                    className={`shrink-0 transition-colors ${isActive
-                        ? 'text-[#0068FF]'
-                        : 'text-[#19191a] dark:text-[#bfc6cc]'
-                      }`}
-                  />
+                  {/* Icon */}
+                  <div className="relative shrink-0">
+                    <Icon
+                      size={15}
+                      style={{ color: isActive ? '#1e51f9' : '#272e35' }}
+                    />
+                    {/* Notification dot (collapsed mode) */}
+                    {badge && collapsed && (
+                      <span
+                        className="absolute -top-1 -right-1 w-[7px] h-[7px] rounded-full bg-red-500"
+                      />
+                    )}
+                  </div>
 
-                  <span className="flex-1 truncate leading-none">{t(link.labelKey as string)}</span>
-
-                  {badge && (
-                    <span className="min-w-[17px] h-[17px] rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center px-1 leading-none shrink-0">
-                      {badge > 9 ? '9+' : badge}
+                  {/* Label + badge */}
+                  {!collapsed && (
+                    <span
+                      className="flex-1 flex items-center justify-between leading-none text-[12.5px] font-medium truncate"
+                      style={{ color: isActive ? '#1e51f9' : '#272e35' }}
+                    >
+                      {t(link.labelKey as string)}
+                      {badge && (
+                        <span className="min-w-[17px] h-[17px] rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center px-1 leading-none shrink-0">
+                          {badge > 9 ? '9+' : badge}
+                        </span>
+                      )}
                     </span>
                   )}
                 </Link>
@@ -108,47 +179,47 @@ const LeftSidebar = () => {
         ))}
       </nav>
 
-      {/* User footer */}
-      {/* <div className="px-2 pb-3 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+      {/* ── Collapse toggle ───────────────────────────────────────── */}
+      <button
+        onClick={toggleCollapse}
+        className="flex items-center justify-center shrink-0 transition-colors border-t border-[#E0E4EB] dark:border-[#33485c] text-slate-400 hover:text-[#1e51f9]"
+        style={{ height: '36px' }}
+        title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+      >
+        {collapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
+      </button>
+
+      {/* ── User footer ──────────────────────────────────────────── */}
+      <div
+        className="shrink-0 flex items-center border-t border-[#E0E4EB] dark:border-[#33485c]"
+        style={{
+          padding: collapsed ? '10px 0' : '10px 10px',
+          justifyContent: collapsed ? 'center' : 'flex-start',
+          gap: collapsed ? 0 : '9px',
+        }}
+      >
         <Link
           to={`/update-profile/${user?.id}`}
-          className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors group"
+          title={collapsed ? displayName : undefined}
+          className="flex items-center shrink-0"
         >
-          <div
-            className="w-7 h-7 rounded-full flex items-center justify-center text-white text-[10px] font-bold shrink-0"
-            style={{ background: 'linear-gradient(135deg,#0068FF,#2F398E)' }}
-          >
-            {initials}
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-[12px] font-semibold text-slate-700 dark:text-slate-200 truncate leading-none">{user?.name || 'User'}</p>
-            <div className="flex items-center gap-1 mt-0.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-400 shrink-0" />
-              <span className="text-[9px] font-mono font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase">Online</span>
-            </div>
-          </div>
+          <UserAvatar name={user?.name || '?'} className="w-[26px] h-[26px] text-[10px] rounded-md" />
         </Link>
-      </div> */}
-
-  <div className="px-2 pb-3 pt-2 border-t border-slate-100 dark:border-[#33485c]/40">
-  <Link
-    to={`/update-profile/${user?.id}`}
-    className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-[#0d2137] transition-colors group"
-  >
-    <UserAvatar name={user?.name || '?'} className="w-7 h-7 text-[10px]" />
-    <div className="min-w-0 flex-1">
-      <p
-        className="text-[12px] font-semibold text-slate-700 dark:text-[#99a3ad] truncate leading-none"
-        title={user?.name || 'User'}
-      >
-        {user?.name
-          ? user.name.trim().split(/\s+/).slice(-2).join(' ')
-          : 'User'}
-      </p>
-    </div>
-  </Link>
-</div>
-
+        {!collapsed && (
+          <Link
+            to={`/update-profile/${user?.id}`}
+            className="min-w-0 flex-1 overflow-hidden hover:text-[#1e51f9] transition-colors"
+          >
+            <p
+              className="text-[11.5px] font-semibold text-slate-700 dark:text-[#bfc6cc] truncate leading-none"
+              title={user?.name || 'User'}
+            >
+              {displayName}
+            </p>
+            <p className="text-[10px] text-slate-400 dark:text-[#4d6070] mt-0.5 truncate">{user?.email || ''}</p>
+          </Link>
+        )}
+      </div>
     </aside>
   );
 };

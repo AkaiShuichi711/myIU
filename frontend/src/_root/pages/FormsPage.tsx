@@ -19,8 +19,11 @@ import FormSubmitModal from '@/components/shared/FormSubmitModal';
 import { FORM_STATUS, FILE_TYPE_META, FORM_CATEGORIES, INPUT_CLS } from '@/constants/ui';
 
 const SubmissionRow = ({ sub, mode = 'mine' }: { sub: IFormSubmission; mode?: 'mine' | 'review' }) => {
-  const meta = FORM_STATUS[sub.status];
+  const meta = FORM_STATUS[sub.status] ?? FORM_STATUS.pending;
   const StatusIcon = meta.Icon;
+  const dateStr = sub.$createdAt
+    ? (() => { try { return new Date(sub.$createdAt).toLocaleDateString('vi-VN'); } catch { return '—'; } })()
+    : '—';
   return (
     <Link
       to={`/forms/review/${sub.$id}`}
@@ -30,20 +33,18 @@ const SubmissionRow = ({ sub, mode = 'mine' }: { sub: IFormSubmission; mode?: 'm
         <FileText size={14} className="text-slate-400 dark:text-slate-500" />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 truncate">{sub.formTitle}</p>
+        <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 truncate">{sub.formTitle ?? '—'}</p>
         <p className="text-xs text-slate-400 dark:text-slate-500 truncate mt-0.5">
           {mode === 'review'
-            ? `Từ: ${sub.submitterName || sub.submitterEmail}`
-            : `Người duyệt: ${sub.approverName || sub.approverEmail}`}
+            ? `Từ: ${sub.submitterName || sub.submitterEmail || '—'}`
+            : `Người duyệt: ${sub.approverName || sub.approverEmail || '—'}`}
         </p>
       </div>
       <div className="flex items-center gap-2 shrink-0">
         <span className={`flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold ${meta.color} ${meta.bg}`}>
           <StatusIcon size={10} /> {meta.label}
         </span>
-        <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono">
-          {new Date(sub.$createdAt).toLocaleDateString('vi-VN')}
-        </span>
+        <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono">{dateStr}</span>
       </div>
     </Link>
   );
@@ -113,7 +114,7 @@ const FormRow = ({
       </a>
       <button
         onClick={() => onSubmit(form)}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-[#0068FF] hover:bg-[#0087b3] transition-all"
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-[#1e51f9] hover:bg-[#0087b3] transition-all"
       >
         <Send size={12} /> Nộp
       </button>
@@ -153,7 +154,7 @@ const EditPanel = ({
   isSaving: boolean;
   isNew: boolean;
 }) => (
-  <div className="bg-white dark:bg-slate-800/80 rounded-xl border border-[#0068FF]/20 p-4 mb-4 flex flex-col gap-3">
+  <div className="bg-white dark:bg-slate-800/80 rounded-xl border border-[#1e51f9]/20 p-4 mb-4 flex flex-col gap-3">
     <div className="flex items-center justify-between">
       <p className="text-sm font-bold text-slate-700 dark:text-slate-200">
         {isNew ? 'Thêm biểu mẫu mới' : 'Chỉnh sửa biểu mẫu'}
@@ -197,7 +198,7 @@ const EditPanel = ({
         <div className="flex gap-2">
           <input value={state.fileUrl} onChange={(e) => onChange('fileUrl', e.target.value)} placeholder="https://drive.google.com/..." className={INPUT_CLS} />
           {state.fileUrl && (
-            <a href={state.fileUrl} target="_blank" rel="noopener noreferrer" className="px-2.5 rounded-lg border border-slate-200 dark:border-slate-600 flex items-center text-slate-400 hover:text-[#0068FF] transition-colors shrink-0">
+            <a href={state.fileUrl} target="_blank" rel="noopener noreferrer" className="px-2.5 rounded-lg border border-slate-200 dark:border-slate-600 flex items-center text-slate-400 hover:text-[#1e51f9] transition-colors shrink-0">
               <ExternalLink size={13} />
             </a>
           )}
@@ -210,7 +211,7 @@ const EditPanel = ({
       <button
         onClick={onSave}
         disabled={isSaving || !state.title.trim() || !state.fileUrl.trim() || !state.fileName.trim()}
-        className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold text-white bg-[#0068FF] hover:bg-[#0087b3] transition-colors disabled:opacity-60"
+        className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold text-white bg-[#1e51f9] hover:bg-[#0087b3] transition-colors disabled:opacity-60"
       >
         {isSaving ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />}
         {isNew ? 'Thêm biểu mẫu' : 'Lưu thay đổi'}
@@ -246,59 +247,12 @@ const FormsPage = () => {
   const { data: mySubmissionsRaw = [] }   = useGetFormSubmissionsByUser(user.id);
   const { data: toReviewRaw = [] }        = useGetFormSubmissionsForApprover(user.email);
 
-  // ── MOCK SUBMISSIONS — comment toàn bộ block này khi Appwrite form_submissions collection đã có data ──
-  const MOCK_MY: IFormSubmission[] = [
-    { $id: 'sub001', submitterId: user.id, submitterName: user.name, submitterEmail: user.email,
-      formTemplateId: 'm1', formTitle: 'Đơn xin nghỉ học có phép',
-      uploadedFileId: 'file001', uploadedFileUrl: '#',
-      approverEmail: 'advisor@hcmiu.edu.vn', approverName: 'Nguyễn Thị Lan',
-      status: 'pending', $createdAt: '2026-06-08T09:12:00.000Z', $updatedAt: '2026-06-08T09:12:00.000Z' },
-    { $id: 'sub002', submitterId: user.id, submitterName: user.name, submitterEmail: user.email,
-      formTemplateId: 'm6', formTitle: 'Đề nghị cấp bảng điểm',
-      uploadedFileId: 'file002', uploadedFileUrl: '#',
-      approverEmail: 'academic.office@hcmiu.edu.vn', approverName: 'Phòng Đào tạo',
-      status: 'approved', $createdAt: '2026-05-20T14:00:00.000Z', $updatedAt: '2026-05-22T10:30:00.000Z' },
-    { $id: 'sub003', submitterId: user.id, submitterName: user.name, submitterEmail: user.email,
-      formTemplateId: 'm4', formTitle: 'Gia hạn đóng học phí',
-      uploadedFileId: 'file003', uploadedFileUrl: '#',
-      approverEmail: 'finance@hcmiu.edu.vn', approverName: 'Phòng Tài chính',
-      status: 'rejected', rejectionReason: 'Hết hạn gia hạn theo quy định. Vui lòng liên hệ trực tiếp phòng Tài chính.',
-      $createdAt: '2026-05-10T08:45:00.000Z', $updatedAt: '2026-05-11T16:00:00.000Z' },
-  ];
-  const MOCK_REVIEW: IFormSubmission[] = [
-    { $id: 'sub010', submitterId: 'stu001', submitterName: 'Trần Văn Bình', submitterEmail: 'ITITIU21010@hcmiu.edu.vn',
-      formTemplateId: 'm1', formTitle: 'Đơn xin nghỉ học có phép',
-      uploadedFileId: 'file010', uploadedFileUrl: '#',
-      approverEmail: user.email, approverName: user.name,
-      status: 'pending', $createdAt: '2026-06-09T07:30:00.000Z', $updatedAt: '2026-06-09T07:30:00.000Z' },
-    { $id: 'sub011', submitterId: 'stu002', submitterName: 'Lê Thị Cẩm', submitterEmail: 'ITITIU21022@hcmiu.edu.vn',
-      formTemplateId: 'm7', formTitle: 'Đơn xin cấp lại thẻ sinh viên',
-      uploadedFileId: 'file011', uploadedFileUrl: '#',
-      approverEmail: user.email, approverName: user.name,
-      status: 'pending', $createdAt: '2026-06-07T13:20:00.000Z', $updatedAt: '2026-06-07T13:20:00.000Z' },
-  ];
-  const mySubmissions  = (mySubmissionsRaw.length  > 0 ? mySubmissionsRaw  : MOCK_MY)    as unknown as IFormSubmission[];
-  const toReview       = (toReviewRaw.length        > 0 ? toReviewRaw       : MOCK_REVIEW) as unknown as IFormSubmission[];
-  // ── END MOCK SUBMISSIONS (uncomment 2 dòng dưới + xóa 2 dòng trên sau khi có data thật) ──
-  // const mySubmissions  = mySubmissionsRaw  as unknown as IFormSubmission[];
-  // const toReview       = toReviewRaw       as unknown as IFormSubmission[];
+  const mySubmissions = mySubmissionsRaw as unknown as IFormSubmission[];
+  const toReview      = toReviewRaw      as unknown as IFormSubmission[];
 
   const pendingCount   = toReview.filter((s) => s.status === 'pending').length;
 
-  // ── MOCK DATA — xóa/comment block này khi Appwrite collection đã có data thật ──
-  const MOCK_FORMS: IFormTemplate[] = [
-    { $id: 'm1', title: 'Đơn xin nghỉ học có phép', description: 'Dùng khi vắng mặt từ 3 buổi trở lên, nộp trước 2 ngày', fileUrl: '#', fileName: 'don_xin_nghi_hoc.pdf', fileType: 'pdf', category: 'academic', sortOrder: 1, isActive: true, createdBy: 'admin', $createdAt: '', $updatedAt: '' },
-    { $id: 'm2', title: 'Xác nhận tình trạng sinh viên', description: 'Xác nhận đang theo học, dùng cho ngân hàng, visa, học bổng', fileUrl: '#', fileName: 'xac_nhan_sinh_vien.docx', fileType: 'docx', category: 'academic', sortOrder: 2, isActive: true, createdBy: 'admin', $createdAt: '', $updatedAt: '' },
-    { $id: 'm3', title: 'Đơn xin bảo lưu kết quả học tập', description: 'Bảo lưu tối đa 2 học kỳ', fileUrl: '#', fileName: 'don_bao_luu.pdf', fileType: 'pdf', category: 'academic', sortOrder: 3, isActive: true, createdBy: 'admin', $createdAt: '', $updatedAt: '' },
-    { $id: 'm4', title: 'Gia hạn đóng học phí', description: 'Yêu cầu gia hạn thời gian nộp học phí học kỳ', fileUrl: '#', fileName: 'gia_han_hoc_phi.pdf', fileType: 'pdf', category: 'finance', sortOrder: 1, isActive: true, createdBy: 'admin', $createdAt: '', $updatedAt: '' },
-    { $id: 'm5', title: 'Đơn xin hoàn học phí', description: 'Áp dụng khi rút khỏi môn học trong thời gian quy định', fileUrl: '#', fileName: 'hoan_hoc_phi.xlsx', fileType: 'xlsx', category: 'finance', sortOrder: 2, isActive: true, createdBy: 'admin', $createdAt: '', $updatedAt: '' },
-    { $id: 'm6', title: 'Đề nghị cấp bảng điểm', description: 'Cấp bảng điểm chính thức có dấu đỏ', fileUrl: '#', fileName: 'cap_bang_diem.docx', fileType: 'docx', category: 'administrative', sortOrder: 1, isActive: true, createdBy: 'admin', $createdAt: '', $updatedAt: '' },
-    { $id: 'm7', title: 'Đơn xin cấp lại thẻ sinh viên', description: 'Điền đầy đủ lý do mất/hỏng, đính kèm ảnh 3x4', fileUrl: '#', fileName: 'cap_lai_the_sv.pdf', fileType: 'pdf', category: 'administrative', sortOrder: 2, isActive: true, createdBy: 'admin', $createdAt: '', $updatedAt: '' },
-    { $id: 'm8', title: 'Đăng ký sử dụng phòng lab / phòng học nhóm', fileUrl: '#', fileName: 'dat_phong_lab.docx', fileType: 'docx', category: 'other', sortOrder: 1, isActive: true, createdBy: 'admin', $createdAt: '', $updatedAt: '' },
-  ];
-  const allForms = (templates.length > 0 ? templates : MOCK_FORMS) as unknown as IFormTemplate[];
-  // ── END MOCK (thay bằng dòng dưới khi có Appwrite data thật) ──
-  // const allForms = templates as unknown as IFormTemplate[];
+  const allForms = templates as unknown as IFormTemplate[];
 
   const handleChange = (k: keyof EditState, v: any) =>
     setEditState((s) => ({ ...s, [k]: v }));
@@ -354,11 +308,11 @@ const FormsPage = () => {
   const mq = mySearch.trim().toLowerCase();
   const filteredMy = mySubmissions.filter((s) => {
     const matchStatus = myFilter === 'all' || myFilter === s.status;
-    const matchSearch = !mq || s.formTitle.toLowerCase().includes(mq);
+    const matchSearch = !mq || (s.formTitle ?? '').toLowerCase().includes(mq);
     return matchStatus && matchSearch;
   });
   const filteredReview = toReview.filter((s) => {
-    const matchSearch = !mq || s.formTitle.toLowerCase().includes(mq) || (s.submitterName ?? '').toLowerCase().includes(mq);
+    const matchSearch = !mq || (s.formTitle ?? '').toLowerCase().includes(mq) || (s.submitterName ?? '').toLowerCase().includes(mq);
     return matchSearch;
   });
 
@@ -375,7 +329,7 @@ const FormsPage = () => {
     { id: 'my-requests', label: 'Yêu cầu của tôi', icon: Send, badge: pendingCount || undefined },
   ];
 
-  const searchInputCls = 'w-full pl-7 pr-3 py-1.5 text-xs rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0068FF]/20 focus:border-[#0068FF] transition-all';
+  const searchInputCls = 'w-full pl-7 pr-3 py-1.5 text-xs rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#1e51f9]/20 focus:border-[#1e51f9] transition-all';
 
   return (
     <div className="min-h-full bg-[#F8FAFC] dark:bg-[#19191a]">
@@ -386,15 +340,13 @@ const FormsPage = () => {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => navigate('/home')}
-                className="flex items-center gap-1 text-[11px] text-slate-400 dark:text-slate-500 hover:text-[#0068FF] transition-colors font-mono"
+                className="flex items-center gap-1 text-[11px] text-slate-400 dark:text-slate-500 hover:text-[#1e51f9] transition-colors font-mono"
               >
                 <Home size={11} /> HOME
               </button>
               <span className="text-slate-300 dark:text-slate-700 text-[11px]">/</span>
               <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-md bg-slate-800 dark:bg-slate-700 flex items-center justify-center">
-                  <FileText size={12} className="text-white" />
-                </div>
+                <FileText size={16} className="text-slate-700 dark:text-slate-300" />
                 <h1 className="text-sm font-bold text-slate-800 dark:text-slate-100 tracking-wide">BIỂU MẪU</h1>
               </div>
             </div>
@@ -557,8 +509,8 @@ const FormsPage = () => {
                     <div className="divide-y divide-slate-50 dark:divide-slate-700/50">
                       {groupedForms[id].map((form) => (
                         editing?.$id === form.$id ? (
-                          <div key={form.$id} className="px-4 py-3 bg-[#0068FF]/4 dark:bg-[#0068FF]/6 border-l-2 border-[#0068FF]">
-                            <p className="text-xs text-[#0068FF] font-semibold mb-1 flex items-center gap-1">
+                          <div key={form.$id} className="px-4 py-3 bg-[#1e51f9]/4 dark:bg-[#1e51f9]/6 border-l-2 border-[#1e51f9]">
+                            <p className="text-xs text-[#1e51f9] font-semibold mb-1 flex items-center gap-1">
                               <Pencil size={11} /> Đang chỉnh sửa: {form.title}
                             </p>
                           </div>
@@ -604,7 +556,7 @@ const FormsPage = () => {
                       {mq ? `Không tìm thấy kết quả cho "${mySearch}"` : 'Chưa có yêu cầu nào'}
                     </p>
                     {!mq && (
-                      <button onClick={() => setPageTab('forms')} className="text-xs text-[#0068FF] hover:underline mt-1">
+                      <button onClick={() => setPageTab('forms')} className="text-xs text-[#1e51f9] hover:underline mt-1">
                         Nộp biểu mẫu đầu tiên
                       </button>
                     )}

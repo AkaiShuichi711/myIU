@@ -187,7 +187,7 @@ const PostCard = ({ post, savedRecords = [] }: PostCardProps) => {
           {mediaUrls.length > 1 && (
             <div className="px-5 pt-2 flex items-center gap-1.5">
               {Array.from({ length: Math.min(mediaUrls.length, 5) }).map((_, i) => (
-                <div key={i} className={`h-1 rounded-full transition-all ${i === 0 ? 'w-4 bg-[#0068FF]' : 'w-1.5 bg-slate-200 dark:bg-slate-600'}`} />
+                <div key={i} className={`h-1 rounded-full transition-all ${i === 0 ? 'w-4 bg-[#1e51f9]' : 'w-1.5 bg-slate-200 dark:bg-slate-600'}`} />
               ))}
               {mediaUrls.length > 5 && <span className="text-[10px] text-slate-400 dark:text-slate-500 ml-1">+{mediaUrls.length - 5}</span>}
             </div>
@@ -207,7 +207,7 @@ const PostCard = ({ post, savedRecords = [] }: PostCardProps) => {
           {Array.isArray(post.tags) && post.tags.filter(Boolean).length > 0 && (
             <div className="flex flex-wrap gap-1">
               {post.tags.filter(Boolean).map((tag: string) => (
-                <span key={tag} className="text-[#0068FF] font-medium">#{tag}</span>
+                <span key={tag} className="text-[#1e51f9] font-medium">#{tag}</span>
               ))}
             </div>
           )}

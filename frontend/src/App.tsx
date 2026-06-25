@@ -2,10 +2,16 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import './globals.css';
 import { useEffect } from 'react';
 import AuthLayout from './_auth/AuthLayout';
+import AuthCallback from './_auth/AuthCallback';
 import RootLayout from './_root/RootLayout';
 import SignInForm from './_auth/forms/SignInForm';
 import SignUpForm from './_auth/forms/SignUpForm';
 import ForgotPassword from './_auth/forms/ForgotPassword';
+import AdminLoginPage from './_admin/AdminLoginPage';
+import AdminLayout from './_admin/AdminLayout';
+import AdminDashboard from './_admin/AdminDashboard';
+import AdminUsersPage from './_admin/AdminUsersPage';
+import AdminProvisionPage from './_admin/AdminProvisionPage';
 import { Toaster } from './components/ui/toaster';
 import {
   Home,
@@ -18,6 +24,7 @@ import {
   CreateCoursePage,
   FormsPage,
   FormReviewPage,
+  SupportPage,
 } from './_root/pages';
 import TenantPage from './_root/pages/Tenant';
 
@@ -35,6 +42,10 @@ const App = () => {
           <Route path="/sign-in" element={<SignInForm />} />
           <Route path="/sign-up" element={<SignUpForm />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
+          {/* OAuth2 callback — nhận token từ Spring Boot sau Microsoft SSO */}
+          <Route path="/auth/callback" element={<AuthCallback />} />
+          {/* Redirect other /auth/* paths */}
+          <Route path="/auth/*" element={<Navigate to="/sign-in" replace />} />
         </Route>
 
         {/* Private Routes */}
@@ -58,7 +69,19 @@ const App = () => {
           <Route path="/courses/:id" element={<CourseDetail />} />
           <Route path="/forms" element={<FormsPage />} />
           <Route path="/forms/review/:id" element={<FormReviewPage />} />
+          <Route path="/support" element={<SupportPage />} />
         </Route>
+
+        {/* Admin Routes */}
+        <Route path="/admin/login" element={<AdminLoginPage />} />
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminDashboard />} />
+          <Route path="users" element={<AdminUsersPage />} />
+          <Route path="provision" element={<AdminProvisionPage />} />
+        </Route>
+
+        {/* Catch-all: redirect unknown paths */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <Toaster />
     </main>
