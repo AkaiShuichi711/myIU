@@ -1,0 +1,41 @@
+# ─────────────────────────────────────────────────────────────────
+#  LOCAL profile — developer workstation (Windows / macOS)
+#  DB: myiu_local  (separate from dev/prod, safe to nuke anytime)
+#  Run: SPRING_PROFILES_ACTIVE=local  (also the default)
+# ─────────────────────────────────────────────────────────────────
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/myiu_local}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    hikari:
+      pool-name: myiu-portal-local
+      maximum-pool-size: 5        # small pool — single developer workstation
+      minimum-idle: 2
+
+  jpa:
+    hibernate:
+      ddl-auto: validate          # validate schema against Flyway migrations
+
+# JWT: safe hardcoded default for local dev — never deploy this to any server
+app:
+  jwt:
+    secret: "local-dev-secret-key-min-256-bits-ONLY-for-localhost-never-production-use"
+    expiration-ms: 86400000
+  cors:
+    allowed-origins: "http://localhost:5173,http://localhost:3000"
+
+logging:
+  level:
+    com.myiu: DEBUG
+    org.springframework.security: DEBUG
+    org.flywaydb: INFO
+  pattern:
+    console: "%d{HH:mm:ss.SSS} %-5level [%X{requestId:-}] %logger{25} - %msg%n"
+
+springdoc:
+  swagger-ui:
+    enabled: true               # Swagger UI available at /swagger-ui.html

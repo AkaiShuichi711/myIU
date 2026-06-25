@@ -85,7 +85,7 @@ async function createIndex(databaseId: string, collectionId: string, key: string
 }
 
 async function run() {
-  const databaseId = process.env.DATABASE_ID || 'myiu_db';
+  const databaseId = process.env.DATABASE_ID || 'myIU_dev';
   const usersCollectionId = process.env.USERS_COLLECTION_ID || 'users';
   const postsCollectionId = process.env.POSTS_COLLECTION_ID || 'posts';
   const savesCollectionId = process.env.SAVES_COLLECTION_ID || 'saves';

@@ -378,9 +378,9 @@ const FormsPage = () => {
   const searchInputCls = 'w-full pl-7 pr-3 py-1.5 text-xs rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0068FF]/20 focus:border-[#0068FF] transition-all';
 
   return (
-    <div className="min-h-full bg-[#F8FAFC] dark:bg-[#0A0F1E]">
+    <div className="min-h-full bg-[#F8FAFC] dark:bg-[#19191a]">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-white dark:bg-[#0B1120] border-b border-slate-200 dark:border-slate-800 px-6 py-3">
+      <div className="sticky top-0 z-10 bg-white dark:bg-[#19191a] border-b border-slate-200 dark:border-slate-800 px-6 py-3">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">

@@ -7,7 +7,6 @@ import {
   useMarkNotificationRead,
   useMarkAllNotificationsRead,
 } from '@/lib/react-query/queriesAndMutations';
-import { client, appwriteConfig } from '@/lib/appwrite/config';
 import { formatTimeAgo } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
 import { QUERY_KEYS } from '@/lib/react-query/queriesAndMutations';
@@ -32,19 +31,13 @@ const NotificationBell = () => {
   const unreadCount = (notifications as any[]).filter((n) => !n.read).length;
   const preview = (notifications as any[]).slice(0, 5);
 
-  // Appwrite Realtime subscription for live notifications
+  // Poll for new notifications every 30s
   useEffect(() => {
-    if (!appwriteConfig.notificationsCollectionId || !user.id) return;
-
-    const channelId = `databases.${appwriteConfig.databaseId}.collections.${appwriteConfig.notificationsCollectionId}.documents`;
-    const unsub = client.subscribe(channelId, (response: any) => {
-      const payload = response.payload as any;
-      if (payload?.userId === user.id) {
-        queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_NOTIFICATIONS, user.id] });
-      }
-    });
-
-    return () => { try { unsub(); } catch { /* silent */ } };
+    if (!user.id) return;
+    const interval = setInterval(() => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GET_NOTIFICATIONS, user.id] });
+    }, 30000);
+    return () => clearInterval(interval);
   }, [user.id, queryClient]);
 
   // Close dropdown on outside click

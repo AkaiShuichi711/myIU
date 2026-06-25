@@ -1,0 +1,13 @@
+# Exclude build artifacts and sensitive files from Docker context
+target/
+.mvn/wrapper/maven-wrapper.jar
+*.class
+*.jar
+.env
+.env.*
+!.env.*.example
+*.log
+uploads/
+.idea/
+*.iml
+.DS_Store

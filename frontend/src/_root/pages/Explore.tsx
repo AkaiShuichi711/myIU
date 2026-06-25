@@ -50,8 +50,8 @@ const Explore = () => {
   const isLoading = !isSearchMode && isLoadingFeed && realPosts.length === 0;
 
   return (
-    <div className="min-h-full bg-[#F8FAFC] dark:bg-[#0F172A]">
-      <div className="sticky top-0 z-10 bg-white dark:bg-[#0F172A] border-b border-slate-100 dark:border-slate-700 px-6 py-4">
+    <div className="min-h-full bg-[#F8FAFC] dark:bg-[#19191a]">
+      <div className="sticky top-0 z-10 bg-white dark:bg-[#19191a] border-b border-slate-100 dark:border-slate-700 px-6 py-4">
         <div className="max-w-5xl mx-auto flex flex-col gap-2">
           <Link to="/home" className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-[#0068FF] transition-colors font-mono w-fit">
             <Home size={11} /> HOME

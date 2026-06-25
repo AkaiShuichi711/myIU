@@ -35,9 +35,9 @@ const CreateCoursePage = () => {
   const gradient = COVER_GRADIENTS[form.coverColor] ?? COVER_GRADIENTS['#0068FF'];
 
   return (
-    <div className="min-h-full bg-[#F8FAFC] dark:bg-[#0A0F1E]">
+    <div className="min-h-full bg-[#F8FAFC] dark:bg-[#19191a]">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-white dark:bg-[#0B1120] border-b border-slate-200 dark:border-slate-800 px-6 py-3">
+      <div className="sticky top-0 z-10 bg-white dark:bg-[#19191a] border-b border-slate-200 dark:border-slate-800 px-6 py-3">
         <div className="max-w-3xl mx-auto flex items-center gap-2">
           <Link
             to="/courses"

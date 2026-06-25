@@ -233,6 +233,7 @@ const GroupPanel = ({ group, courseId, isLecturer, onDeleteGroup }: any) => {
   );
 };
 
+// MOCK: cấu trúc thành phần điểm — thay bằng GET /api/courses/{id}/grade-components khi có endpoint
 const MOCK_COMPONENTS = [
   { key: 'quiz',     label: 'Quizzes',  weight: 10 },
   { key: 'exercise', label: 'Exercise', weight: 10 },
@@ -278,6 +279,7 @@ const CourseDetail = () => {
   const { data: myLecturerGroups = [] } = useGetLecturerGroupsInCourse(id, user.id);
   const { data: myStudentGroups  = [] } = useGetStudentGroupsInCourse(id, user.id);
 
+  // MOCK: dùng dữ liệu giả lập khi course/groups/posts chưa có trong DB
   const isMockCourse = !rawCourse && !isLoadingCourse && !!MOCK_COURSE_MAP[id];
   const course = (rawCourse ?? MOCK_COURSE_MAP[id]) as any;
   const groups = (rawGroups as any[]).length > 0 ? rawGroups : (isMockCourse ? MOCK_GROUPS_FALLBACK : []);
@@ -360,7 +362,7 @@ const CourseDetail = () => {
 
   if (isLoadingCourse) {
     return (
-      <div className="min-h-full bg-[#F8FAFC] dark:bg-[#0A0F1E] flex items-center justify-center">
+      <div className="min-h-full bg-[#F8FAFC] dark:bg-[#19191a] flex items-center justify-center">
         <Loader2 size={24} className="animate-spin text-slate-400" />
       </div>
     );
@@ -368,7 +370,7 @@ const CourseDetail = () => {
 
   if (!course) {
     return (
-      <div className="min-h-full bg-[#F8FAFC] dark:bg-[#0A0F1E] flex flex-col items-center justify-center gap-3">
+      <div className="min-h-full bg-[#F8FAFC] dark:bg-[#19191a] flex flex-col items-center justify-center gap-3">
         <p className="text-slate-500 dark:text-slate-400 font-medium">Không tìm thấy môn học</p>
         <button onClick={() => navigate('/courses')} className="text-sm text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors">← Quay lại</button>
       </div>
@@ -386,9 +388,9 @@ const CourseDetail = () => {
   ];
 
   return (
-    <div className="min-h-full bg-[#F8FAFC] dark:bg-[#0A0F1E]">
+    <div className="min-h-full bg-[#F8FAFC] dark:bg-[#19191a]">
       {/* Topbar */}
-      <div className="sticky top-0 z-10 bg-white dark:bg-[#0B1120] border-b border-slate-200 dark:border-slate-800 px-6 py-3">
+      <div className="sticky top-0 z-10 bg-white dark:bg-[#19191a] border-b border-slate-200 dark:border-slate-800 px-6 py-3">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Link to="/courses" className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-[#0068FF] transition-colors font-mono">
@@ -423,7 +425,7 @@ const CourseDetail = () => {
       </div>
 
       {/* Tab bar */}
-      <div className="bg-white dark:bg-[#0B1120] border-b border-slate-200 dark:border-slate-800 px-6">
+      <div className="bg-white dark:bg-[#19191a] border-b border-slate-200 dark:border-slate-800 px-6">
         <div className="max-w-5xl mx-auto flex gap-0">
           {TABS.map(({ id: tid, label, count }) => (
             <button

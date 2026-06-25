@@ -1,0 +1,50 @@
+# ─────────────────────────────────────────────────────────────────
+#  DEV profile — shared dev server / CI integration testing
+#  DB: myiu_dev  (shared team database on dev server)
+#  All secrets MUST come from environment variables — no fallbacks
+#  Run: SPRING_PROFILES_ACTIVE=dev
+# ─────────────────────────────────────────────────────────────────
+server:
+  port: ${SERVER_PORT:8080}
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/plain
+    min-response-size: 1024
+
+spring:
+  datasource:
+    url: ${DB_URL}                # REQUIRED — no fallback
+    username: ${DB_USERNAME}      # REQUIRED
+    password: ${DB_PASSWORD}      # REQUIRED
+    hikari:
+      pool-name: myiu-portal-dev
+      maximum-pool-size: 10
+      minimum-idle: 3
+      connection-timeout: 20000
+      idle-timeout: 300000
+      max-lifetime: 1200000
+      keepalive-time: 60000
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+app:
+  jwt:
+    secret: ${JWT_SECRET}         # REQUIRED — fail-fast if missing
+    expiration-ms: 86400000
+  cors:
+    allowed-origins: ${FRONTEND_URL}
+
+logging:
+  level:
+    com.myiu: INFO
+    org.springframework.security: WARN
+    org.flywaydb: INFO
+    com.zaxxer.hikari: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%X{requestId:-}] %logger{30} - %msg%n"
+
+springdoc:
+  swagger-ui:
+    enabled: true                 # keep enabled on dev for team testing

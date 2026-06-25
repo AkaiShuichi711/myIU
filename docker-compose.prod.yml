@@ -1,0 +1,123 @@
+# ─────────────────────────────────────────────────────────────────
+#  PROD environment — production server
+#  DB: myiu_prod
+#
+#  Deploy: docker compose -f docker-compose.prod.yml --env-file .env.prod up -d
+#
+#  Notes:
+#  - Postgres NOT exposed to host (internal network only)
+#  - Swagger disabled (via prod Spring profile)
+#  - Resource limits set for container isolation
+# ─────────────────────────────────────────────────────────────────
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: myiu-postgres-prod
+    environment:
+      POSTGRES_DB: myiu_prod
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
+    volumes:
+      - postgres-prod-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d myiu_prod"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+    networks:
+      - myiu-prod
+
+  portal-backend:
+    image: ${REGISTRY}/myiu-portal-backend:${TAG}
+    container_name: myiu-portal-backend-prod
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_URL: jdbc:postgresql://postgres:5432/myiu_prod
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${PORTAL_JWT_SECRET}
+      AZURE_CLIENT_ID: ${AZURE_CLIENT_ID}
+      AZURE_CLIENT_SECRET: ${AZURE_CLIENT_SECRET}
+      AZURE_TENANT_ID: ${AZURE_TENANT_ID}
+      FRONTEND_URL: ${PORTAL_FRONTEND_URL}
+      APP_BASE_URL: ${PORTAL_API_URL}
+      UPLOAD_DIR: /app/uploads
+    ports:
+      - "8080:8080"
+    volumes:
+      - portal-uploads-prod:/app/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 768m
+        reservations:
+          memory: 256m
+    networks:
+      - myiu-prod
+
+  admin-backend:
+    image: ${REGISTRY}/myiu-admin-backend:${TAG}
+    container_name: myiu-admin-backend-prod
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_URL: jdbc:postgresql://postgres:5432/myiu_prod
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${ADMIN_JWT_SECRET}
+      ADMIN_FRONTEND_URL: ${ADMIN_FRONTEND_URL}
+      APP_BASE_URL: ${ADMIN_API_URL}
+      UPLOAD_DIR: /app/uploads
+    ports:
+      - "8081:8081"
+    volumes:
+      - admin-uploads-prod:/app/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+    networks:
+      - myiu-prod
+
+  portal-frontend:
+    image: ${REGISTRY}/myiu-portal-frontend:${TAG}
+    container_name: myiu-portal-frontend-prod
+    ports:
+      - "80:80"
+    restart: always
+    networks:
+      - myiu-prod
+
+  admin-frontend:
+    image: ${REGISTRY}/myiu-admin-frontend:${TAG}
+    container_name: myiu-admin-frontend-prod
+    ports:
+      - "3000:80"
+    restart: always
+    networks:
+      - myiu-prod
+
+networks:
+  myiu-prod:
+    name: myiu-prod-network
+
+volumes:
+  postgres-prod-data:
+    name: myiu-postgres-prod
+  portal-uploads-prod:
+    name: myiu-portal-uploads-prod
+  admin-uploads-prod:
+    name: myiu-admin-uploads-prod

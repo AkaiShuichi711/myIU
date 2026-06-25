@@ -1,4 +1,5 @@
-// ── Centralized mock data — replace with real Appwrite data when collections are ready ──
+// ── MOCK DATA — dữ liệu giả lập, thay bằng API thật khi Spring Boot backend đã có data ──
+// TODO: xóa từng export khi endpoint tương ứng đã trả về dữ liệu thực
 
 // ── Courses ───────────────────────────────────────────────────────────────────
 export const MOCK_COURSES_BASE = [

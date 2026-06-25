@@ -1,0 +1,32 @@
+# ─────────────────────────────────────────────────────────────────
+#  LOCAL environment — chỉ chạy PostgreSQL trong Docker
+#  Các backend/frontend chạy trực tiếp trên máy (hot-reload)
+#
+#  Usage:
+#    Windows (Git Bash): docker compose -f docker-compose.local.yml up -d
+#    macOS/Linux:        docker compose -f docker-compose.local.yml up -d
+#
+#  DB: myiu_local (safe to drop anytime — không ảnh hưởng dev/prod)
+# ─────────────────────────────────────────────────────────────────
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: myiu-postgres-local
+    environment:
+      POSTGRES_DB: myiu_local
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-local-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d myiu_local"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  postgres-local-data:
+    name: myiu-postgres-local

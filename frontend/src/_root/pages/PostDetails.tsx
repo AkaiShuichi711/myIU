@@ -30,7 +30,7 @@ const PostDetails = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-full bg-[#F8FAFC] dark:bg-[#0F172A] flex items-center justify-center">
+      <div className="min-h-full bg-[#F8FAFC] dark:bg-[#19191a] flex items-center justify-center">
         <Loader2 size={24} className="animate-spin text-[#0068FF]" />
       </div>
     );
@@ -38,7 +38,7 @@ const PostDetails = () => {
 
   if (!post) {
     return (
-      <div className="min-h-full bg-[#F8FAFC] dark:bg-[#0F172A] flex flex-col items-center justify-center gap-4">
+      <div className="min-h-full bg-[#F8FAFC] dark:bg-[#19191a] flex flex-col items-center justify-center gap-4">
         <p className="text-slate-500 dark:text-slate-400 font-medium">Post not found</p>
         <button onClick={() => navigate(-1)} className="text-sm text-[#0068FF] hover:underline">Go back</button>
       </div>
@@ -88,9 +88,9 @@ const PostDetails = () => {
   const creatorInitials = getInitials(creatorName);
 
   return (
-    <div className="min-h-full bg-[#F8FAFC] dark:bg-[#0F172A]">
+    <div className="min-h-full bg-[#F8FAFC] dark:bg-[#19191a]">
       {/* Back bar */}
-      <div className="sticky top-0 z-10 bg-white dark:bg-[#0F172A] border-b border-slate-100 dark:border-slate-700 px-6 py-3.5">
+      <div className="sticky top-0 z-10 bg-white dark:bg-[#19191a] border-b border-slate-100 dark:border-slate-700 px-6 py-3.5">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <button
             onClick={() => navigate(-1)}

@@ -1,7 +1,7 @@
-import { getCurrentUser } from "@/lib/appwrite/api";
 import { IContextType, Passer } from "@/types";
 import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { api, setToken, clearToken, getToken, norm } from "@/lib/api/client";
 
 export const INITIAL_USER = {
   id: "",
@@ -35,94 +35,28 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const navigate = useNavigate();
 
-  const backendUrl = (import.meta.env.VITE_OAUTH_BACKEND_URL || window.location.origin).replace(/\/+$/, '');
-
-  const getBackendUser = async () => {
-    try {
-      const response = await fetch(`${backendUrl}/api/user`, {
-        credentials: 'include',
-      });
-
-      if (!response.ok) return null;
-      return await response.json();
-    } catch (error) {
-      console.log('Backend auth check failed:', error);
-      return null;
-    }
-  };
-
-  const getBackendProfile = async () => {
-    try {
-      const response = await fetch(`${backendUrl}/api/profile`, {
-        credentials: 'include',
-      });
-
-      if (!response.ok) {
-        const body = await response.text();
-        throw new Error(`Profile request failed: ${response.status} ${body}`);
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.log('Backend profile fetch failed:', error);
-      throw error;
-    }
-  };
-
-  const getBackendTenant = async () => {
-    try {
-      const response = await fetch(`${backendUrl}/api/tenant`, {
-        credentials: 'include',
-      });
-
-      if (!response.ok) {
-        const body = await response.text();
-        throw new Error(`Tenant request failed: ${response.status} ${body}`);
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.log('Backend tenant fetch failed:', error);
-      throw error;
-    }
-  };
-
   const checkAuthUser = async () => {
     try {
       setIsLoading(true);
-
-      const backendUser = await getBackendUser();
-      if (backendUser?.id) {
+      if (!getToken()) {
+        setIsAuthenticated(false);
+        return false;
+      }
+      const me = await api.get<any>('/api/auth/me');
+      if (me?.id) {
+        const u = norm(me);
         setUser({
-          id: backendUser.id,
-          name: backendUser.name || '',
-          username: backendUser.username || '',
-          email: backendUser.email || '',
-          imageUrl: backendUser.imageUrl || '',
-          bio: backendUser.bio || '',
-          roles: Array.isArray(backendUser.roles) ? backendUser.roles : [],
+          id: u.id,
+          name: u.name || '',
+          username: u.username || '',
+          email: u.email || '',
+          imageUrl: u.imageUrl || '',
+          bio: u.bio || '',
+          roles: Array.isArray(u.roles) ? u.roles : [],
         });
         setIsAuthenticated(true);
         return true;
       }
-
-      const currentAccount = await getCurrentUser();
-      console.log('Auth: ', currentAccount);
-
-      if (currentAccount) {
-        setUser({
-          id: currentAccount.$id,
-          name: currentAccount.name,
-          username: currentAccount.username,
-          email: currentAccount.email,
-          imageUrl: currentAccount.imageUrl,
-          bio: currentAccount.bio,
-          roles: (currentAccount.roles as string[] | undefined) ?? [],
-        });
-        setIsAuthenticated(true);
-        return true;
-      }
-
       setIsAuthenticated(false);
       return false;
     } catch (error) {
@@ -138,6 +72,30 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     checkAuthUser();
   }, []);
 
+  const signIn = async (email: string, password: string) => {
+    const res = await api.post<any>('/api/auth/login', { email, password });
+    if (res?.token) {
+      setToken(res.token);
+      setUser({
+        id: res.id,
+        name: res.name || '',
+        username: res.username || '',
+        email: res.email || '',
+        imageUrl: res.imageUrl || '',
+        bio: res.bio || '',
+        roles: Array.isArray(res.roles) ? res.roles : [],
+      });
+      setIsAuthenticated(true);
+    }
+  };
+
+  const signOut = async () => {
+    clearToken();
+    setUser(INITIAL_USER);
+    setIsAuthenticated(false);
+    navigate('/sign-in');
+  };
+
   const value: IContextType = {
     user,
     setUser,
@@ -145,14 +103,10 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     isAuthenticated,
     setIsAuthenticated,
     checkAuthUser,
-    signIn: async () => {},
-    signOut: async () => {},
-    getProfileData: async () => {
-      return await getBackendProfile();
-    },
-    getTenantData: async () => {
-      return await getBackendTenant();
-    },
+    signIn: signIn as any,
+    signOut,
+    getProfileData: async () => ({}),
+    getTenantData: async () => ({}),
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

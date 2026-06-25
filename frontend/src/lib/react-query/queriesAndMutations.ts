@@ -209,12 +209,12 @@ export const useGetPostById = (postId: string) =>
 export const useGetInfinitePosts = () =>
   useInfiniteQuery({
     queryKey: [QUERY_KEYS.GET_INFINITE_POSTS],
-    queryFn: ({ pageParam }: { pageParam: string }) => getInfinitePosts({ pageParam }),
-    getNextPageParam: (lastPage: any) => {
+    queryFn: ({ pageParam }: { pageParam: number }) => getInfinitePosts({ pageParam }),
+    getNextPageParam: (lastPage: any, allPages: any[]) => {
       if (!lastPage || lastPage.length === 0) return null;
-      return lastPage[lastPage.length - 1].$id;
+      return allPages.length;
     },
-    initialPageParam: '',
+    initialPageParam: 0,
   });
 
 export const useUpdatePost = () => {

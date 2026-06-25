@@ -72,8 +72,8 @@ const CreatePost = () => {
   };
 
   return (
-    <div className="min-h-full bg-[#F8FAFC] dark:bg-[#0F172A]">
-      <div className="bg-white dark:bg-[#0F172A] border-b border-slate-100 dark:border-slate-700 px-6 py-5">
+    <div className="min-h-full bg-[#F8FAFC] dark:bg-[#19191a]">
+      <div className="bg-white dark:bg-[#19191a] border-b border-slate-100 dark:border-slate-700 px-6 py-5">
         <div className="max-w-2xl mx-auto flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-[#0068FF]/10 flex items-center justify-center">
             <PenSquare size={18} className="text-[#0068FF]" />

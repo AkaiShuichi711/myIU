@@ -1,34 +1,29 @@
-import { Client, Account, Databases, Storage, Avatars } from 'appwrite';
+// Appwrite removed — backend is now Java Spring Boot.
+// This stub prevents import errors during incremental migration.
 
 export const appwriteConfig = {
-    projectId: import.meta.env.VITE_APPWRITE_PROJECT_ID,
-    url: import.meta.env.VITE_APPWRITE_URL,
-    databaseId: import.meta.env.VITE_APPWRITE_DATABASE_ID,
-    storageId: import.meta.env.VITE_APPWRITE_STORAGE_ID,
-    savesCollectionId: import.meta.env.VITE_APPWRITE_SAVES_COLLECTION_ID,
-    usersCollectionId: import.meta.env.VITE_APPWRITE_USERS_COLLECTION_ID,
-    postsCollectionId: import.meta.env.VITE_APPWRITE_POSTS_COLLECTION_ID,
-    // Phase 2 collections – create these in Appwrite Console first
-    notificationsCollectionId: import.meta.env.VITE_APPWRITE_NOTIFICATIONS_COLLECTION_ID ?? '',
-    commentsCollectionId: import.meta.env.VITE_APPWRITE_COMMENTS_COLLECTION_ID ?? '',
-    blocksCollectionId: import.meta.env.VITE_APPWRITE_BLOCKS_COLLECTION_ID ?? '',
-    // Phase 3 – Courses
-    coursesCollectionId:       import.meta.env.VITE_APPWRITE_COURSES_COLLECTION_ID ?? '',
-    courseGroupsCollectionId:  import.meta.env.VITE_APPWRITE_COURSE_GROUPS_COLLECTION_ID ?? '',
-    groupMembersCollectionId:  import.meta.env.VITE_APPWRITE_GROUP_MEMBERS_COLLECTION_ID ?? '',
-    coursePostsCollectionId:   import.meta.env.VITE_APPWRITE_COURSE_POSTS_COLLECTION_ID ?? '',
-    // Phase 4 – Forms
-    formTemplatesCollectionId:   import.meta.env.VITE_APPWRITE_FORM_TEMPLATES_COLLECTION_ID ?? '',
-    formSubmissionsCollectionId: import.meta.env.VITE_APPWRITE_FORM_SUBMISSIONS_COLLECTION_ID ?? '',
-    // Phase 4 – Grades
-    courseGradesCollectionId:    import.meta.env.VITE_APPWRITE_COURSE_GRADES_COLLECTION_ID ?? '',
-}
+  projectId: '',
+  url: '',
+  databaseId: '',
+  storageId: '',
+  savesCollectionId: '',
+  usersCollectionId: '',
+  postsCollectionId: '',
+  notificationsCollectionId: '',
+  commentsCollectionId: '',
+  blocksCollectionId: '',
+  coursesCollectionId: '',
+  courseGroupsCollectionId: '',
+  groupMembersCollectionId: '',
+  coursePostsCollectionId: '',
+  formTemplatesCollectionId: '',
+  formSubmissionsCollectionId: '',
+  courseGradesCollectionId: '',
+};
 
-export const client = new Client();
-client.setProject(appwriteConfig.projectId);
-client.setEndpoint(appwriteConfig.url);
-
-export const account = new Account(client);
-export const databases = new Databases(client);
-export const storage = new Storage(client);
-export const avatars = new Avatars(client);
+// Stub types to avoid any import crash
+export const client = { subscribe: () => () => {} } as any;
+export const account = {} as any;
+export const databases = {} as any;
+export const storage = {} as any;
+export const avatars = {} as any;

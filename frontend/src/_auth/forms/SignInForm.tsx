@@ -149,7 +149,7 @@ const SignInForm = () => {
               <div className="min-h-[0.25rem]" />
             )}
 
-            <div className="flex items-center justify-between gap-3 text-sm text-[#0F172A]">
+            <div className="flex items-center justify-between gap-3 text-sm text-[#19191a]">
               <label className="inline-flex items-center gap-2">
                 <input
                   type="checkbox"

@@ -41,10 +41,10 @@ module.exports = {
         // ── Zalo Neutral Dark / Navy (nl) — dark-mode backgrounds ─────────────
         'znl': {
           100: '#050a19',
-          200: '#001121',   // page bg dark
-          300: '#001a33',   // card / sidebar dark
+          200: '#4a4b4d',   // page bg dark
+          300: '#19191a',   // card / sidebar dark
           400: '#33485c',   // elevated surface / border dark
-          500: '#667685',   // muted text dark
+          500: '#DCE3E8',   // muted text dark
           600: '#99a3ad',   // secondary text dark
           700: '#bfc6cc',   // primary text dark
         },
@@ -53,7 +53,7 @@ module.exports = {
           200: '#dbdfe2',
           300: '#ccd1d6',
           400: '#8b8f92',
-          500: '#4a4b4d',
+          500: '#19191a',
           600: '#19191a',
           700: '#090909',
         },

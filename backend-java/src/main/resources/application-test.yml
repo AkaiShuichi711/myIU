@@ -1,0 +1,38 @@
+# ─────────────────────────────────────────────────────────────────
+#  TEST profile — unit / integration tests (Testcontainers)
+#  DB: spun up by Testcontainers (real PostgreSQL in Docker)
+#  Run: SPRING_PROFILES_ACTIVE=test  (set automatically by test runner)
+# ─────────────────────────────────────────────────────────────────
+spring:
+  datasource:
+    # Testcontainers provides the URL via @DynamicPropertySource in test classes
+    # Fallback for non-Testcontainers unit tests
+    url: ${TEST_DB_URL:jdbc:postgresql://localhost:5432/myiu_test}
+    username: ${TEST_DB_USERNAME:postgres}
+    password: ${TEST_DB_PASSWORD:postgres}
+
+  flyway:
+    enabled: true
+    clean-disabled: false         # allow flyway:clean between tests
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+app:
+  jwt:
+    secret: "test-only-secret-key-at-least-256-bits-long-not-for-production-use-ever-ok"
+    expiration-ms: 86400000
+  cors:
+    allowed-origins: "http://localhost:3000"
+
+logging:
+  level:
+    com.myiu: DEBUG
+    org.springframework.security: WARN
+    org.flywaydb: INFO
+    org.testcontainers: INFO
+
+springdoc:
+  swagger-ui:
+    enabled: false

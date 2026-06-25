@@ -1,0 +1,123 @@
+# ─────────────────────────────────────────────────────────────────
+#  DEPLOY → PROD
+#  Triggers: push tag v* (e.g. v1.2.0) OR manual workflow_dispatch
+#  DB: myiu_prod
+#
+#  Required GitHub Secrets: same as dev but with PROD_ prefix
+#  IMPORTANT: production deploy requires manual approval via
+#  GitHub Environment "prod" protection rules
+# ─────────────────────────────────────────────────────────────────
+name: Deploy → Prod
+
+on:
+  push:
+    tags: ['v*.*.*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Docker image tag to deploy (e.g. dev-abc1234)'
+        required: true
+
+env:
+  TAG: ${{ github.event.inputs.tag || github.ref_name }}
+
+jobs:
+  deploy-prod:
+    name: Deploy to production
+    runs-on: ubuntu-latest
+    environment: prod         # REQUIRED: set up GitHub Environment with protection rules
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build & push portal backend (prod)
+        uses: docker/build-push-action@v6
+        with:
+          context: backend-java
+          push: true
+          tags: |
+            ${{ secrets.REGISTRY }}/myiu-portal-backend:${{ env.TAG }}
+            ${{ secrets.REGISTRY }}/myiu-portal-backend:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build & push admin backend (prod)
+        uses: docker/build-push-action@v6
+        with:
+          context: myIU-admin/backend
+          push: true
+          tags: |
+            ${{ secrets.REGISTRY }}/myiu-admin-backend:${{ env.TAG }}
+            ${{ secrets.REGISTRY }}/myiu-admin-backend:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build & push portal frontend (prod)
+        uses: docker/build-push-action@v6
+        with:
+          context: frontend
+          push: true
+          build-args: VITE_API_URL=${{ secrets.PROD_PORTAL_API_URL }}
+          tags: |
+            ${{ secrets.REGISTRY }}/myiu-portal-frontend:${{ env.TAG }}
+            ${{ secrets.REGISTRY }}/myiu-portal-frontend:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build & push admin frontend (prod)
+        uses: docker/build-push-action@v6
+        with:
+          context: myIU-admin/frontend
+          push: true
+          build-args: VITE_API_URL=${{ secrets.PROD_ADMIN_API_URL }}
+          tags: |
+            ${{ secrets.REGISTRY }}/myiu-admin-frontend:${{ env.TAG }}
+            ${{ secrets.REGISTRY }}/myiu-admin-frontend:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Deploy to production server via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.PROD_SSH_HOST }}
+          username: ${{ secrets.PROD_SSH_USER }}
+          key: ${{ secrets.PROD_SSH_KEY }}
+          script: |
+            set -e
+            cd /opt/myiu
+
+            cat > .env.prod <<EOF
+            REGISTRY=${{ secrets.REGISTRY }}
+            TAG=${{ env.TAG }}
+            DB_USERNAME=${{ secrets.PROD_DB_USERNAME }}
+            DB_PASSWORD=${{ secrets.PROD_DB_PASSWORD }}
+            PORTAL_JWT_SECRET=${{ secrets.PROD_PORTAL_JWT }}
+            ADMIN_JWT_SECRET=${{ secrets.PROD_ADMIN_JWT }}
+            AZURE_CLIENT_ID=${{ secrets.PROD_AZURE_CLIENT_ID }}
+            AZURE_CLIENT_SECRET=${{ secrets.PROD_AZURE_CLIENT_SECRET }}
+            AZURE_TENANT_ID=${{ secrets.PROD_AZURE_TENANT_ID }}
+            PORTAL_FRONTEND_URL=${{ secrets.PROD_PORTAL_FRONTEND_URL }}
+            ADMIN_FRONTEND_URL=${{ secrets.PROD_ADMIN_FRONTEND_URL }}
+            PORTAL_API_URL=${{ secrets.PROD_PORTAL_API_URL }}
+            ADMIN_API_URL=${{ secrets.PROD_ADMIN_API_URL }}
+            EOF
+
+            docker compose -f docker-compose.prod.yml --env-file .env.prod pull
+            docker compose -f docker-compose.prod.yml --env-file .env.prod up -d --remove-orphans
+            docker image prune -f
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          generate_release_notes: true

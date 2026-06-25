@@ -30,13 +30,14 @@ const Notifications = () => {
   const { mutate: markRead } = useMarkNotificationRead();
   const { mutate: markAll, isPending: isMarkingAll } = useMarkAllNotificationsRead();
 
+  // MOCK: fallback khi API /api/notifications chưa trả data — xóa block này sau khi có data thật
   const MOCK_NOTIFS = [
     { $id: 'nn1', userId: user.id, type: 'form_approved', actorId: 'sys', actorName: 'Phòng Đào Tạo', linkTo: '/forms', message: 'Phòng Đào Tạo đã duyệt đơn xin miễn học phần của bạn',       read: false, $createdAt: '2026-06-10T09:00:00.000Z' },
     { $id: 'nn2', userId: user.id, type: 'grade',         actorId: 'sys', actorName: 'Hệ thống',       linkTo: '/courses', message: 'Hệ thống vừa cập nhật điểm môn Mạng Máy Tính (CS301)',   read: false, $createdAt: '2026-06-10T07:30:00.000Z' },
     { $id: 'nn3', userId: user.id, type: 'course',        actorId: 'sys', actorName: 'Hệ thống',       linkTo: '/courses', message: 'Bạn vừa được đăng ký vào lớp Lập Trình Hướng Đối Tượng', read: false, $createdAt: '2026-06-09T15:00:00.000Z' },
     { $id: 'nn4', userId: user.id, type: 'form_rejected', actorId: 'sys', actorName: 'Phòng Đào Tạo', linkTo: '/forms', message: 'Phòng Đào Tạo đã từ chối đơn xin bảo lưu — vui lòng bổ sung hồ sơ', read: true, $createdAt: '2026-06-09T08:00:00.000Z' },
     { $id: 'nn5', userId: user.id, type: 'system',        actorId: 'sys', actorName: 'myIU Portal',    linkTo: '', message: 'Lịch thi HK2 2025-2026 đã được công bố. Kiểm tra ngay trên Courses.',  read: true, $createdAt: '2026-06-08T08:00:00.000Z' },
-  ];
+  ]; // END MOCK
   const allNotifs = (rawNotifs as any[]).length > 0 ? (rawNotifs as any[]) : MOCK_NOTIFS;
 
   const notifications = allNotifs.filter((n) => filter === 'all' || !n.read);
@@ -47,8 +48,8 @@ const Notifications = () => {
   };
 
   return (
-    <div className="min-h-full bg-[#F8FAFC] dark:bg-[#0F172A]">
-      <div className="sticky top-0 z-10 bg-white dark:bg-[#0F172A] border-b border-slate-100 dark:border-slate-700 px-6 py-4">
+    <div className="min-h-full bg-[#F8FAFC] dark:bg-[#19191a]">
+      <div className="sticky top-0 z-10 bg-white dark:bg-[#19191a] border-b border-slate-100 dark:border-slate-700 px-6 py-4">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -88,7 +89,7 @@ const Notifications = () => {
               className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-colors ${
                 filter === f
                   ? 'bg-[#2F398E] text-white'
-                  : 'bg-white dark:bg-[#001a33] border border-slate-200 dark:border-[#33485c]/50 text-slate-500 dark:text-[#667685] hover:bg-slate-50 dark:hover:bg-[#0d2137]'
+                  : 'bg-white dark:bg-[#19191a] border border-slate-200 dark:border-[#33485c]/50 text-slate-500 dark:text-[#DCE3E8] hover:bg-slate-50 dark:hover:bg-[#0d2137]'
               }`}
             >
               {f === 'all'
@@ -98,7 +99,7 @@ const Notifications = () => {
           ))}
         </div>
 
-        <div className="bg-white dark:bg-[#001a33] rounded-xl border border-slate-200 dark:border-[#33485c]/50 overflow-hidden">
+        <div className="bg-white dark:bg-[#19191a] rounded-xl border border-slate-200 dark:border-[#33485c]/50 overflow-hidden">
           {isPending ? (
             <div className="flex justify-center py-16">
               <Loader2 size={24} className="animate-spin text-[#0068FF]" />
@@ -118,7 +119,7 @@ const Notifications = () => {
           ) : (
             <div className="divide-y divide-slate-50 dark:divide-[#0d2137]">
               {notifications.map((n: any) => {
-                const meta = TYPE_META[n.type] ?? { icon: <Bell size={15} className="text-[#667685]" />, color: 'bg-[#33485c]/12' };
+                const meta = TYPE_META[n.type] ?? { icon: <Bell size={15} className="text-[#DCE3E8]" />, color: 'bg-[#33485c]/12' };
 
                 const content = (
                   <div

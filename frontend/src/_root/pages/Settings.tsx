@@ -4,12 +4,7 @@ import { useTranslation } from 'react-i18next';
 import Flag from 'react-world-flags';
 import { useUserContext } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
-
-const languageOptions = [
-  { code: 'en' as const, label: 'English (US)', flagCode: 'gb' },
-  { code: 'vi' as const, label: 'Tiếng Việt', flagCode: 'vn' },
-] as const;
-type LangCode = (typeof languageOptions)[number]['code'];
+import { LANGUAGES, getSavedLang, changeLanguage } from '@/lib/googleTranslate';
 
 import { useGetAccountSessions } from '@/lib/react-query/queriesAndMutations';
 import { formatTimeAgo } from '@/lib/utils';
@@ -19,16 +14,13 @@ type Tab = 'appearance' | 'sessions';
 const Settings = () => {
   const { user: _user } = useUserContext();
   const { theme, toggleTheme } = useTheme();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [tab, setTab] = useState<Tab>('appearance');
+  const [currentLang, setCurrentLang] = useState(getSavedLang);
 
-  const currentLangCode = (languageOptions.some((o) => o.code === i18n.language?.split('-')[0])
-    ? i18n.language?.split('-')[0]
-    : 'en') as LangCode;
-
-  const changeLanguage = async (lng: LangCode) => {
-    await i18n.changeLanguage(lng);
-    localStorage.setItem('language', lng);
+  const handleLangChange = (code: string) => {
+    setCurrentLang(code);
+    changeLanguage(code);
   };
 
   const { data: sessionsData, isPending: isLoadingSessions } = useGetAccountSessions();
@@ -39,9 +31,9 @@ const Settings = () => {
   ];
 
   return (
-    <div className="min-h-full bg-[#F8FAFC] dark:bg-[#0F172A]">
+    <div className="min-h-full bg-[#F8FAFC] dark:bg-[#19191a]">
       {/* Header */}
-      <div className="bg-white dark:bg-[#0F172A] border-b border-slate-100 dark:border-slate-700 px-6 py-5">
+      <div className="bg-white dark:bg-[#19191a] border-b border-slate-100 dark:border-slate-700 px-6 py-5">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-700/60 flex items-center justify-center">
@@ -122,24 +114,21 @@ const Settings = () => {
                 <p className="text-sm font-bold text-slate-800 dark:text-slate-100">{t('settings.langTitle')}</p>
                 <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{t('settings.langDesc')}</p>
               </div>
-              <div className="px-5 py-5 flex flex-col gap-3">
-                {languageOptions.map((opt) => (
+              <div className="px-5 py-4 grid grid-cols-2 gap-2.5">
+                {LANGUAGES.map((opt) => (
                   <button
                     key={opt.code}
-                    onClick={() => void changeLanguage(opt.code)}
-                    className={`flex items-center gap-4 px-4 py-3.5 rounded-xl border-2 text-left transition-all ${
-                      currentLangCode === opt.code
+                    onClick={() => handleLangChange(opt.code)}
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl border-2 text-left transition-all ${
+                      currentLang === opt.code
                         ? 'border-[#0068FF] bg-[#0068FF]/5 dark:bg-[#0068FF]/10'
                         : 'border-slate-100 dark:border-slate-600 hover:border-slate-200 dark:hover:border-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700'
                     }`}
                   >
-                    <Flag code={opt.flagCode} className="h-7 w-10 object-cover rounded-[4px] shadow-sm shrink-0" />
-                    <span className={`text-sm font-semibold flex-1 ${currentLangCode === opt.code ? 'text-[#0068FF]' : 'text-slate-700 dark:text-slate-200'}`}>
+                    <Flag code={opt.flagCode} className="h-5 w-7 object-cover rounded-[3px] shadow-sm shrink-0" />
+                    <span className={`text-xs font-semibold truncate ${currentLang === opt.code ? 'text-[#0068FF]' : 'text-slate-700 dark:text-slate-200'}`}>
                       {opt.label}
                     </span>
-                    <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${currentLangCode === opt.code ? 'border-[#0068FF]' : 'border-slate-300 dark:border-slate-500'}`}>
-                      {currentLangCode === opt.code && <div className="w-2 h-2 rounded-full bg-[#0068FF]" />}
-                    </div>
                   </button>
                 ))}
               </div>

@@ -1,0 +1,146 @@
+# ─────────────────────────────────────────────────────────────────
+#  CI — Runs on every PR to main/develop
+#  Jobs: lint → test-portal → test-admin → build-images (dry run)
+#
+#  Uses GitHub Actions Ubuntu runner + Testcontainers (real PostgreSQL)
+#  Caches Maven dependencies between runs for faster builds
+# ─────────────────────────────────────────────────────────────────
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+env:
+  JAVA_VERSION: '21'
+  NODE_VERSION: '22'
+  REGISTRY: ghcr.io/${{ github.repository_owner }}
+
+jobs:
+  # ── Frontend checks ───────────────────────────────────────────
+  lint-frontend:
+    name: Frontend lint & type-check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci --frozen-lockfile
+
+      - name: Type-check
+        working-directory: frontend
+        run: npx tsc --noEmit
+
+      - name: Lint
+        working-directory: frontend
+        run: npm run lint --if-present
+
+  lint-admin-frontend:
+    name: Admin frontend lint & type-check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: myIU-admin/frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: myIU-admin/frontend
+        run: npm ci --frozen-lockfile
+
+      - name: Type-check
+        working-directory: myIU-admin/frontend
+        run: npx tsc --noEmit
+
+  # ── Portal backend tests ───────────────────────────────────────
+  test-portal:
+    name: Portal backend tests
+    runs-on: ubuntu-latest
+    # Testcontainers needs Docker daemon — ubuntu-latest has it
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: temurin
+          cache: maven
+          cache-dependency-path: backend-java/pom.xml
+
+      - name: Run tests (Testcontainers spins up real PostgreSQL)
+        working-directory: backend-java
+        run: ./mvnw test --no-transfer-progress
+        env:
+          SPRING_PROFILES_ACTIVE: test
+          AZURE_CLIENT_ID: test-client-id
+          AZURE_CLIENT_SECRET: test-client-secret
+          AZURE_TENANT_ID: test-tenant-id
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: portal-test-results
+          path: backend-java/target/surefire-reports/
+
+  # ── Admin backend tests ────────────────────────────────────────
+  test-admin:
+    name: Admin backend tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: temurin
+          cache: maven
+          cache-dependency-path: myIU-admin/backend/pom.xml
+
+      - name: Run tests
+        working-directory: myIU-admin/backend
+        run: ./mvnw test --no-transfer-progress
+        env:
+          SPRING_PROFILES_ACTIVE: test
+
+  # ── Docker build check (no push) ──────────────────────────────
+  build-check:
+    name: Docker build check
+    runs-on: ubuntu-latest
+    needs: [test-portal, test-admin]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build portal backend image
+        uses: docker/build-push-action@v6
+        with:
+          context: backend-java
+          push: false
+          tags: myiu-portal-backend:pr-${{ github.sha }}
+
+      - name: Build admin backend image
+        uses: docker/build-push-action@v6
+        with:
+          context: myIU-admin/backend
+          push: false
+          tags: myiu-admin-backend:pr-${{ github.sha }}
+
+      - name: Build portal frontend image
+        uses: docker/build-push-action@v6
+        with:
+          context: frontend
+          push: false
+          build-args: VITE_API_URL=https://dev-api.myiu.edu.vn
+          tags: myiu-portal-frontend:pr-${{ github.sha }}

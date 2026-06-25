@@ -9,6 +9,7 @@ import "swiper/css/pagination";
 import { useTranslation } from "react-i18next";
 import { useUserContext } from "@/context/AuthContext";
 import Flag from "react-world-flags";
+import { LANGUAGES, getSavedLang, changeLanguage } from "@/lib/googleTranslate";
 
 const carouselImages = [
   "/assets/images/side-img1.svg",
@@ -27,12 +28,6 @@ const footerLinks = [
 
 const socialIcons = ["facebook", "instagram", "outlook", "linkedin"] as const;
 
-const languageOptions = [
-  { code: "en" as const, label: "English (US)", flagCode: "gb" },
-  { code: "vi" as const, label: "Tiếng Việt", flagCode: "vn" },
-] as const;
-
-type LanguageCode = (typeof languageOptions)[number]["code"];
 
 const swiperStyle = {
   "--swiper-pagination-color": "linear-gradient(to right, #0068FF, #323393)",
@@ -43,9 +38,10 @@ const swiperStyle = {
 // === COMPONENT DEFINITION ===
 const AuthLayout = () => {
   // === STATE AND CONSTANTS ===
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { isAuthenticated } = useUserContext();
   const [isLangOpen, setIsLangOpen] = useState(false);
+  const [currentLanguage, setCurrentLanguage] = useState(getSavedLang);
   const { pauseTheme, resumeTheme } = useTheme();
 
   useEffect(() => {
@@ -53,17 +49,12 @@ const AuthLayout = () => {
     return resumeTheme;
   }, [pauseTheme, resumeTheme]);
 
-  const languageFromI18n = i18n.language?.split("-")[0] ?? "en";
-  const currentLanguage = languageOptions.some((option) => option.code === languageFromI18n)
-    ? (languageFromI18n as LanguageCode)
-    : "en";
+  const activeLanguage = LANGUAGES.find((o) => o.code === currentLanguage) ?? LANGUAGES[0];
 
-  const activeLanguage =
-    languageOptions.find((option) => option.code === currentLanguage) ?? languageOptions[0];
-
-  const changeLanguage = async (lng: LanguageCode) => {
-    await i18n.changeLanguage(lng);
-    localStorage.setItem("language", lng);
+  const handleLangChange = (code: string) => {
+    setCurrentLanguage(code);
+    setIsLangOpen(false);
+    changeLanguage(code);
   };
 
   // === CONDITIONAL RENDERING ===
@@ -210,16 +201,13 @@ const AuthLayout = () => {
               onClick={() => setIsLangOpen(false)}
             />
 
-            <div className="absolute right-0 bottom-full mb-2 w-48 rounded-xl bg-white p-1.5 shadow-xl ring-1 ring-black/5 z-50 animate-in fade-in slide-in-from-bottom-2 duration-150">
-              {languageOptions.map((option) => (
+            <div className="absolute right-0 bottom-full mb-2 w-52 rounded-xl bg-white p-1.5 shadow-xl ring-1 ring-black/5 z-50 animate-in fade-in slide-in-from-bottom-2 duration-150 max-h-72 overflow-y-auto">
+              {LANGUAGES.map((option) => (
                 <button
                   key={option.code}
                   type="button"
-                  onClick={() => {
-                    void changeLanguage(option.code);
-                    setIsLangOpen(false);
-                  }}
-                  className={`flex items-center justify-between w-full px-3 py-2.5 text-sm rounded-lg text-left transition-colors ${
+                  onClick={() => handleLangChange(option.code)}
+                  className={`flex items-center justify-between w-full px-3 py-2 text-sm rounded-lg text-left transition-colors ${
                     currentLanguage === option.code
                       ? "bg-[#0A1128]/5 text-[#0A1128] font-semibold"
                       : "text-gray-700 hover:bg-gray-50"
@@ -228,23 +216,13 @@ const AuthLayout = () => {
                   <div className="flex items-center gap-3">
                     <Flag
                       code={option.flagCode}
-                      className="h-5 w-7 object-cover rounded-[2px]"
+                      className="h-4 w-6 object-cover rounded-[2px]"
                     />
                     <span>{option.label}</span>
                   </div>
                   {currentLanguage === option.code && (
-                    <svg
-                      className="w-4 h-4 text-gray-900"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2.5"
-                        d="M5 13l4 4L19 7"
-                      />
+                    <svg className="w-4 h-4 text-gray-900 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
                     </svg>
                   )}
                 </button>

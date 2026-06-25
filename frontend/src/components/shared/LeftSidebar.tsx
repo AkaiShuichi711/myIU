@@ -36,7 +36,7 @@ const LeftSidebar = () => {
   const unreadCount = (notifs as any[]).filter((n) => !n.read).length;
 
   return (
-    <aside className="w-full max-w-[220px] border-r border-slate-200 dark:border-[#33485c]/50 bg-white dark:bg-[#001a33] hidden md:flex flex-col shrink-0 h-full transition-colors duration-200">
+    <aside className="w-full max-w-[220px] border-r border-slate-200 dark:border-[#33485c]/50 bg-white dark:bg-[#19191a] hidden md:flex flex-col shrink-0 h-full transition-colors duration-200">
 
       {/* Brand bar */}
       {/* <div className="flex items-center gap-2.5 px-4 py-3 border-b border-slate-100 dark:border-slate-800/80"> */}
@@ -78,7 +78,7 @@ const LeftSidebar = () => {
                   to={link.route}
                   className={`relative flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium transition-all duration-150 group ${isActive
                       ? 'bg-[#0068FF]/8 dark:bg-[#0068FF]/15 text-[#0068FF]'
-                      : 'text-[#0F172A] dark:text-[#bfc6cc]'
+                      : 'text-[#19191a] dark:text-[#bfc6cc]'
                     }`}
                 >
                   {/* Left accent bar */}
@@ -90,7 +90,7 @@ const LeftSidebar = () => {
                     size={15}
                     className={`shrink-0 transition-colors ${isActive
                         ? 'text-[#0068FF]'
-                        : 'text-[#0F172A] dark:text-[#bfc6cc]'
+                        : 'text-[#19191a] dark:text-[#bfc6cc]'
                       }`}
                   />
 

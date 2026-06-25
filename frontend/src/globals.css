@@ -24,6 +24,21 @@
   }
 }
 
+/* ── Google Translate: hide toolbar & prevent body shift ── */
+.goog-te-banner-frame,
+.goog-te-banner-frame.skiptranslate,
+#goog-gt-tt,
+.goog-te-balloon-frame,
+.goog-te-spinner-pos,
+.VIpgJd-ZVi9od-aZ2wEe-wOHMyf {
+  display: none !important;
+  visibility: hidden !important;
+}
+body {
+  top: 0 !important;
+}
+.skiptranslate { display: none !important; }
+
 @layer utilities {
   /* TYPOGRAPHY */
   .h1-bold {
@@ -274,7 +289,7 @@
 
   /* Light text */
   --text-primary:     #090909;
-  --text-secondary:   #4a4b4d;
+  --text-secondary:   #19191a;
   --text-muted:       #8b8f92;
   --text-faint:       #ccd1d6;
 
@@ -290,8 +305,8 @@ html.dark {
   color-scheme: dark;
 
   /* Dark surfaces — Zalo nl series */
-  --bg-page:          #001121;   /* nl200 — deepest navy */
-  --bg-surface:       #001a33;   /* nl300 — card / sidebar */
+  --bg-page:          #4a4b4d;   /* nl200 — deepest navy */
+  --bg-surface:       #19191a;   /* nl300 — card / sidebar */
   --bg-surface-2:     #0d2137;   /* nl200↔nl300 — subtle variant */
   --bg-elevated:      #33485c;   /* nl400 — hover / elevated */
 
@@ -303,30 +318,30 @@ html.dark {
   --text-primary:     #e8edf0;   /* just above nl700 */
   --text-secondary:   #bfc6cc;   /* nl700 */
   --text-muted:       #99a3ad;   /* nl600 */
-  --text-faint:       #667685;   /* nl500 */
+  --text-faint:       #DCE3E8;   /* nl500 */
 }
 
 html.dark body {
-  background-color: #001121;   /* nl200 */
+  background-color: #4a4b4d;   /* nl200 */
   color: #bfc6cc;              /* nl700 */
 }
 
 /* ── Surfaces ────────────────────────────────────────────────────────────────── */
-html.dark .bg-white        { background-color: #001a33; }   /* nl300 */
-html.dark .bg-slate-50     { background-color: #001121; }   /* nl200 */
+html.dark .bg-white        { background-color: #19191a; }   /* nl300 */
+html.dark .bg-slate-50     { background-color: #4a4b4d; }   /* nl200 */
 html.dark .bg-slate-100    { background-color: #0d2137; }   /* between nl200-nl300 */
 html.dark .bg-slate-200    { background-color: #1a3347; }
-html.dark .bg-slate-700    { background-color: #001a33; }   /* nl300 */
-html.dark .bg-slate-800    { background-color: #001a33; }   /* nl300 */
-html.dark .bg-slate-900    { background-color: #001121; }   /* nl200 */
+html.dark .bg-slate-700    { background-color: #19191a; }   /* nl300 */
+html.dark .bg-slate-800    { background-color: #19191a; }   /* nl300 */
+html.dark .bg-slate-900    { background-color: #4a4b4d; }   /* nl200 */
 
 /* Page bg */
-html.dark .bg-\[#F8FAFC\]  { background-color: #001121; }   /* nl200 */
+html.dark .bg-\[#F8FAFC\]  { background-color: #4a4b4d; }   /* nl200 */
 
 /* Sidebar / header explicit bg overrides */
-html.dark .bg-\[#0B1120\]  { background-color: #001a33; }   /* nl300 */
-html.dark .bg-\[#0F172A\]  { background-color: #001121; }   /* nl200 */
-html.dark .bg-\[#0A0F1E\]  { background-color: #001121; }   /* nl200 */
+html.dark .bg-\[#19191a\]  { background-color: #19191a; }   /* nl300 */
+html.dark .bg-\[#19191a\]  { background-color: #4a4b4d; }   /* nl200 */
+html.dark .bg-\[#19191a\]  { background-color: #4a4b4d; }   /* nl200 */
 
 /* ── Borders ─────────────────────────────────────────────────────────────────── */
 html.dark .border-slate-50  { border-color: #0d2137; }
@@ -352,7 +367,7 @@ html.dark .text-slate-900 { color: #e8edf0; }
 html.dark .text-slate-800 { color: #dce3e8; }   /* headings */
 html.dark .text-slate-700 { color: #bfc6cc; }   /* nl700 — body */
 html.dark .text-slate-600 { color: #99a3ad; }   /* nl600 — muted */
-html.dark .text-slate-500 { color: #667685; }   /* nl500 */
+html.dark .text-slate-500 { color: #DCE3E8; }   /* nl500 */
 html.dark .text-slate-400 { color: #4d6070; }   /* disabled / placeholder */
 
 /* ── Hover surfaces ───────────────────────────────────────────────────────────── */
@@ -366,13 +381,13 @@ html.dark .hover\:bg-red-50:hover    { background-color: rgba(239,68,68,0.08); }
 /* ── Inputs ──────────────────────────────────────────────────────────────────── */
 html.dark input,
 html.dark textarea {
-  background-color: #001a33;   /* nl300 */
+  background-color: #19191a;   /* nl300 */
   color: #bfc6cc;              /* nl700 */
   border-color: #33485c;       /* nl400 */
 }
 
 html.dark input::placeholder,
-html.dark textarea::placeholder { color: #667685; }   /* nl500 */
+html.dark textarea::placeholder { color: #DCE3E8; }   /* nl500 */
 
 html.dark input:focus,
 html.dark textarea:focus {
@@ -393,13 +408,13 @@ html.dark .shadow-2xl { box-shadow: 0 24px 64px rgba(0,17,33,0.95); }
 html.dark .animate-pulse .bg-slate-100 { background-color: #0d2137; }
 
 /* ── Scrollbar — navy themed ─────────────────────────────────────────────────── */
-html.dark .custom-scrollbar::-webkit-scrollbar-track { background: #001a33; }
+html.dark .custom-scrollbar::-webkit-scrollbar-track { background: #19191a; }
 html.dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #33485c; border-radius: 50px; }
 html.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #4d6070; }
 
 /* Global scrollbar in dark */
 html.dark ::-webkit-scrollbar       { width: 5px; height: 5px; }
-html.dark ::-webkit-scrollbar-track { background: #001121; }
+html.dark ::-webkit-scrollbar-track { background: #4a4b4d; }
 html.dark ::-webkit-scrollbar-thumb { background: #33485c; border-radius: 50px; }
 html.dark ::-webkit-scrollbar-thumb:hover { background: #4d6070; }
 

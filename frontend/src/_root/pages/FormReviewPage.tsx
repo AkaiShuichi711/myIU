@@ -18,19 +18,19 @@ const buildResultEmail = (submitterName: string, formTitle: string, status: 'app
         <h1 style="color:white;margin:0;font-size:17px;font-weight:700">myIU Portal</h1>
         <p style="color:rgba(255,255,255,0.8);margin:3px 0 0;font-size:12px">Hệ thống biểu mẫu điện tử</p>
       </div>
-      <h2 style="color:#0f172a;font-size:15px;margin:0 0 6px">
+      <h2 style="color:#19191a;font-size:15px;margin:0 0 6px">
         ${status === 'approved' ? '✅ Biểu mẫu đã được duyệt' : '❌ Biểu mẫu bị từ chối'}
       </h2>
       <p style="color:#475569;font-size:13px;margin:0 0 16px">Xin chào <strong>${submitterName}</strong>,</p>
       <table style="width:100%;border-collapse:collapse;margin-bottom:20px;font-size:13px">
         <tr><td style="padding:8px 12px;background:#f1f5f9;color:#64748b;width:130px">Biểu mẫu</td>
-            <td style="padding:8px 12px;background:#f8fafc;color:#0f172a;font-weight:600">${formTitle}</td></tr>
+            <td style="padding:8px 12px;background:#f8fafc;color:#19191a;font-weight:600">${formTitle}</td></tr>
         <tr><td style="padding:8px 12px;color:#64748b">Kết quả</td>
             <td style="padding:8px 12px;color:${status === 'approved' ? '#059669' : '#ef4444'};font-weight:700">
               ${status === 'approved' ? 'ĐÃ DUYỆT' : 'BỊ TỪ CHỐI'}
             </td></tr>
         <tr><td style="padding:8px 12px;color:#64748b">Người duyệt</td>
-            <td style="padding:8px 12px;color:#0f172a">${approverName}</td></tr>
+            <td style="padding:8px 12px;color:#19191a">${approverName}</td></tr>
         ${status === 'rejected' && rejectionReason ? `
         <tr><td style="padding:8px 12px;color:#64748b">Lý do</td>
             <td style="padding:8px 12px;color:#ef4444">${rejectionReason}</td></tr>` : ''}
@@ -127,9 +127,9 @@ const FormReviewPage = () => {
   const isSubmitter = user.id === submission.submitterId;
 
   return (
-    <div className="min-h-full bg-[#F8FAFC] dark:bg-[#0A0F1E]">
+    <div className="min-h-full bg-[#F8FAFC] dark:bg-[#19191a]">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-white dark:bg-[#0B1120] border-b border-slate-200 dark:border-slate-800 px-6 py-3.5">
+      <div className="sticky top-0 z-10 bg-white dark:bg-[#19191a] border-b border-slate-200 dark:border-slate-800 px-6 py-3.5">
         <div className="max-w-2xl mx-auto flex items-center gap-3">
           <button onClick={() => navigate(-1)}
             className="flex items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors">

@@ -52,6 +52,7 @@ const Home = () => {
 
   const rawCourses = isLecturer || isAdmin ? lecturerCourses : studentCourses;
   const loadingCourses = isLecturer || isAdmin ? loadingLecturerCourses : loadingStudentCourses;
+  // MOCK: fallback khi API /api/courses, /api/notifications, /api/forms chưa trả data
   const courses    = (rawCourses  as any[]).length > 0 ? (rawCourses  as any[]) : MOCK_COURSES_BASE;
   const notifs     = (rawNotifs   as any[]).length > 0 ? (rawNotifs   as any[]) : MOCK_NOTIFS_HOME;
   const forms      = (rawForms    as any[]).length > 0 ? (rawForms    as any[]) : MOCK_FORMS_STUDENT;
@@ -66,7 +67,7 @@ const Home = () => {
   const dateStr = now.toLocaleDateString('vi-VN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
   return (
-    <div className="min-h-full bg-[#F8FAFC] dark:bg-[#0F172A]">
+    <div className="min-h-full bg-[#F8FAFC] dark:bg-[#19191a]">
       {/* ── Hero header ─────────────────────────────────────────────────────── */}
       <div className="bg-white border-b border-slate-100 dark:border-[#0d2137] px-6 py-5">
         <div className="max-w-5xl mx-auto flex items-center justify-between gap-4 flex-wrap">
@@ -75,7 +76,7 @@ const Home = () => {
             <h1 className="text-xl font-bold text-slate-900 dark:text-[#e8edf0] mt-0.5">
               {t('home.greeting', { name: firstName })}
             </h1>
-            <p className="text-sm text-slate-500 dark:text-[#667685] mt-0.5">
+            <p className="text-sm text-slate-500 dark:text-[#DCE3E8] mt-0.5">
               {isAdmin ? 'Quản trị viên' : isLecturer ? 'Giảng viên' : 'Sinh viên'} — myIU Portal
             </p>
           </div>
@@ -123,7 +124,7 @@ const Home = () => {
                     <Link
                       key={course.$id}
                       to={`/courses/${course.$id}`}
-                      className="group bg-white dark:bg-[#001a33] rounded-xl border border-slate-200 dark:border-[#33485c]/50 overflow-hidden hover:border-[#0B2275]/50 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[#0B2275]/8 transition-all duration-200"
+                      className="group bg-white dark:bg-[#19191a] rounded-xl border border-slate-200 dark:border-[#33485c]/50 overflow-hidden hover:border-[#0B2275]/50 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[#0B2275]/8 transition-all duration-200"
                     >
                       <div className="h-16 relative bg-[#0B2275]">
                         <div className="absolute inset-0 flex items-center px-3">
@@ -153,7 +154,8 @@ const Home = () => {
               title="Điểm gần đây"
               to="/courses"
             />
-            <div className="bg-white dark:bg-[#001a33] rounded-xl border border-slate-200 dark:border-[#33485c]/50 divide-y divide-slate-50 dark:divide-[#0d2137]">
+            {/* MOCK: hardcoded grades — thay bằng GET /api/grades?studentId=... khi có */}
+            <div className="bg-white dark:bg-[#19191a] rounded-xl border border-slate-200 dark:border-[#33485c]/50 divide-y divide-slate-50 dark:divide-[#0d2137]">
               {[
                 { subject: 'Mạng Máy Tính (CS301)',         component: 'Giữa kỳ', score: 8.5, max: 10, color: '#0068FF' },
                 { subject: 'Kiểm Thử Phần Mềm (SE302)',     component: 'Bài tập', score: 9.0, max: 10, color: '#27ae60' },
@@ -193,7 +195,7 @@ const Home = () => {
               title={`Thông báo${unreadCount > 0 ? ` (${unreadCount})` : ''}`}
               to="/notifications"
             />
-            <div className="bg-white dark:bg-[#001a33] rounded-xl border border-slate-200 dark:border-[#33485c]/50 overflow-hidden">
+            <div className="bg-white dark:bg-[#19191a] rounded-xl border border-slate-200 dark:border-[#33485c]/50 overflow-hidden">
               {loadingNotifs ? (
                 <div className="flex justify-center py-8"><Loader2 size={18} className="animate-spin text-[#0068FF]" /></div>
               ) : notifs.length === 0 ? (
@@ -225,7 +227,7 @@ const Home = () => {
               title="Biểu mẫu của tôi"
               to="/forms"
             />
-            <div className="bg-white dark:bg-[#001a33] rounded-xl border border-slate-200 dark:border-[#33485c]/50 overflow-hidden">
+            <div className="bg-white dark:bg-[#19191a] rounded-xl border border-slate-200 dark:border-[#33485c]/50 overflow-hidden">
               {loadingForms ? (
                 <div className="flex justify-center py-8"><Loader2 size={18} className="animate-spin text-[#0068FF]" /></div>
               ) : forms.length === 0 ? (

@@ -71,6 +71,7 @@ const CoursesPage = () => {
 
   const isLoading = tab === 'teaching' ? loadingTeaching : loadingLearning;
   const rawCourses = (tab === 'teaching' ? teachingCourses : learningCourses) as any[];
+  // MOCK: fallback khi API /api/courses chưa trả data
   const courses = rawCourses.length > 0 ? rawCourses : (tab === 'learning' ? MOCK_COURSES_ALL : []);
 
   const TAB_DEFS = [
@@ -79,9 +80,9 @@ const CoursesPage = () => {
   ].filter((t) => t.visible);
 
   return (
-    <div className="min-h-full bg-[#F8FAFC] dark:bg-[#0A0F1E]">
+    <div className="min-h-full bg-[#F8FAFC] dark:bg-[#19191a]">
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-white dark:bg-[#0B1120] border-b border-slate-200 dark:border-slate-800 px-6 py-3">
+      <div className="sticky top-0 z-10 bg-white dark:bg-[#19191a] border-b border-slate-200 dark:border-slate-800 px-6 py-3">
         <div className="max-w-5xl mx-auto">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">

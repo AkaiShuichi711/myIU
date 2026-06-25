@@ -9,7 +9,7 @@ import { Paginator } from '@/components/shared';
 
 const PAGE_SIZE = 12;
 
-const PALETTE = ['#1D4ED8', '#7C3AED', '#0891B2', '#059669', '#B45309', '#DC2626', '#0F172A', '#2F398E'];
+const PALETTE = ['#1D4ED8', '#7C3AED', '#0891B2', '#059669', '#B45309', '#DC2626', '#19191a', '#2F398E'];
 const avatarBg = (n: string) => PALETTE[(n?.charCodeAt(0) ?? 65) % PALETTE.length];
 
 const UserCard = ({ user }: { user: any }) => {

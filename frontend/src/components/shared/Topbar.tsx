@@ -1,38 +1,27 @@
 import { useState, useRef, useEffect, type CSSProperties } from 'react';
 import { LogOut, Sun, Moon, ChevronDown } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import Flag from 'react-world-flags';
 import { useUserContext } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import NotificationBell from './NotificationBell';
-
-const languageOptions = [
-  { code: 'en' as const, label: 'English', flagCode: 'gb' },
-  { code: 'vi' as const, label: 'Tiếng Việt', flagCode: 'vn' },
-] as const;
-type LangCode = (typeof languageOptions)[number]['code'];
+import { LANGUAGES, getSavedLang, changeLanguage } from '@/lib/googleTranslate';
 
 const Topbar = () => {
   const { user } = useUserContext();
   const { theme, toggleTheme } = useTheme();
-  const { i18n } = useTranslation();
   const [isLangOpen, setIsLangOpen] = useState(false);
+  const [currentLang, setCurrentLang] = useState(getSavedLang);
   const langRef = useRef<HTMLDivElement>(null);
 
   const isDark = theme === 'dark';
+  const activeLang = LANGUAGES.find((l) => l.code === currentLang) ?? LANGUAGES[0];
 
-  const currentLangCode = (languageOptions.some((o) => o.code === i18n.language?.split('-')[0])
-    ? i18n.language?.split('-')[0]
-    : 'en') as LangCode;
-  const activeLang = languageOptions.find((o) => o.code === currentLangCode) ?? languageOptions[0];
-
-  const changeLanguage = (lng: LangCode) => {
-    void i18n.changeLanguage(lng);
-    localStorage.setItem('language', lng);
+  const handleLangChange = (code: string) => {
+    setCurrentLang(code);
     setIsLangOpen(false);
+    changeLanguage(code);
   };
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (langRef.current && !langRef.current.contains(e.target as Node)) {
@@ -48,10 +37,10 @@ const Topbar = () => {
     : '?';
 
   const colors = {
-    bg:          isDark ? '#0F172A' : '#ffffff',
+    bg:          isDark ? '#19191a' : '#ffffff',
     border:      isDark ? '#1E293B' : '#E2E8F0',
     shadow:      isDark ? '0 1px 4px rgba(0,0,0,0.4)' : '0 1px 4px rgba(0,0,0,0.06)',
-    text:        isDark ? '#F1F5F9' : '#0F172A',
+    text:        isDark ? '#F1F5F9' : '#19191a',
     textMuted:   isDark ? '#94A3B8' : '#64748B',
     divider:     isDark ? '#334155' : '#E2E8F0',
     avatarBorder:isDark ? '#334155' : '#E2E8F0',
@@ -87,7 +76,11 @@ const Topbar = () => {
     }}>
       {/* Left: Logo */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <img src="/assets/images/logo_aftersignin.svg" alt="myIU" style={{ height: '44px' }} />
+        <img
+          src="/assets/images/logo_aftersignin.svg"
+          alt="myIU"
+          style={{ height: '38px', width: 'auto' }}
+        />
       </div>
 
       {/* Right: controls */}
@@ -122,29 +115,29 @@ const Topbar = () => {
               position: 'absolute', top: 'calc(100% + 6px)', right: 0,
               background: colors.dropdownBg, border: `1px solid ${colors.dropdownBorder}`,
               borderRadius: '10px', boxShadow: isDark ? '0 8px 24px rgba(0,0,0,0.5)' : '0 8px 24px rgba(0,0,0,0.12)',
-              minWidth: '150px', overflow: 'hidden', zIndex: 100,
+              minWidth: '168px', maxHeight: '320px', overflowY: 'auto', zIndex: 100,
             }}>
-              {languageOptions.map((opt) => (
+              {LANGUAGES.map((opt) => (
                 <button
                   key={opt.code}
-                  onClick={() => changeLanguage(opt.code)}
+                  onClick={() => handleLangChange(opt.code)}
                   style={{
                     display: 'flex', alignItems: 'center', gap: '10px',
-                    width: '100%', padding: '9px 14px',
-                    background: opt.code === currentLangCode ? (isDark ? '#253450' : '#EEF2FF') : 'transparent',
+                    width: '100%', padding: '8px 14px',
+                    background: opt.code === currentLang ? (isDark ? '#253450' : '#EEF2FF') : 'transparent',
                     border: 'none', cursor: 'pointer', fontSize: '13px',
-                    color: opt.code === currentLangCode ? '#2F398E' : colors.text,
-                    fontWeight: opt.code === currentLangCode ? 600 : 400,
+                    color: opt.code === currentLang ? '#2F398E' : colors.text,
+                    fontWeight: opt.code === currentLang ? 600 : 400,
                     textAlign: 'left', transition: 'background 0.1s',
                   }}
                   onMouseEnter={e => {
-                    if (opt.code !== currentLangCode) (e.currentTarget as HTMLElement).style.background = colors.optionHover;
+                    if (opt.code !== currentLang) (e.currentTarget as HTMLElement).style.background = colors.optionHover;
                   }}
                   onMouseLeave={e => {
-                    if (opt.code !== currentLangCode) (e.currentTarget as HTMLElement).style.background = 'transparent';
+                    if (opt.code !== currentLang) (e.currentTarget as HTMLElement).style.background = 'transparent';
                   }}
                 >
-                  <Flag code={opt.flagCode} style={{ height: '14px', width: '20px', objectFit: 'cover', borderRadius: '2px' }} />
+                  <Flag code={opt.flagCode} style={{ height: '14px', width: '20px', objectFit: 'cover', borderRadius: '2px', flexShrink: 0 }} />
                   {opt.label}
                 </button>
               ))}

@@ -40,20 +40,20 @@ const TenantPage = () => {
   };
 
   const c = {
-    pageBg:    isDark ? '#0F172A' : '#f8fafc',
+    pageBg:    isDark ? '#19191a' : '#f8fafc',
     cardBg:    isDark ? '#1E293B' : '#ffffff',
     border:    isDark ? '#334155' : '#e2e8f0',
     rowBorder: isDark ? '#334155' : '#f1f5f9',
-    heading:   isDark ? '#F1F5F9' : '#0f172a',
-    label:     isDark ? '#94A3B8' : '#0F172A',
+    heading:   isDark ? '#F1F5F9' : '#19191a',
+    label:     isDark ? '#94A3B8' : '#19191a',
     value:     isDark ? '#93C5FD' : '#1e3a5f',
-    muted:     isDark ? '#0F172A' : '#cbd5e1',
+    muted:     isDark ? '#19191a' : '#cbd5e1',
     sectionHdr:isDark ? '#1E293B' : '#f8fafc',
     sectionTxt:isDark ? '#CBD5E1' : '#09090B',
     topBarBg:  isDark ? '#1E293B' : '#fff',
     shadow:    isDark ? '0 1px 4px rgba(0,0,0,0.4)' : '0 1px 4px rgba(0,0,0,0.05)',
     btnBorder: isDark ? '#334155' : '#e2e8f0',
-    btnColor:  isDark ? '#94A3B8' : '#0F172A',
+    btnColor:  isDark ? '#94A3B8' : '#19191a',
   };
 
   const Row = ({ label, value, id, mono = true }: { label: string; value?: string; id: string; mono?: boolean }) => (
@@ -344,7 +344,7 @@ const TenantPage = () => {
                       }}>READ_ONLY</span>
                     </div>
                     <pre style={{
-                      background: "#0f172a", margin: 0,
+                      background: "#19191a", margin: 0,
                       padding: "16px", fontFamily: "'SF Mono', 'Fira Code', monospace",
                       fontSize: "12px", color: "#4ade80", lineHeight: 1.7,
                       overflowX: "auto", maxHeight: "300px",
