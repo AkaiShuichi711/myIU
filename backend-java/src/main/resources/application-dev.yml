@@ -12,6 +12,13 @@ server:
     min-response-size: 1024
 
 spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          microsoft:
+            redirect-uri: "https://myiu.onrender.com/login/oauth2/code/microsoft"
+
   datasource:
     url: ${DB_URL}                # REQUIRED — no fallback
     username: ${DB_USERNAME}      # REQUIRED
