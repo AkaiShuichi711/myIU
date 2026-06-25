@@ -4,6 +4,9 @@
 #  Active profile: set SPRING_PROFILES_ACTIVE env var
 #  Default: 'local'  (developer convenience — safe fallback for first run)
 # ─────────────────────────────────────────────────────────────────
+server:
+  forward-headers-strategy: native   # trust X-Forwarded-* from Render/cloud proxy
+
 spring:
   profiles:
     default: local
