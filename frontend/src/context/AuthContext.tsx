@@ -92,7 +92,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const TENANT = 'a7380202-eb54-415a-9b66-4d9806cfab42';
   const MS_LOGOUT = `https://login.microsoftonline.com/${TENANT}/oauth2/v2.0/logout`
-    + `?post_logout_redirect_uri=${encodeURIComponent('http://localhost:5173/sign-in')}`;
+    + `?post_logout_redirect_uri=${encodeURIComponent(`${import.meta.env.VITE_APP_URL || window.location.origin}/sign-in`)}`;
 
   const signOut = async () => {
     const provider = getAuthProvider();

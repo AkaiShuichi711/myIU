@@ -32,7 +32,7 @@ const SignInForm = () => {
   const handleMicrosoftSignIn = () => {
     setIsLoading(true);
     setErrorMsg(null);
-    window.location.href = "http://localhost:8080/oauth2/authorization/microsoft";
+    window.location.href = `${import.meta.env.VITE_API_URL}/oauth2/authorization/microsoft`;
   };
 
   return (
