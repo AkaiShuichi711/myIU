@@ -1,4 +1,4 @@
-import { Clock, CheckCircle2, XCircle } from 'lucide-react';
+﻿import { Clock, CheckCircle2, XCircle } from 'lucide-react';
 import type { SubmissionStatus, FormCategory, FormFileType } from '@/types';
 
 // ── Form / submission status ──────────────────────────────────────────────────
@@ -18,7 +18,7 @@ export const FORM_STATUS: Record<SubmissionStatus, {
 // ── File type badges ──────────────────────────────────────────────────────────
 export const FILE_TYPE_META: Record<FormFileType | 'other', { label: string; color: string; bg: string }> = {
   pdf:   { label: 'PDF',  color: 'text-[#ef4e49]', bg: 'bg-[#ef4e49]/10' },
-  docx:  { label: 'DOCX', color: 'text-[#1e51f9]', bg: 'bg-[#1e51f9]/10' },
+  docx:  { label: 'DOCX', color: 'text-[#F15A22]', bg: 'bg-[#F15A22]/10' },
   doc:   { label: 'DOC',  color: 'text-[#00adf4]', bg: 'bg-[#00adf4]/10' },
   xlsx:  { label: 'XLSX', color: 'text-[#00c578]', bg: 'bg-[#00c578]/10' },
   ppt:   { label: 'PPT',  color: 'text-[#f5832f]', bg: 'bg-[#f5832f]/10' },

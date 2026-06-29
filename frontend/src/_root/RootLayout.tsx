@@ -1,4 +1,4 @@
-// import { Outlet, useLocation } from "react-router-dom";
+﻿// import { Outlet, useLocation } from "react-router-dom";
 // import { useUserContext } from "@/context/AuthContext";
 // import { LeftSidebar, Topbar } from "@/components/shared";
 // import { useEffect } from "react";
@@ -22,7 +22,7 @@
 //   if (isLoading) {
 //     return (
 //       <div className="h-screen w-full flex items-center justify-center bg-slate-50">
-//         <Loader2 className="h-8 w-8 animate-spin text-[#1e51f9]" />
+//         <Loader2 className="h-8 w-8 animate-spin text-[#F15A22]" />
 //       </div>
 //     );
 //   }
@@ -69,7 +69,7 @@ const RootLayout = () => {
   if (isLoading) {
     return (
       <div className="h-screen w-full flex items-center justify-center bg-slate-50 dark:bg-slate-900">
-        <Loader2 className="h-8 w-8 animate-spin text-[#1e51f9]" />
+        <Loader2 className="h-8 w-8 animate-spin text-[#F15A22]" />
       </div>
     );
   }

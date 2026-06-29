@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+﻿import { Link } from 'react-router-dom';
 import { BookOpen, Bell, FileText, ChevronRight, GraduationCap, Star, Loader2, ArrowUpRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useUserContext } from '@/context/AuthContext';
@@ -16,18 +16,18 @@ const NOTIF_DOT: Record<string, string> = {
   form_approved: 'bg-green-500',
   form_rejected: 'bg-red-400',
   form_pending:  'bg-amber-400',
-  grade:         'bg-[#1e51f9]',
-  course:        'bg-[#2F398E]',
+  grade:         'bg-[#F15A22]',
+  course:        'bg-[#F47A50]',
   system:        'bg-slate-400',
 };
 
 // ── Section header — ir.vng style ─────────────────────────────────────────
 const SectionHeader = ({ title, to }: { title: string; to: string }) => (
-  <div className="flex items-center justify-between mb-4">
+  <div className="flex items-center justify-between mb-3">
     <h2 className="text-[15px] font-bold text-slate-900 dark:text-[#e8edf0] tracking-tight">{title}</h2>
     <Link
       to={to}
-      className="flex items-center gap-1 text-[12px] font-semibold text-[#1e51f9] hover:opacity-80 transition-opacity"
+      className="flex items-center gap-1 text-[12px] font-semibold text-[#F15A22] hover:opacity-80 transition-opacity"
     >
       Xem tất cả <ArrowUpRight size={12} />
     </Link>
@@ -65,11 +65,11 @@ const Home = () => {
   const roleLabel = isAdmin ? 'Quản trị viên' : isLecturer ? 'Giảng viên' : 'Sinh viên';
 
   return (
-    <div className="min-h-full bg-[#F4F6F8] dark:bg-[#19191a]">
+    <div className="h-full overflow-y-auto bg-[#F4F6F8] dark:bg-[#19191a]">
 
       {/* ── Hero banner ────────────────────────────────────────────────────── */}
       <div className="bg-white dark:bg-[#1e2028] border-b border-[#E0E4EB] dark:border-[#33485c]">
-        <div className="max-w-5xl mx-auto px-6 py-6 flex items-end justify-between gap-6">
+        <div className="max-w-5xl mx-auto px-6 py-4 flex items-end justify-between gap-6">
           {/* Greeting */}
           <div>
             <p className="text-[11px] text-slate-400 dark:text-[#4d6070] uppercase tracking-[0.12em] font-semibold mb-1">
@@ -103,7 +103,7 @@ const Home = () => {
                 <p className="text-2xl font-extrabold text-slate-900 dark:text-[#e8edf0] leading-none tracking-tight">
                   {value}
                 </p>
-                <p className="text-[11px] text-[#1e51f9] font-semibold mt-0.5">{sub}</p>
+                <p className="text-[11px] text-[#F15A22] font-semibold mt-0.5">{sub}</p>
               </div>
             ))}
           </div>
@@ -111,20 +111,20 @@ const Home = () => {
       </div>
 
       {/* ── Content ────────────────────────────────────────────────────────── */}
-      <div className="max-w-5xl mx-auto px-6 py-6 grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
+      <div className="max-w-5xl mx-auto px-6 py-4 grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-4">
 
         {/* ── LEFT: Courses + Grades ──────────────────────────────────────── */}
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-4">
 
           {/* Courses */}
           <div>
             <SectionHeader title="Khóa học đang học" to="/courses" />
             {loadingCourses ? (
-              <div className="flex justify-center py-10">
-                <Loader2 size={20} className="animate-spin text-[#1e51f9]" />
+              <div className="flex justify-center py-6">
+                <Loader2 size={20} className="animate-spin text-[#F15A22]" />
               </div>
             ) : courses.length === 0 ? (
-              <div className="bg-white dark:bg-[#1e2028] rounded-2xl border border-[#E0E4EB] dark:border-[#33485c] flex flex-col items-center py-10 gap-2">
+              <div className="bg-white dark:bg-[#1e2028] rounded-2xl border border-[#E0E4EB] dark:border-[#33485c] flex flex-col items-center py-6 gap-2">
                 <BookOpen size={24} className="text-slate-200 dark:text-[#33485c]" />
                 <p className="text-sm text-slate-400">Chưa có khóa học nào</p>
               </div>
@@ -139,15 +139,15 @@ const Home = () => {
                     {/* Color bar */}
                     <div
                       className="h-1.5 w-full"
-                      style={{ background: course.coverColor ?? '#1e51f9' }}
+                      style={{ background: course.coverColor ?? '#F15A22' }}
                     />
                     <div className="p-4">
                       <div className="flex items-start justify-between mb-2">
                         <span
                           className="font-mono text-[10px] font-black tracking-widest px-1.5 py-0.5 rounded"
                           style={{
-                            background: `${course.coverColor ?? '#1e51f9'}15`,
-                            color: course.coverColor ?? '#1e51f9',
+                            background: `${course.coverColor ?? '#F15A22'}15`,
+                            color: course.coverColor ?? '#F15A22',
                           }}
                         >
                           {course.code}
@@ -158,7 +158,7 @@ const Home = () => {
                           </span>
                         )}
                       </div>
-                      <p className="text-[13px] font-semibold text-slate-800 dark:text-[#dce3e8] leading-snug line-clamp-2 group-hover:text-[#1e51f9] transition-colors">
+                      <p className="text-[13px] font-semibold text-slate-800 dark:text-[#dce3e8] leading-snug line-clamp-2 group-hover:text-[#F15A22] transition-colors">
                         {course.name}
                       </p>
                       <p className="text-[11px] text-slate-400 dark:text-[#4d6070] mt-1.5 flex items-center gap-1">
@@ -174,10 +174,10 @@ const Home = () => {
           {/* Grades */}
           <div>
             <SectionHeader title="Điểm gần đây" to="/courses" />
-            <div className="bg-white dark:bg-[#1e2028] rounded-2xl border border-[#E0E4EB] dark:border-[#33485c] flex flex-col items-center py-10 gap-2">
+            <div className="bg-white dark:bg-[#1e2028] rounded-2xl border border-[#E0E4EB] dark:border-[#33485c] flex flex-col items-center py-6 gap-2">
               <Star size={22} className="text-slate-200 dark:text-[#33485c]" />
               <p className="text-sm text-slate-400">Chưa có điểm nào</p>
-              <Link to="/courses" className="text-xs text-[#1e51f9] hover:underline mt-0.5">
+              <Link to="/courses" className="text-xs text-[#F15A22] hover:underline mt-0.5">
                 Vào khóa học để xem điểm →
               </Link>
             </div>
@@ -185,7 +185,7 @@ const Home = () => {
         </div>
 
         {/* ── RIGHT: Notifications + Forms ───────────────────────────────── */}
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-4">
 
           {/* Notifications */}
           <div>
@@ -195,11 +195,11 @@ const Home = () => {
             />
             <div className="bg-white dark:bg-[#1e2028] rounded-2xl border border-[#E0E4EB] dark:border-[#33485c] overflow-hidden">
               {loadingNotifs ? (
-                <div className="flex justify-center py-10">
-                  <Loader2 size={18} className="animate-spin text-[#1e51f9]" />
+                <div className="flex justify-center py-6">
+                  <Loader2 size={18} className="animate-spin text-[#F15A22]" />
                 </div>
               ) : notifs.length === 0 ? (
-                <div className="flex flex-col items-center py-10 gap-2">
+                <div className="flex flex-col items-center py-6 gap-2">
                   <Bell size={20} className="text-slate-200 dark:text-[#33485c]" />
                   <p className="text-xs text-slate-400">Không có thông báo</p>
                 </div>
@@ -209,7 +209,7 @@ const Home = () => {
                     <Link
                       key={n.$id}
                       to={n.linkTo || '/notifications'}
-                      className={`flex items-start gap-3 px-4 py-3 hover:bg-[#F4F6F8] dark:hover:bg-[#0d2137] transition-colors ${!n.read ? 'bg-[#1e51f9]/3' : ''}`}
+                      className={`flex items-start gap-3 px-4 py-3 hover:bg-[#F4F6F8] dark:hover:bg-[#0d2137] transition-colors ${!n.read ? 'bg-[#F15A22]/3' : ''}`}
                     >
                       <span className={`w-1.5 h-1.5 rounded-full shrink-0 mt-[5px] ${NOTIF_DOT[n.type] ?? 'bg-slate-300'}`} />
                       <div className="min-w-0 flex-1">
@@ -228,14 +228,14 @@ const Home = () => {
             <SectionHeader title="Biểu mẫu của tôi" to="/forms" />
             <div className="bg-white dark:bg-[#1e2028] rounded-2xl border border-[#E0E4EB] dark:border-[#33485c] overflow-hidden">
               {loadingForms ? (
-                <div className="flex justify-center py-10">
-                  <Loader2 size={18} className="animate-spin text-[#1e51f9]" />
+                <div className="flex justify-center py-6">
+                  <Loader2 size={18} className="animate-spin text-[#F15A22]" />
                 </div>
               ) : forms.length === 0 ? (
-                <div className="flex flex-col items-center py-10 gap-2">
+                <div className="flex flex-col items-center py-6 gap-2">
                   <FileText size={20} className="text-slate-200 dark:text-[#33485c]" />
                   <p className="text-xs text-slate-400">Chưa có biểu mẫu nào</p>
-                  <Link to="/forms" className="text-xs text-[#1e51f9] hover:underline mt-0.5">
+                  <Link to="/forms" className="text-xs text-[#F15A22] hover:underline mt-0.5">
                     Nộp biểu mẫu →
                   </Link>
                 </div>

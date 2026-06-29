@@ -15,7 +15,6 @@ module.exports = {
       padding: '2rem',
       screens: {
         '2xl': '1400px',
-      
       },
     },
     extend: {
@@ -41,12 +40,12 @@ module.exports = {
         // ── Zalo Neutral Dark / Navy (nl) — dark-mode backgrounds ─────────────
         'znl': {
           100: '#050a19',
-          200: '#4a4b4d',   // page bg dark
-          300: '#19191a',   // card / sidebar dark
-          400: '#33485c',   // elevated surface / border dark
-          500: '#DCE3E8',   // muted text dark
-          600: '#99a3ad',   // secondary text dark
-          700: '#bfc6cc',   // primary text dark
+          200: '#4a4b4d',
+          300: '#19191a',
+          400: '#33485c',
+          500: '#DCE3E8',
+          600: '#99a3ad',
+          700: '#bfc6cc',
         },
         // ── Zalo Neutral (nd) — light-mode text & borders ─────────────────────
         'znd': {
@@ -127,7 +126,6 @@ module.exports = {
       },
       screens: {
         'xs': '480px',
-      
       },
       width: {
         '420': '420px',
@@ -135,7 +133,7 @@ module.exports = {
       },
       fontFamily: {
         inter: ['Inter', 'sans-serif'],
-
+        sans: ['Be Vietnam Pro', 'system-ui', 'sans-serif'],
       },
       keyframes: {
         'accordion-down': {
@@ -151,7 +149,17 @@ module.exports = {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
       },
+      borderRadius: {
+        DEFAULT: '6px',
+        sm:      '4px',
+        md:      '8px',
+        lg:      '10px',
+        xl:      '12px',
+        '2xl':   '16px',
+        '3xl':   '20px',
+        full:    '9999px',
+      },
     },
   },
   plugins: [require('tailwindcss-animate')],
-};
+}

@@ -1,4 +1,4 @@
-import { zodResolver } from "@hookform/resolvers/zod";
+﻿import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -151,7 +151,7 @@ const SignUpForm = () => {
             Already have an account?
             <Link
               to="/sign-in"
-              className="text-[#1e51f9] text-small-semibold ml-1"
+              className="text-[#F15A22] text-small-semibold ml-1"
             >
               {" "}
               Log in

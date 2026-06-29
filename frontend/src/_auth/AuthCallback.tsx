@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+﻿import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { setToken, setAuthProvider } from '@/lib/api/client';
@@ -19,7 +19,7 @@ const AuthCallback = () => {
 
   return (
     <div className="h-screen w-full flex items-center justify-center bg-white">
-      <Loader2 className="h-8 w-8 animate-spin text-[#1e51f9]" />
+      <Loader2 className="h-8 w-8 animate-spin text-[#F15A22]" />
     </div>
   );
 };

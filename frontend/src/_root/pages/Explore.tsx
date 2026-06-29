@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { Search, X, Loader2, LayoutGrid, List, Home } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -7,7 +7,7 @@ import { useGetInfinitePosts, useSearchPosts } from '@/lib/react-query/queriesAn
 import { PostCard, GridPostList } from '@/components/shared';
 import { useDebounce } from '@/hooks/useDebounce';
 
-const searchInputCls = "w-full pl-9 pr-8 py-2.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#1e51f9]/20 focus:border-[#1e51f9] transition-all";
+const searchInputCls = "w-full pl-9 pr-8 py-2.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#F15A22]/20 focus:border-[#F15A22] transition-all";
 
 const Explore = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -43,7 +43,7 @@ const Explore = () => {
     <div className="min-h-full bg-[#F8FAFC] dark:bg-[#19191a]">
       <div className="sticky top-0 z-10 bg-white dark:bg-[#19191a] border-b border-slate-100 dark:border-slate-700 px-6 py-4">
         <div className="max-w-5xl mx-auto flex flex-col gap-2">
-          <Link to="/home" className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-[#1e51f9] transition-colors font-mono w-fit">
+          <Link to="/home" className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-[#F15A22] transition-colors font-mono w-fit">
             <Home size={11} /> HOME
           </Link>
           <div className="flex items-center gap-3">
@@ -69,14 +69,14 @@ const Explore = () => {
           <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-700 rounded-xl p-1 shrink-0">
             <button
               onClick={() => setViewMode('feed')}
-              className={`p-2 rounded-lg transition-all ${viewMode === 'feed' ? 'bg-white dark:bg-slate-600 shadow-sm text-[#2F398E]' : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'}`}
+              className={`p-2 rounded-lg transition-all ${viewMode === 'feed' ? 'bg-white dark:bg-slate-600 shadow-sm text-[#F47A50]' : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'}`}
               title="Feed view"
             >
               <List size={16} />
             </button>
             <button
               onClick={() => setViewMode('grid')}
-              className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-white dark:bg-slate-600 shadow-sm text-[#2F398E]' : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'}`}
+              className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-white dark:bg-slate-600 shadow-sm text-[#F47A50]' : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'}`}
               title="Grid view"
             >
               <LayoutGrid size={16} />
@@ -144,7 +144,7 @@ const Explore = () => {
         {!isSearchMode && (
           <div ref={loadMoreRef} className="py-8 flex justify-center">
             {isFetchingNextPage && (
-              <Loader2 size={20} className="animate-spin text-[#1e51f9]" />
+              <Loader2 size={20} className="animate-spin text-[#F15A22]" />
             )}
             {!hasNextPage && posts.length > 0 && (
               <p className="text-xs text-slate-400 dark:text-slate-500">{t('explore.seenAll')}</p>

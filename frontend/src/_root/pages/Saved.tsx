@@ -1,4 +1,4 @@
-import { Bookmark, Loader2, Home } from 'lucide-react';
+﻿import { Bookmark, Loader2, Home } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useUserContext } from '@/context/AuthContext';
@@ -16,12 +16,12 @@ const Saved = () => {
     <div className="min-h-full bg-[#F8FAFC] dark:bg-[#19191a]">
       <div className="bg-white dark:bg-[#19191a] border-b border-slate-100 dark:border-slate-700 px-6 py-5">
         <div className="max-w-5xl mx-auto flex flex-col gap-1.5">
-          <Link to="/home" className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-[#1e51f9] transition-colors font-mono w-fit">
+          <Link to="/home" className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-[#F15A22] transition-colors font-mono w-fit">
             <Home size={11} /> HOME
           </Link>
           <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-[#2F398E]/10 flex items-center justify-center">
-            <Bookmark size={18} className="text-[#2F398E]" />
+          <div className="w-9 h-9 rounded-xl bg-[#F47A50]/10 flex items-center justify-center">
+            <Bookmark size={18} className="text-[#F47A50]" />
           </div>
           <div>
             <h1 className="text-lg font-bold text-slate-900 dark:text-slate-50">{t('saved.title')}</h1>
@@ -34,7 +34,7 @@ const Saved = () => {
       <div className="max-w-5xl mx-auto px-6 py-4">
         {isPending ? (
           <div className="flex justify-center py-20">
-            <Loader2 size={24} className="animate-spin text-[#1e51f9]" />
+            <Loader2 size={24} className="animate-spin text-[#F15A22]" />
           </div>
         ) : savedPosts.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 text-center">

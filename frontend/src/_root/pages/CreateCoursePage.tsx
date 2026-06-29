@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, BookOpen, Check, Loader2 } from 'lucide-react';
 import { useUserContext } from '@/context/AuthContext';
@@ -15,7 +15,7 @@ const CreateCoursePage = () => {
     name: '',
     semester: SEMESTERS[0],
     description: '',
-    coverColor: '#1e51f9',
+    coverColor: '#F15A22',
   });
 
   const set = (key: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
@@ -32,7 +32,7 @@ const CreateCoursePage = () => {
     }
   };
 
-  const gradient = COVER_GRADIENTS[form.coverColor] ?? COVER_GRADIENTS['#1e51f9'];
+  const gradient = COVER_GRADIENTS[form.coverColor] ?? COVER_GRADIENTS['#F15A22'];
 
   return (
     <div className="min-h-full bg-[#F8FAFC] dark:bg-[#19191a]">
@@ -41,7 +41,7 @@ const CreateCoursePage = () => {
         <div className="max-w-3xl mx-auto flex items-center gap-2">
           <Link
             to="/courses"
-            className="flex items-center gap-1 text-[11px] text-slate-400 dark:text-slate-500 hover:text-[#1e51f9] transition-colors font-mono"
+            className="flex items-center gap-1 text-[11px] text-slate-400 dark:text-slate-500 hover:text-[#F15A22] transition-colors font-mono"
           >
             <ArrowLeft size={12} /> MÔN HỌC
           </Link>
@@ -135,7 +135,7 @@ const CreateCoursePage = () => {
           <button
             type="submit"
             disabled={isPending || !form.code.trim() || !form.name.trim()}
-            className="w-full py-2.5 rounded-xl text-sm font-semibold text-white flex items-center justify-center gap-2 disabled:opacity-60 bg-[#1e51f9] hover:bg-[#0087b3] transition-colors"
+            className="w-full py-2.5 rounded-xl text-sm font-semibold text-white flex items-center justify-center gap-2 disabled:opacity-60 bg-[#F15A22] hover:bg-[#0087b3] transition-colors"
           >
             {isPending ? <Loader2 size={15} className="animate-spin" /> : <BookOpen size={15} />}
             {isPending ? 'Đang tạo...' : 'Tạo môn học'}

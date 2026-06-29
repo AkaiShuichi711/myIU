@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect, type CSSProperties } from 'react';
-import { LogOut, Sun, Moon, ChevronDown } from 'lucide-react';
+﻿import { useState, useRef, useEffect } from 'react';
+import { LogOut, ChevronDown } from 'lucide-react';
 import Flag from 'react-world-flags';
 import { useUserContext } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
@@ -8,7 +8,7 @@ import { LANGUAGES, getSavedLang, changeLanguage } from '@/lib/googleTranslate';
 
 const Topbar = () => {
   const { signOut } = useUserContext();
-  const { theme, toggleTheme } = useTheme();
+  const { theme } = useTheme();
   const [isLangOpen, setIsLangOpen] = useState(false);
   const [currentLang, setCurrentLang] = useState(getSavedLang);
   const langRef = useRef<HTMLDivElement>(null);
@@ -44,16 +44,7 @@ const Topbar = () => {
     optionHover:    isDark ? '#0d2137' : '#F8FAFC',
   };
 
-  const [themeHover, setThemeHover]   = useState(false);
   const [logoutHover, setLogoutHover] = useState(false);
-
-  const iconBtn = (hovered: boolean): CSSProperties => ({
-    display: 'flex', alignItems: 'center', justifyContent: 'center',
-    width: '32px', height: '32px', borderRadius: '6px',
-    border: 'none', cursor: 'pointer', transition: 'background 0.15s',
-    background: hovered ? c.btnHoverBg : 'transparent',
-    color: c.textMuted,
-  });
 
   return (
     <header style={{
@@ -123,10 +114,10 @@ const Topbar = () => {
                     display: 'flex', alignItems: 'center', gap: '9px',
                     width: '100%', padding: '7px 10px', borderRadius: '6px',
                     background: opt.code === currentLang
-                      ? (isDark ? 'rgba(0,104,255,0.15)' : 'rgba(0,104,255,0.08)')
+                      ? (isDark ? 'rgba(241,90,34,0.15)' : 'rgba(241,90,34,0.08)')
                       : 'transparent',
                     border: 'none', cursor: 'pointer', fontSize: '12.5px',
-                    color: opt.code === currentLang ? '#1e51f9' : c.text,
+                    color: opt.code === currentLang ? '#F15A22' : c.text,
                     fontWeight: opt.code === currentLang ? 600 : 400,
                     textAlign: 'left', transition: 'background 0.1s',
                   }}
@@ -146,20 +137,6 @@ const Topbar = () => {
             </div>
           )}
         </div>
-
-        {/* Theme toggle */}
-        <button
-          onClick={toggleTheme}
-          title={isDark ? 'Light mode' : 'Dark mode'}
-          style={iconBtn(themeHover)}
-          onMouseEnter={() => setThemeHover(true)}
-          onMouseLeave={() => setThemeHover(false)}
-        >
-          {isDark
-            ? <Sun size={15} style={{ color: '#F59E0B' }} />
-            : <Moon size={15} style={{ color: c.textMuted }} />
-          }
-        </button>
 
         <div style={{ width: 1, height: 20, background: c.divider, margin: '0 6px', flexShrink: 0 }} />
 

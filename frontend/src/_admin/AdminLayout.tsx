@@ -18,7 +18,7 @@ const AdminLayout = () => {
   if (isLoading) {
     return (
       <div className="h-screen w-full flex items-center justify-center bg-[#F4F6FA]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1e51f9]" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#F15A22]" />
       </div>
     );
   }
@@ -91,7 +91,7 @@ const AdminLayout = () => {
             )?.label ?? 'Admin'}
           </h1>
           <div className="flex items-center gap-2 text-sm text-gray-600">
-            <span className="bg-[#1e51f9]/10 text-[#1e51f9] px-2 py-0.5 rounded text-xs font-medium">
+            <span className="bg-[#F15A22]/10 text-[#F15A22] px-2 py-0.5 rounded text-xs font-medium">
               {admin?.role}
             </span>
             <span>{admin?.name}</span>

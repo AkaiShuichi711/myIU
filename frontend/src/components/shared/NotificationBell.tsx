@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+﻿import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Bell, Heart, MessageCircle, AtSign, Loader2, CheckCheck } from 'lucide-react';
 import { useUserContext } from '@/context/AuthContext';
@@ -13,7 +13,7 @@ import { QUERY_KEYS } from '@/lib/react-query/queriesAndMutations';
 
 const ICON_MAP: Record<string, React.ReactNode> = {
   like: <Heart size={13} className="text-red-400" fill="#f87171" />,
-  comment: <MessageCircle size={13} className="text-[#1e51f9]" />,
+  comment: <MessageCircle size={13} className="text-[#F15A22]" />,
   mention: <AtSign size={13} className="text-purple-400" />,
   tag: <AtSign size={13} className="text-green-400" />,
 };
@@ -80,7 +80,7 @@ const NotificationBell = () => {
             {unreadCount > 0 && (
               <button
                 onClick={() => markAll(user.id)}
-                className="flex items-center gap-1 text-xs text-slate-400 hover:text-[#1e51f9] transition-colors"
+                className="flex items-center gap-1 text-xs text-slate-400 hover:text-[#F15A22] transition-colors"
               >
                 <CheckCheck size={13} /> Đọc tất cả
               </button>
@@ -91,7 +91,7 @@ const NotificationBell = () => {
           <div className="max-h-[340px] overflow-y-auto">
             {isPending ? (
               <div className="flex justify-center py-8">
-                <Loader2 size={20} className="animate-spin text-[#1e51f9]" />
+                <Loader2 size={20} className="animate-spin text-[#F15A22]" />
               </div>
             ) : preview.length === 0 ? (
               <div className="flex flex-col items-center py-10 gap-2 text-center">
@@ -104,13 +104,13 @@ const NotificationBell = () => {
                   key={n.$id}
                   onClick={() => handleClickNotif(n)}
                   className={`w-full flex items-start gap-3 px-4 py-3 text-left hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0 ${
-                    !n.read ? 'bg-[#1e51f9]/4' : ''
+                    !n.read ? 'bg-[#F15A22]/4' : ''
                   }`}
                 >
                   {/* Actor avatar */}
                   <div
                     className="w-9 h-9 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
-                    style={{ background: '#1e51f9' }}
+                    style={{ background: '#F15A22' }}
                   >
                     {(n.actorName || '?').split(' ').map((w: string) => w[0]).slice(0, 2).join('').toUpperCase()}
                   </div>
@@ -127,7 +127,7 @@ const NotificationBell = () => {
                   <div className="mt-0.5 shrink-0">{ICON_MAP[n.type] ?? <Bell size={13} className="text-slate-300" />}</div>
 
                   {/* Unread dot */}
-                  {!n.read && <span className="w-2 h-2 rounded-full bg-[#1e51f9] shrink-0 mt-1.5" />}
+                  {!n.read && <span className="w-2 h-2 rounded-full bg-[#F15A22] shrink-0 mt-1.5" />}
                 </button>
               ))
             )}
@@ -139,7 +139,7 @@ const NotificationBell = () => {
               <Link
                 to="/notifications"
                 onClick={() => setOpen(false)}
-                className="block text-center text-xs font-semibold text-[#1e51f9] hover:underline"
+                className="block text-center text-xs font-semibold text-[#F15A22] hover:underline"
               >
                 Xem tất cả thông báo
               </Link>

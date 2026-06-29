@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { Bell, CheckCheck, Loader2, FileText, BookOpen, Star, GraduationCap } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -16,8 +16,8 @@ const TYPE_META: Record<string, { icon: React.ReactNode; color: string }> = {
   form_approved: { icon: <FileText size={15} className="text-[#00c578]" />,  color: 'bg-[#00c578]/12' },
   form_rejected: { icon: <FileText size={15} className="text-[#ef4e49]" />,  color: 'bg-[#ef4e49]/12' },
   form_pending:  { icon: <FileText size={15} className="text-[#f5832f]" />,  color: 'bg-[#f5832f]/12' },
-  grade:         { icon: <Star size={15} className="text-[#1e51f9]" />,      color: 'bg-[#1e51f9]/10' },
-  course:        { icon: <BookOpen size={15} className="text-[#2F398E]" />,  color: 'bg-[#2F398E]/10' },
+  grade:         { icon: <Star size={15} className="text-[#F15A22]" />,      color: 'bg-[#F15A22]/10' },
+  course:        { icon: <BookOpen size={15} className="text-[#F47A50]" />,  color: 'bg-[#F47A50]/10' },
   system:        { icon: <GraduationCap size={15} className="text-[#99a3ad]" />, color: 'bg-[#33485c]/15' },
 };
 
@@ -40,12 +40,12 @@ const Notifications = () => {
   };
 
   return (
-    <div className="min-h-full bg-[#F8FAFC] dark:bg-[#19191a]">
+    <div className="bg-[#F8FAFC] dark:bg-[#19191a]">
       <div className="sticky top-0 z-10 bg-white dark:bg-[#19191a] border-b border-slate-100 dark:border-slate-700 px-6 py-4">
-        <div className="max-w-4xl mx-auto">
+        <div>
           <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Bell size={18} className="text-[#2F398E] dark:text-blue-400" />
+            <Bell size={18} className="text-[#F47A50] dark:text-blue-400" />
             <h1 className="text-base font-bold text-slate-900 dark:text-slate-50">
               {t('notifications.title')}
               {unreadCount > 0 && (
@@ -60,7 +60,7 @@ const Notifications = () => {
             <button
               onClick={() => markAll(user.id)}
               disabled={isMarkingAll}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-[#1e51f9] bg-[#1e51f9]/8 border border-[#1e51f9]/20 hover:bg-[#1e51f9]/12 transition-colors disabled:opacity-60"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-[#F15A22] bg-[#F15A22]/8 border border-[#F15A22]/20 hover:bg-[#F15A22]/12 transition-colors disabled:opacity-60"
             >
               {isMarkingAll ? <Loader2 size={12} className="animate-spin" /> : <CheckCheck size={13} />}
               {t('notifications.markAllRead')}
@@ -70,7 +70,7 @@ const Notifications = () => {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-6 py-4">
+      <div className="px-6 py-4">
         <div className="flex gap-2 mb-4">
           {(['all', 'unread'] as Filter[]).map((f) => (
             <button
@@ -78,7 +78,7 @@ const Notifications = () => {
               onClick={() => setFilter(f)}
               className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-colors ${
                 filter === f
-                  ? 'bg-[#2F398E] text-white'
+                  ? 'bg-[#F47A50] text-white'
                   : 'bg-white dark:bg-[#19191a] border border-slate-200 dark:border-[#33485c]/50 text-slate-500 dark:text-[#DCE3E8] hover:bg-slate-50 dark:hover:bg-[#0d2137]'
               }`}
             >
@@ -92,10 +92,10 @@ const Notifications = () => {
         <div className="bg-white dark:bg-[#19191a] rounded-xl border border-slate-200 dark:border-[#33485c]/50 overflow-hidden">
           {isPending ? (
             <div className="flex justify-center py-16">
-              <Loader2 size={24} className="animate-spin text-[#1e51f9]" />
+              <Loader2 size={24} className="animate-spin text-[#F15A22]" />
             </div>
           ) : notifications.length === 0 ? (
-            <div className="flex flex-col items-center py-20 gap-3 text-center">
+            <div className="flex flex-col items-center py-10 gap-3 text-center">
               <div className="w-14 h-14 rounded-xl bg-slate-100 dark:bg-[#0d2137] flex items-center justify-center">
                 <Bell size={24} className="text-slate-300 dark:text-slate-500" />
               </div>
@@ -113,7 +113,7 @@ const Notifications = () => {
 
                 const content = (
                   <div
-                    className={`flex items-start gap-3 px-5 py-4 hover:bg-slate-50 dark:hover:bg-[#0d2137] transition-colors cursor-pointer ${!n.read ? 'bg-[#1e51f9]/4 dark:bg-[#1e51f9]/6' : ''}`}
+                    className={`flex items-start gap-3 px-5 py-4 hover:bg-slate-50 dark:hover:bg-[#0d2137] transition-colors cursor-pointer ${!n.read ? 'bg-[#F15A22]/4 dark:bg-[#F15A22]/6' : ''}`}
                     onClick={() => handleClick(n)}
                   >
                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${meta.color}`}>
@@ -125,7 +125,7 @@ const Notifications = () => {
                       <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">{formatTimeAgo(n.$createdAt)}</p>
                     </div>
 
-                    {!n.read && <span className="w-2.5 h-2.5 rounded-full bg-[#1e51f9] shrink-0 mt-1.5" />}
+                    {!n.read && <span className="w-2.5 h-2.5 rounded-full bg-[#F15A22] shrink-0 mt-1.5" />}
                   </div>
                 );
 

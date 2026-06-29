@@ -22,6 +22,8 @@ build/
 .vite/
 backend-java/target/
 backend-java/.mvn-dist/
+backend/target/
+backend/.mvn-dist/
 uploads/
 
 # Logs

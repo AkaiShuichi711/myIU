@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   ArrowLeft, FileText, Download, CheckCircle2, XCircle,
@@ -14,7 +14,7 @@ const BACKEND = (import.meta.env.VITE_OAUTH_BACKEND_URL || window.location.origi
 const buildResultEmail = (submitterName: string, formTitle: string, status: 'approved' | 'rejected', approverName: string, rejectionReason?: string) => `
   <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f8fafc;padding:20px">
     <div style="background:white;border-radius:12px;padding:28px;border:1px solid #e2e8f0">
-      <div style="background:#1e51f9;padding:16px 20px;border-radius:8px;margin-bottom:24px">
+      <div style="background:#F15A22;padding:16px 20px;border-radius:8px;margin-bottom:24px">
         <h1 style="color:white;margin:0;font-size:17px;font-weight:700">myIU Portal</h1>
         <p style="color:rgba(255,255,255,0.8);margin:3px 0 0;font-size:12px">Hệ thống biểu mẫu điện tử</p>
       </div>
@@ -36,7 +36,7 @@ const buildResultEmail = (submitterName: string, formTitle: string, status: 'app
             <td style="padding:8px 12px;color:#ef4444">${rejectionReason}</td></tr>` : ''}
       </table>
       ${status === 'rejected' ? '<p style="color:#475569;font-size:13px">Vui lòng xem lại thông tin và nộp lại biểu mẫu với người duyệt phù hợp.</p>' : ''}
-      <a href="${window.location.origin}/forms" style="display:inline-block;background:#1e51f9;color:white;text-decoration:none;padding:10px 24px;border-radius:8px;font-size:13px;font-weight:600">
+      <a href="${window.location.origin}/forms" style="display:inline-block;background:#F15A22;color:white;text-decoration:none;padding:10px 24px;border-radius:8px;font-size:13px;font-weight:600">
         Xem danh sách biểu mẫu →
       </a>
     </div>
@@ -94,7 +94,7 @@ const FormReviewPage = () => {
       <div className="min-h-full bg-[#F8FAFC] dark:bg-slate-900 flex items-center justify-center">
         <div className="text-center">
           <p className="text-slate-600 dark:text-slate-400 mb-4">Bạn cần đăng nhập để xem yêu cầu này.</p>
-          <Link to="/sign-in" className="px-4 py-2 rounded-lg bg-[#1e51f9] text-white text-sm font-semibold">Đăng nhập</Link>
+          <Link to="/sign-in" className="px-4 py-2 rounded-lg bg-[#F15A22] text-white text-sm font-semibold">Đăng nhập</Link>
         </div>
       </div>
     );
@@ -103,7 +103,7 @@ const FormReviewPage = () => {
   if (isPending) {
     return (
       <div className="min-h-full bg-[#F8FAFC] dark:bg-slate-900 flex items-center justify-center">
-        <Loader2 size={24} className="animate-spin text-[#1e51f9]" />
+        <Loader2 size={24} className="animate-spin text-[#F15A22]" />
       </div>
     );
   }
@@ -114,7 +114,7 @@ const FormReviewPage = () => {
         <div className="text-center">
           <AlertTriangle size={32} className="text-slate-300 mx-auto mb-3" />
           <p className="text-slate-500 dark:text-slate-400">Không tìm thấy yêu cầu này.</p>
-          <button onClick={() => navigate(-1)} className="mt-3 text-sm text-[#1e51f9] hover:underline">Quay lại</button>
+          <button onClick={() => navigate(-1)} className="mt-3 text-sm text-[#F15A22] hover:underline">Quay lại</button>
         </div>
       </div>
     );
@@ -190,11 +190,11 @@ const FormReviewPage = () => {
               href={submission.uploadedFileUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 hover:border-[#1e51f9]/40 transition-colors group w-fit"
+              className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 hover:border-[#F15A22]/40 transition-colors group w-fit"
             >
               <FileText size={14} className="text-slate-400" />
               <span className="text-sm text-slate-700 dark:text-slate-200">Xem file biểu mẫu đã nộp</span>
-              <Download size={12} className="text-slate-400 group-hover:text-[#1e51f9] transition-colors" />
+              <Download size={12} className="text-slate-400 group-hover:text-[#F15A22] transition-colors" />
             </a>
           </div>
         </div>
@@ -203,7 +203,7 @@ const FormReviewPage = () => {
         {isApprover && isStatusPending && !actionDone && (
           <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-5">
             <div className="flex items-center gap-2 mb-3">
-              <User size={14} className="text-[#1e51f9]" />
+              <User size={14} className="text-[#F15A22]" />
               <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Bạn là người được chỉ định duyệt</p>
             </div>
 

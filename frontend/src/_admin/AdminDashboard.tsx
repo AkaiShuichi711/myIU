@@ -1,4 +1,4 @@
-import { useAdminAuth } from '@/context/AdminAuthContext';
+﻿import { useAdminAuth } from '@/context/AdminAuthContext';
 import { Users, BookOpen, FileText, TrendingUp } from 'lucide-react';
 
 const stats = [
@@ -38,7 +38,7 @@ const AdminDashboard = () => {
       <div className="bg-white rounded-lg border border-gray-200 p-6">
         <h3 className="text-sm font-semibold text-gray-700 mb-4">Quick Actions</h3>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm text-gray-600">
-          <a href="/admin/users" className="flex items-center gap-2 p-3 rounded-md border border-gray-200 hover:border-[#1e51f9] hover:text-[#1e51f9] transition-colors">
+          <a href="/admin/users" className="flex items-center gap-2 p-3 rounded-md border border-gray-200 hover:border-[#F15A22] hover:text-[#F15A22] transition-colors">
             <Users className="h-4 w-4" /> Manage Users
           </a>
         </div>

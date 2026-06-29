@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect } from 'react';
 
 export type Theme = 'light' | 'dark';
 
@@ -17,31 +17,15 @@ const ThemeContext = createContext<ThemeContextType>({
 });
 
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  const [theme, setTheme] = useState<Theme>(() => {
-    const saved = localStorage.getItem('theme') as Theme | null;
-    if (saved === 'dark' || saved === 'light') return saved;
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-  });
-
-  // When true, always force light — used by auth pages
-  const [paused, setPaused] = useState(false);
-
   useEffect(() => {
-    const root = document.documentElement;
-    if (paused || theme === 'light') {
-      root.classList.remove('dark');
-    } else {
-      root.classList.add('dark');
-    }
-    if (!paused) localStorage.setItem('theme', theme);
-  }, [theme, paused]);
+    document.documentElement.classList.remove('dark');
+    localStorage.removeItem('theme');
+  }, []);
 
-  const toggleTheme = () => setTheme((t) => (t === 'light' ? 'dark' : 'light'));
-  const pauseTheme  = useCallback(() => setPaused(true),  []);
-  const resumeTheme = useCallback(() => setPaused(false), []);
+  const noop = useCallback(() => {}, []);
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, pauseTheme, resumeTheme }}>
+    <ThemeContext.Provider value={{ theme: 'light', toggleTheme: noop, pauseTheme: noop, resumeTheme: noop }}>
       {children}
     </ThemeContext.Provider>
   );

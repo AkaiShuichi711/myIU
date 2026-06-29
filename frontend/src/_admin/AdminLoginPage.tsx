@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdminAuth } from '@/context/AdminAuthContext';
 import { Button } from '@/components/ui/button';
@@ -84,7 +84,7 @@ const AdminLoginPage = () => {
 
         <div className="mt-6 text-center text-sm text-gray-500">
           <p>Issues? Contact</p>
-          <a href="mailto:support@pas.vn" className="text-[#1e51f9] hover:underline">support@pas.vn</a>
+          <a href="mailto:support@pas.vn" className="text-[#F15A22] hover:underline">support@pas.vn</a>
         </div>
       </div>
     </div>

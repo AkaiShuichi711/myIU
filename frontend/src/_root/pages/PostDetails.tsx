@@ -1,4 +1,4 @@
-import { useParams, useNavigate, Link } from 'react-router-dom';
+﻿import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, Heart, Bookmark, MapPin, Trash2, Edit3, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { useUserContext } from '@/context/AuthContext';
@@ -31,7 +31,7 @@ const PostDetails = () => {
   if (isLoading) {
     return (
       <div className="min-h-full bg-[#F8FAFC] dark:bg-[#19191a] flex items-center justify-center">
-        <Loader2 size={24} className="animate-spin text-[#1e51f9]" />
+        <Loader2 size={24} className="animate-spin text-[#F15A22]" />
       </div>
     );
   }
@@ -40,7 +40,7 @@ const PostDetails = () => {
     return (
       <div className="min-h-full bg-[#F8FAFC] dark:bg-[#19191a] flex flex-col items-center justify-center gap-4">
         <p className="text-slate-500 dark:text-slate-400 font-medium">Post not found</p>
-        <button onClick={() => navigate(-1)} className="text-sm text-[#1e51f9] hover:underline">Go back</button>
+        <button onClick={() => navigate(-1)} className="text-sm text-[#F15A22] hover:underline">Go back</button>
       </div>
     );
   }
@@ -143,7 +143,7 @@ const PostDetails = () => {
                 >
                   <div
                     className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0"
-                    style={{ background: '#1e51f9' }}
+                    style={{ background: '#F15A22' }}
                   >
                     {creatorInitials}
                   </div>
@@ -169,7 +169,7 @@ const PostDetails = () => {
                 {Array.isArray(post.tags) && post.tags.filter(Boolean).length > 0 && (
                   <div className="flex flex-wrap gap-1.5">
                     {post.tags.filter(Boolean).map((tag: string) => (
-                      <span key={tag} className="px-2.5 py-1 rounded-full text-xs font-medium bg-[#1e51f9]/8 dark:bg-[#1e51f9]/20 text-[#1e51f9]">
+                      <span key={tag} className="px-2.5 py-1 rounded-full text-xs font-medium bg-[#F15A22]/8 dark:bg-[#F15A22]/20 text-[#F15A22]">
                         #{tag}
                       </span>
                     ))}
@@ -193,9 +193,9 @@ const PostDetails = () => {
                   onClick={handleSave}
                   disabled={isSaving || isDeletingSave}
                   className="flex items-center gap-1.5 text-sm font-medium transition-colors px-3 py-1.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700"
-                  style={{ color: isSaved ? '#2F398E' : '#94a3b8' }}
+                  style={{ color: isSaved ? '#F47A50' : '#94a3b8' }}
                 >
-                  <Bookmark size={18} fill={isSaved ? '#2F398E' : 'none'} className="transition-transform active:scale-110" />
+                  <Bookmark size={18} fill={isSaved ? '#F47A50' : 'none'} className="transition-transform active:scale-110" />
                   {isSaved ? 'Saved' : 'Save'}
                 </button>
               </div>

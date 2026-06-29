@@ -1,8 +1,8 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   User, Network, Bell, Settings, BookOpen, FileText, Home,
-  ChevronLeft, ChevronRight, GraduationCap, Headset,
+  ChevronLeft, ChevronRight, GraduationCap, Headset, Mail,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useUserContext } from '@/context/AuthContext';
@@ -16,6 +16,7 @@ const NAV_SECTIONS = [
       { labelKey: 'nav.home',    route: '/home',    icon: Home },
       { labelKey: 'nav.courses', route: '/courses', icon: BookOpen },
       { labelKey: 'nav.forms',   route: '/forms',   icon: FileText },
+      { labelKey: 'nav.mail',    route: '',         icon: Mail, href: 'https://outlook.office365.com/mail/' },
     ],
   },
   {
@@ -61,29 +62,6 @@ const LeftSidebar = () => {
         transition: 'width 0.18s ease',
       }}
     >
-      {/* ── Logo bar ─────────────────────────────────────────────── */}
-      <div
-        className="flex items-center shrink-0 border-b border-[#E0E4EB] dark:border-[#33485c]"
-        style={{
-          padding: collapsed ? '12px 0' : '12px 14px',
-          justifyContent: collapsed ? 'center' : 'flex-start',
-          gap: collapsed ? 0 : '10px',
-          height: '52px',
-        }}
-      >
-        <div
-          className="w-[28px] h-[28px] flex items-center justify-center text-white shrink-0"
-          style={{ background: '#1e51f9', borderRadius: '6px' }}
-        >
-          <GraduationCap size={14} className="text-white" />
-        </div>
-        {!collapsed && (
-          <div className="overflow-hidden whitespace-nowrap">
-            <p className="text-[13px] font-bold text-slate-900 dark:text-[#e6edf3] leading-none tracking-tight">myIU</p>
-            <p className="text-[9px] mt-0.5 tracking-[0.14em] uppercase font-semibold text-slate-400 dark:text-[#4d6070]">Portal</p>
-          </div>
-        )}
-      </div>
 
       {/* ── Navigation ───────────────────────────────────────────── */}
       <nav className="flex-1 py-3 overflow-y-auto overflow-x-hidden" style={{ scrollbarWidth: 'none' }}>
@@ -115,54 +93,45 @@ const LeftSidebar = () => {
               const badge =
                 (link as any).badge === 'notifs' && unreadCount > 0 ? unreadCount : null;
 
-              return (
-                <Link
-                  key={link.route}
-                  to={link.route}
-                  title={collapsed ? t(link.labelKey as string) : undefined}
-                  className="relative flex items-center transition-all duration-100"
-                  style={{
-                    padding: collapsed ? '7px 0' : '7px 10px',
-                    justifyContent: collapsed ? 'center' : 'flex-start',
-                    gap: collapsed ? 0 : '9px',
-                    background: isActive ? 'rgba(0,104,255,0.07)' : 'transparent',
-                    margin: '1px 4px',
-                    borderRadius: '6px',
-                  }}
-                  onMouseEnter={e => {
-                    if (!isActive) (e.currentTarget as HTMLElement).style.background = 'rgba(0,104,255,0.05)';
-                  }}
-                  onMouseLeave={e => {
-                    (e.currentTarget as HTMLElement).style.background = isActive ? 'rgba(0,104,255,0.07)' : 'transparent';
-                  }}
-                >
-                  {/* Left accent bar */}
+              const href = (link as any).href as string | undefined;
+              const sharedStyle = {
+                padding: collapsed ? '7px 0' : '7px 10px',
+                justifyContent: collapsed ? 'center' : 'flex-start',
+                gap: collapsed ? 0 : '9px',
+                background: isActive ? 'rgba(241,90,34,0.07)' : 'transparent',
+                margin: '1px 4px',
+                borderRadius: '6px',
+              };
+              const sharedProps = {
+                title: collapsed ? t(link.labelKey as string) : undefined,
+                className: 'relative flex items-center transition-all duration-100',
+                style: sharedStyle,
+                onMouseEnter: (e: React.MouseEvent<HTMLElement>) => {
+                  if (!isActive) (e.currentTarget as HTMLElement).style.background = 'rgba(241,90,34,0.05)';
+                },
+                onMouseLeave: (e: React.MouseEvent<HTMLElement>) => {
+                  (e.currentTarget as HTMLElement).style.background = isActive ? 'rgba(241,90,34,0.07)' : 'transparent';
+                },
+              };
+
+              const inner = (
+                <>
                   {isActive && (
                     <span
                       className="absolute left-0 top-1/2 -translate-y-1/2"
-                      style={{ width: '3px', height: '16px', background: '#1e51f9', borderRadius: '0 3px 3px 0' }}
+                      style={{ width: '3px', height: '16px', background: '#F15A22', borderRadius: '0 3px 3px 0' }}
                     />
                   )}
-
-                  {/* Icon */}
                   <div className="relative shrink-0">
-                    <Icon
-                      size={15}
-                      style={{ color: isActive ? '#1e51f9' : '#272e35' }}
-                    />
-                    {/* Notification dot (collapsed mode) */}
+                    <Icon size={15} style={{ color: isActive ? '#F15A22' : '#272e35' }} />
                     {badge && collapsed && (
-                      <span
-                        className="absolute -top-1 -right-1 w-[7px] h-[7px] rounded-full bg-red-500"
-                      />
+                      <span className="absolute -top-1 -right-1 w-[7px] h-[7px] rounded-full bg-red-500" />
                     )}
                   </div>
-
-                  {/* Label + badge */}
                   {!collapsed && (
                     <span
                       className="flex-1 flex items-center justify-between leading-none text-[12.5px] font-medium truncate"
-                      style={{ color: isActive ? '#1e51f9' : '#272e35' }}
+                      style={{ color: isActive ? '#F15A22' : '#272e35' }}
                     >
                       {t(link.labelKey as string)}
                       {badge && (
@@ -172,6 +141,20 @@ const LeftSidebar = () => {
                       )}
                     </span>
                   )}
+                </>
+              );
+
+              if (href) {
+                return (
+                  <a key={link.labelKey} href={href} target="_blank" rel="noopener noreferrer" {...sharedProps}>
+                    {inner}
+                  </a>
+                );
+              }
+
+              return (
+                <Link key={link.route} to={link.route} {...sharedProps}>
+                  {inner}
                 </Link>
               );
             })}
@@ -182,7 +165,7 @@ const LeftSidebar = () => {
       {/* ── Collapse toggle ───────────────────────────────────────── */}
       <button
         onClick={toggleCollapse}
-        className="flex items-center justify-center shrink-0 transition-colors border-t border-[#E0E4EB] dark:border-[#33485c] text-slate-400 hover:text-[#1e51f9]"
+        className="flex items-center justify-center shrink-0 transition-colors border-t border-[#E0E4EB] dark:border-[#33485c] text-slate-400 hover:text-[#F15A22]"
         style={{ height: '36px' }}
         title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
       >
@@ -208,7 +191,7 @@ const LeftSidebar = () => {
         {!collapsed && (
           <Link
             to={`/update-profile/${user?.id}`}
-            className="min-w-0 flex-1 overflow-hidden hover:text-[#1e51f9] transition-colors"
+            className="min-w-0 flex-1 overflow-hidden hover:text-[#F15A22] transition-colors"
           >
             <p
               className="text-[11.5px] font-semibold text-slate-700 dark:text-[#bfc6cc] truncate leading-none"

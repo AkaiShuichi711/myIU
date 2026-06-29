@@ -11,22 +11,7 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      "/auth": {
-        target: "http://localhost:8080",
-        changeOrigin: true,
-      },
-      "/signin": {
-        target: "http://localhost:8080",
-        changeOrigin: true,
-      },
-      "/signout": {
-        target: "http://localhost:8080",
-        changeOrigin: true,
-      },
-      "/redirect": {
-        target: "http://localhost:8080",
-        changeOrigin: true,
-      },
+      // Only proxy actual backend API calls — never proxy React Router paths (/auth/*, /sign-in, etc.)
       "/api": {
         target: "http://localhost:8080",
         changeOrigin: true,

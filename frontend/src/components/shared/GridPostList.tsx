@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+﻿import { Link } from 'react-router-dom';
 import { Heart, Bookmark } from 'lucide-react';
 import { useUserContext } from '@/context/AuthContext';
 
@@ -50,7 +50,7 @@ const GridPostList = ({ posts, showUser = true }: GridPostListProps) => {
                 {showUser && creator && (
                   <div className="flex items-center gap-1.5">
                     <div className="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold"
-                      style={{ background: '#1e51f9' }}>
+                      style={{ background: '#F15A22' }}>
                       {creator.name?.[0]?.toUpperCase() || '?'}
                     </div>
                   </div>

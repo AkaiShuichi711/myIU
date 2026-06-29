@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+﻿import { useRef, useState } from "react";
 import { useAdminAuth } from "@/context/AdminAuthContext";
 import { Upload, FileSpreadsheet, CheckCircle, XCircle, AlertTriangle, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -126,7 +126,7 @@ const AdminProvisionPage = () => {
         onDrop={handleDrop}
         onClick={() => inputRef.current?.click()}
         className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
-          isDragging ? "border-[#1e51f9] bg-blue-50" : "border-gray-300 hover:border-[#1e51f9] hover:bg-gray-50"
+          isDragging ? "border-[#F15A22] bg-blue-50" : "border-gray-300 hover:border-[#F15A22] hover:bg-gray-50"
         }`}
       >
         <input ref={inputRef} type="file" accept=".xlsx" className="hidden" onChange={handleFileChange} />

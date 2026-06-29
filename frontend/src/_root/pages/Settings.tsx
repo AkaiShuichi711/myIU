@@ -1,9 +1,8 @@
-import { useState } from 'react';
-import { Loader2, Monitor, Smartphone, Tablet, Palette, Sun, Moon, MapPin, ShieldOff, Globe, LogOut, ChevronDown, ChevronUp } from 'lucide-react';
+﻿import { useState } from 'react';
+import { Loader2, Monitor, Smartphone, Tablet, Palette, MapPin, ShieldOff, Globe, LogOut, ChevronDown, ChevronUp } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import Flag from 'react-world-flags';
 import { useUserContext } from '@/context/AuthContext';
-import { useTheme } from '@/context/ThemeContext';
 import { LANGUAGES, getSavedLang, changeLanguage } from '@/lib/googleTranslate';
 
 import { useGetAccountSessions, useRevokeSession, useRevokeOtherSessions } from '@/lib/react-query/queriesAndMutations';
@@ -152,7 +151,6 @@ function SessionCard({ s, onRevoke, revoking }: { s: LoginSession; onRevoke: (id
 
 const Settings = () => {
   const { user: _user } = useUserContext();
-  const { theme, toggleTheme } = useTheme();
   const { t } = useTranslation();
   const [tab, setTab] = useState<Tab>('appearance');
   const [currentLang, setCurrentLang] = useState(getSavedLang);
@@ -190,10 +188,10 @@ const Settings = () => {
   ];
 
   return (
-    <div className="min-h-full bg-[#F8FAFC] dark:bg-[#19191a]">
+    <div className="bg-[#F8FAFC] dark:bg-[#19191a]">
       {/* Header */}
       <div className="bg-white dark:bg-[#19191a] border-b border-slate-100 dark:border-slate-700 px-6 py-5">
-        <div className="max-w-4xl mx-auto">
+        <div>
           <div className="flex items-center gap-3">
             <Palette size={20} className="text-slate-500 dark:text-slate-400" />
             <div>
@@ -204,7 +202,7 @@ const Settings = () => {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-6 py-4 flex flex-col gap-4">
+      <div className="px-6 py-4 flex flex-col gap-4">
         {/* Tab bar */}
         <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
           <div className="flex">
@@ -214,7 +212,7 @@ const Settings = () => {
                 onClick={() => setTab(tb.id)}
                 className={`flex-1 flex items-center justify-center gap-2 px-4 py-3.5 text-sm font-medium transition-colors border-b-2 ${
                   tab === tb.id
-                    ? 'border-[#2F398E] text-[#2F398E] bg-[#2F398E]/4 dark:bg-[#2F398E]/10'
+                    ? 'border-[#F47A50] text-[#F47A50] bg-[#F47A50]/4 dark:bg-[#F47A50]/10'
                     : 'border-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700'
                 }`}
               >
@@ -228,41 +226,6 @@ const Settings = () => {
         {/* ── APPEARANCE TAB ── */}
         {tab === 'appearance' && (
           <div className="flex flex-col gap-4">
-            {/* Theme */}
-            <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
-              <div className="px-5 py-4 border-b border-slate-50 dark:border-slate-700">
-                <p className="text-sm font-bold text-slate-800 dark:text-slate-100">{t('settings.themeTitle')}</p>
-                <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{t('settings.themeDesc')}</p>
-              </div>
-              <div className="px-5 py-5 flex flex-col gap-3">
-                {[
-                  { value: 'light', labelKey: 'settings.themeLight', descKey: 'settings.themeLightDesc', icon: <Sun size={16} className="text-yellow-400" />, iconBg: 'bg-yellow-50 dark:bg-yellow-900/20' },
-                  { value: 'dark',  labelKey: 'settings.themeDark',  descKey: 'settings.themeDarkDesc',  icon: <Moon size={16} className="text-slate-400 dark:text-slate-300" />, iconBg: 'bg-slate-100 dark:bg-slate-700' },
-                ].map((opt) => (
-                  <button
-                    key={opt.value}
-                    onClick={() => { if (theme !== opt.value) toggleTheme(); }}
-                    className={`flex items-center gap-4 px-4 py-3.5 rounded-xl border-2 text-left transition-all ${
-                      theme === opt.value
-                        ? 'border-[#2F398E] bg-[#2F398E]/4 dark:bg-[#2F398E]/10'
-                        : 'border-slate-100 dark:border-slate-600 hover:border-slate-200 dark:hover:border-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700'
-                    }`}
-                  >
-                    {opt.icon}
-                    <div className="flex-1 min-w-0">
-                      <p className={`text-sm font-semibold ${theme === opt.value ? 'text-[#2F398E] dark:text-blue-400' : 'text-slate-700 dark:text-slate-200'}`}>
-                        {t(opt.labelKey)}
-                      </p>
-                      <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{t(opt.descKey)}</p>
-                    </div>
-                    <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${theme === opt.value ? 'border-[#2F398E]' : 'border-slate-300 dark:border-slate-500'}`}>
-                      {theme === opt.value && <div className="w-2 h-2 rounded-full bg-[#2F398E]" />}
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-
             {/* Language */}
             <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
               <div className="px-5 py-4 border-b border-slate-50 dark:border-slate-700">
@@ -276,12 +239,12 @@ const Settings = () => {
                     onClick={() => handleLangChange(opt.code)}
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-xl border-2 text-left transition-all ${
                       currentLang === opt.code
-                        ? 'border-[#1e51f9] bg-[#1e51f9]/5 dark:bg-[#1e51f9]/10'
+                        ? 'border-[#F15A22] bg-[#F15A22]/5 dark:bg-[#F15A22]/10'
                         : 'border-slate-100 dark:border-slate-600 hover:border-slate-200 dark:hover:border-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700'
                     }`}
                   >
                     <Flag code={opt.flagCode} className="h-5 w-7 object-cover rounded-[3px] shadow-sm shrink-0" />
-                    <span className={`text-xs font-semibold truncate ${currentLang === opt.code ? 'text-[#1e51f9]' : 'text-slate-700 dark:text-slate-200'}`}>
+                    <span className={`text-xs font-semibold truncate ${currentLang === opt.code ? 'text-[#F15A22]' : 'text-slate-700 dark:text-slate-200'}`}>
                       {opt.label}
                     </span>
                   </button>
@@ -305,7 +268,7 @@ const Settings = () => {
                 <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Thiết bị hiện tại</p>
               </div>
               {isLoadingSessions ? (
-                <div className="flex justify-center py-8"><Loader2 size={18} className="animate-spin text-[#1e51f9]" /></div>
+                <div className="flex justify-center py-8"><Loader2 size={18} className="animate-spin text-[#F15A22]" /></div>
               ) : currentSession ? (
                 <SessionCard s={currentSession} onRevoke={handleRevoke} revoking={revokingId === currentSession.id} />
               ) : (
@@ -336,7 +299,7 @@ const Settings = () => {
                 </div>
                 <div className="divide-y divide-slate-50 dark:divide-slate-700 max-h-[420px] overflow-y-auto">
                   {isLoadingSessions ? (
-                    <div className="flex justify-center py-8"><Loader2 size={18} className="animate-spin text-[#1e51f9]" /></div>
+                    <div className="flex justify-center py-8"><Loader2 size={18} className="animate-spin text-[#F15A22]" /></div>
                   ) : otherSessions.length === 0 ? (
                     <p className="text-xs text-slate-400 dark:text-slate-500 text-center py-8">Không có thiết bị nào khác</p>
                   ) : (

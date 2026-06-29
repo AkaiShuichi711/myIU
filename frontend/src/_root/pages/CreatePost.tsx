@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -20,7 +20,7 @@ const postSchema = z.object({
 
 type PostFormValues = z.infer<typeof postSchema>;
 
-const inputCls = "w-full pl-8 pr-3 py-2.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#1e51f9]/20 focus:border-[#1e51f9] transition-all";
+const inputCls = "w-full pl-8 pr-3 py-2.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#F15A22]/20 focus:border-[#F15A22] transition-all";
 
 const CreatePost = () => {
   const navigate = useNavigate();
@@ -75,8 +75,8 @@ const CreatePost = () => {
     <div className="min-h-full bg-[#F8FAFC] dark:bg-[#19191a]">
       <div className="bg-white dark:bg-[#19191a] border-b border-slate-100 dark:border-slate-700 px-6 py-5">
         <div className="max-w-2xl mx-auto flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-[#1e51f9]/10 flex items-center justify-center">
-            <PenSquare size={18} className="text-[#1e51f9]" />
+          <div className="w-9 h-9 rounded-xl bg-[#F15A22]/10 flex items-center justify-center">
+            <PenSquare size={18} className="text-[#F15A22]" />
           </div>
           <div>
             <h1 className="text-lg font-bold text-slate-900 dark:text-slate-50">{t('createPost.title')}</h1>
@@ -179,7 +179,7 @@ const CreatePost = () => {
                 type="submit"
                 disabled={isPending}
                 className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white flex items-center gap-2 transition-colors disabled:opacity-60"
-                style={{ background: '#2F398E' }}
+                style={{ background: '#F47A50' }}
               >
                 {isPending ? (
                   <><Loader2 size={15} className="animate-spin" /> {t('createPost.publishing')}</>

@@ -1,9 +1,9 @@
-import { getInitials } from '@/lib/utils';
+﻿import { getInitials } from '@/lib/utils';
 
 type AvatarVariant = 'primary' | 'muted';
 
 const AVATAR_BG: Record<AvatarVariant, string> = {
-  primary: '#1e51f9',
+  primary: '#F15A22',
   muted:   '#64748b',
 };
 

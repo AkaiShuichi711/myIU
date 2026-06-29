@@ -1,4 +1,4 @@
-import { useUserContext } from "@/context/AuthContext";
+﻿import { useUserContext } from "@/context/AuthContext";
 import { ArrowLeft, ShieldCheck, ShieldAlert, Fingerprint, Network, User, GraduationCap, Copy, CheckCheck, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -101,7 +101,6 @@ const TenantPage = () => {
       }}>
         <div style={{
           width: "30px", height: "30px", borderRadius: "8px",
-          background: `${accent}15`, border: `1px solid ${accent}30`,
           display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
         }}>{icon}</div>
         <span style={{ fontSize: "11px", fontWeight: 700, color: c.sectionTxt, letterSpacing: "0.07em", textTransform: "uppercase" }}>
@@ -134,7 +133,7 @@ const TenantPage = () => {
         </p>
         <button onClick={() => (window.location.href = "/sign-in")} style={{
           width: "100%", padding: "12px",
-          background: "#1e51f9",
+          background: "#F15A22",
           border: "none", borderRadius: "12px",
           color: "#fff", fontWeight: 600, fontSize: "14px", cursor: "pointer",
         }}>
@@ -149,7 +148,7 @@ const TenantPage = () => {
       <div style={{ width: "100%", height: "100%", display: "flex" }}>
         <div style={{
           width: "40%", minHeight: "100vh", flexShrink: 0,
-          background: "#1e51f9",
+          background: "#F15A22",
           display: "flex", alignItems: "center", justifyContent: "center", padding: "40px",
         }}>
           <div style={{ color: "#fff", textAlign: "center" }}>
@@ -227,11 +226,9 @@ const TenantPage = () => {
             <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
               <div style={{
                 width: "48px", height: "48px", borderRadius: "14px",
-                background: isDark ? "#0C2F4A" : "#e0f2fe",
-                border: `1px solid ${isDark ? "#0369A1" : "#7dd3fc"}`,
                 display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
               }}>
-                <GraduationCap size={22} color="#0284c7" />
+                <GraduationCap size={22} color="#F15A22" />
               </div>
               <div>
                 <h1 style={{ color: c.heading, fontSize: "17px", fontWeight: 700, margin: "0 0 3px" }}>
@@ -257,7 +254,7 @@ const TenantPage = () => {
             <div style={{ background: c.cardBg, borderRadius: "16px", border: `1px solid ${c.border}`, padding: "60px", textAlign: "center" }}>
               <div style={{
                 width: "40px", height: "40px", margin: "0 auto 16px",
-                border: `3px solid ${isDark ? "#1E3A5F" : "#e0f2fe"}`, borderTop: "3px solid #1e51f9",
+                border: `3px solid ${isDark ? "#1E3A5F" : "#e0f2fe"}`, borderTop: "3px solid #F15A22",
                 borderRadius: "50%", animation: "spin 0.8s linear infinite",
               }} />
               <p style={{ color: c.label, fontSize: "13px", margin: 0 }}>{t('tenant.fetching')}</p>
@@ -278,7 +275,7 @@ const TenantPage = () => {
             <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
 
               <Section title={t('tenant.sessionClaims')} accent="#323393"
-                icon={<Fingerprint size={15} color="#6366f1" />}>
+                icon={<Fingerprint size={15} color="#F15A22" />}>
                 {[
                   { label: t('tenant.tenantId'),  value: tenant.tenantId,  id: "tid"  },
                   { label: t('tenant.clientId'),  value: tenant.clientId,  id: "cid"  },
@@ -289,8 +286,8 @@ const TenantPage = () => {
                 ].map((r) => <Row key={r.id} {...r} />)}
               </Section>
 
-              <Section title={t('tenant.identityMetadata')} accent="#1e51f9"
-                icon={<ShieldCheck size={15} color="#0284c7" />}>
+              <Section title={t('tenant.identityMetadata')} accent="#F15A22"
+                icon={<ShieldCheck size={15} color="#F15A22" />}>
                 <Row label={t('tenant.provider')}     value={tenant.issuer}      id="issuer" />
                 <Row label={t('tenant.displayName')}  value={tenant.displayName} id="dname"  mono={false} />
                 <div style={{
@@ -311,8 +308,8 @@ const TenantPage = () => {
               </Section>
 
               {tenant.graphProfile && (
-                <Section title={t('tenant.graphProfile')} accent="#1e51f9"
-                  icon={<User size={15} color="#0284c7" />}>
+                <Section title={t('tenant.graphProfile')} accent="#F15A22"
+                  icon={<User size={15} color="#F15A22" />}>
                   {[
                     { label: t('tenant.displayName'),   value: tenant.graphProfile.displayName,       id: "gdn",  mono: false },
                     { label: t('tenant.principalName'), value: tenant.graphProfile.userPrincipalName, id: "gpn"  },
@@ -323,8 +320,8 @@ const TenantPage = () => {
               )}
 
               {tenant.armTenant && (
-                <Section title={t('tenant.armResponse')} accent="#1e51f9"
-                  icon={<Network size={15} color="#0284c7" />}>
+                <Section title={t('tenant.armResponse')} accent="#F15A22"
+                  icon={<Network size={15} color="#F15A22" />}>
                   <div style={{ marginTop: "10px", borderRadius: "12px", overflow: "hidden", border: `1px solid ${c.border}` }}>
                     <div style={{
                       background: "#1e293b",

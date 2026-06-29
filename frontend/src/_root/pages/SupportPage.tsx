@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+﻿import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Paperclip, X, CheckCircle2, Loader2 } from 'lucide-react';
 import { useCreateSupportTicket } from '@/lib/react-query/queriesAndMutations';
@@ -22,7 +22,7 @@ const NEEDS = [
 const MAX_DESC = 2000;
 
 const inputBase =
-  'w-full rounded-xl border border-slate-200 dark:border-[#2a3a4a] bg-slate-50 dark:bg-dark-3 text-[13px] text-slate-700 dark:text-light-2 px-3.5 py-2.5 transition focus:outline-none focus:border-[#1e51f9]/50 focus:bg-white dark:focus:bg-dark-2 focus:ring-2 focus:ring-[#1e51f9]/10';
+  'w-full rounded-xl border border-slate-200 dark:border-[#2a3a4a] bg-slate-50 dark:bg-dark-3 text-[13px] text-slate-700 dark:text-light-2 px-3.5 py-2.5 transition focus:outline-none focus:border-[#F15A22]/50 focus:bg-white dark:focus:bg-dark-2 focus:ring-2 focus:ring-[#F15A22]/10';
 
 export default function SupportPage() {
   const navigate = useNavigate();
@@ -76,7 +76,7 @@ export default function SupportPage() {
           <button
             onClick={() => { setSubmitted(false); setService(''); setNeed(''); setDesc(''); setFile(null); setTicketId(null); }}
             className="px-5 py-2 rounded-lg text-sm font-semibold text-white transition-colors"
-            style={{ background: '#1e51f9' }}
+            style={{ background: '#F15A22' }}
           >
             Gửi yêu cầu khác
           </button>
@@ -86,8 +86,8 @@ export default function SupportPage() {
   }
 
   return (
-    <div className="flex-1 overflow-y-auto p-5 md:p-8 bg-slate-50/60 dark:bg-[#0f0f10]">
-      <div className="max-w-xl w-full mx-auto">
+    <div className="flex-1 overflow-y-auto p-5 md:p-6 bg-slate-50/60 dark:bg-[#0f0f10]">
+      <div className="max-w-2xl w-full mx-auto">
         <div className="bg-white dark:bg-dark-2 rounded-2xl shadow-md p-6 md:p-7">
 
           {/* Header */}
@@ -167,7 +167,7 @@ export default function SupportPage() {
               <input ref={fileRef} type="file" className="hidden" onChange={handleFile} />
               {file ? (
                 <div className="flex items-center gap-2 px-3 py-2 rounded-xl border border-slate-200 dark:border-[#2a3a4a] bg-slate-50 dark:bg-dark-3">
-                  <Paperclip size={14} className="shrink-0" style={{ color: '#1e51f9' }} />
+                  <Paperclip size={14} className="shrink-0" style={{ color: '#F15A22' }} />
                   <span className="text-[12.5px] text-slate-600 dark:text-light-3 truncate flex-1">{file.name}</span>
                   <button
                     type="button"
@@ -181,7 +181,7 @@ export default function SupportPage() {
                 <button
                   type="button"
                   onClick={() => fileRef.current?.click()}
-                  className="flex items-center gap-2 text-[13px] font-medium text-slate-400 dark:text-light-3 hover:text-[#1e51f9] dark:hover:text-[#1e51f9] transition-colors"
+                  className="flex items-center gap-2 text-[13px] font-medium text-slate-400 dark:text-light-3 hover:text-[#F15A22] dark:hover:text-[#F15A22] transition-colors"
                 >
                   <Paperclip size={15} />
                   Đính kèm tệp
@@ -199,7 +199,7 @@ export default function SupportPage() {
               disabled={!canSubmit || createTicket.isPending}
               className="w-full py-2.5 rounded-xl text-[13.5px] font-semibold transition-all mt-1"
               style={{
-                background: canSubmit && !createTicket.isPending ? '#1e51f9' : '#c7d7fd',
+                background: canSubmit && !createTicket.isPending ? '#F15A22' : '#F9C4AE',
                 color: '#fff',
                 cursor: canSubmit && !createTicket.isPending ? 'pointer' : 'not-allowed',
               }}
