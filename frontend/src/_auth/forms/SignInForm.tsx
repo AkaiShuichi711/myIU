@@ -38,8 +38,6 @@ const SignInForm = () => {
   return (
     <div className="flex flex-col items-center">
       <div className="relative bg-white px-8 py-8 w-[400px] max-w-full rounded-2xl overflow-hidden" style={{ border: '1px solid rgba(0,0,0,0.08)', boxShadow: '0 25px 60px rgba(5,13,31,0.6), 0 8px 24px rgba(0,156,209,0.25)' }}>
-        {/* Accent bar */}
-        <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#0085b3] via-[#009CD1] to-[#33c9ec]" />
         {/* Logo */}
         <div className="flex justify-center mb-6">
           <img src="/assets/images/logo_beforesignin.svg" alt="myIU" />
