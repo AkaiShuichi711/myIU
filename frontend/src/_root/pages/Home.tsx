@@ -241,7 +241,16 @@ const Home = () => {
                 </div>
               ) : (
                 <div className="divide-y divide-[#F4F6F8] dark:divide-[#243447]">
-                  {forms.slice(0, 4).map((f: any) => {
+                  {[...forms]
+                    .sort((a: any, b: any) => {
+                      const priority: Record<string, number> = { pending: 0, approved: 1, rejected: 2 };
+                      const pa = priority[a.status] ?? 1;
+                      const pb = priority[b.status] ?? 1;
+                      if (pa !== pb) return pa - pb;
+                      return new Date(b.$createdAt).getTime() - new Date(a.$createdAt).getTime();
+                    })
+                    .slice(0, 4)
+                    .map((f: any) => {
                     const st = FORM_STATUS[(f.status as SubmissionStatus)] ?? FORM_STATUS.pending;
                     const StatusIcon = st.Icon;
                     return (
@@ -254,7 +263,7 @@ const Home = () => {
                           <p className="text-[12.5px] font-medium text-slate-700 dark:text-[#bfc6cc] truncate">{f.formTitle}</p>
                           <p className="text-[10px] text-slate-400 dark:text-[#4d6070] mt-0.5">{formatTimeAgo(f.$createdAt)}</p>
                         </div>
-                        <span className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold shrink-0 ${st.cls}`}>
+                        <span className={`flex items-center justify-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold shrink-0 w-[118px] ${st.cls}`}>
                           <StatusIcon size={10} /> {st.label}
                         </span>
                       </Link>
