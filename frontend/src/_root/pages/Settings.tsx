@@ -239,12 +239,12 @@ const Settings = () => {
                     onClick={() => handleLangChange(opt.code)}
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-xl border-2 text-left transition-all ${
                       currentLang === opt.code
-                        ? 'border-[#009CD1] bg-[#009CD1]/5 dark:bg-[#009CD1]/10'
+                        ? 'border-[#323393] bg-[#323393]/5 dark:bg-[#323393]/10'
                         : 'border-slate-100 dark:border-slate-600 hover:border-slate-200 dark:hover:border-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700'
                     }`}
                   >
                     <Flag code={opt.flagCode} className="h-5 w-7 object-cover rounded-[3px] shadow-sm shrink-0" />
-                    <span className={`text-xs font-semibold truncate ${currentLang === opt.code ? 'text-[#009CD1]' : 'text-slate-700 dark:text-slate-200'}`}>
+                    <span className={`text-xs font-semibold truncate ${currentLang === opt.code ? 'text-[#323393]' : 'text-slate-700 dark:text-slate-200'}`}>
                       {opt.label}
                     </span>
                   </button>
@@ -268,7 +268,7 @@ const Settings = () => {
                 <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Thiết bị hiện tại</p>
               </div>
               {isLoadingSessions ? (
-                <div className="flex justify-center py-8"><Loader2 size={18} className="animate-spin text-[#009CD1]" /></div>
+                <div className="flex justify-center py-8"><Loader2 size={18} className="animate-spin text-[#323393]" /></div>
               ) : currentSession ? (
                 <SessionCard s={currentSession} onRevoke={handleRevoke} revoking={revokingId === currentSession.id} />
               ) : (
@@ -299,7 +299,7 @@ const Settings = () => {
                 </div>
                 <div className="divide-y divide-slate-50 dark:divide-slate-700 max-h-[420px] overflow-y-auto">
                   {isLoadingSessions ? (
-                    <div className="flex justify-center py-8"><Loader2 size={18} className="animate-spin text-[#009CD1]" /></div>
+                    <div className="flex justify-center py-8"><Loader2 size={18} className="animate-spin text-[#323393]" /></div>
                   ) : otherSessions.length === 0 ? (
                     <p className="text-xs text-slate-400 dark:text-slate-500 text-center py-8">Không có thiết bị nào khác</p>
                   ) : (

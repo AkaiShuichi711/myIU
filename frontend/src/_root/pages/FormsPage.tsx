@@ -114,7 +114,7 @@ const FormRow = ({
       </a>
       <button
         onClick={() => onSubmit(form)}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-[#009CD1] hover:bg-[#0087b3] transition-all"
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-[#323393] hover:bg-[#0087b3] transition-all"
       >
         <Send size={12} /> Nộp
       </button>
@@ -154,7 +154,7 @@ const EditPanel = ({
   isSaving: boolean;
   isNew: boolean;
 }) => (
-  <div className="bg-white dark:bg-slate-800/80 rounded-xl border border-[#009CD1]/20 p-4 mb-4 flex flex-col gap-3">
+  <div className="bg-white dark:bg-slate-800/80 rounded-xl border border-[#323393]/20 p-4 mb-4 flex flex-col gap-3">
     <div className="flex items-center justify-between">
       <p className="text-sm font-bold text-slate-700 dark:text-slate-200">
         {isNew ? 'Thêm biểu mẫu mới' : 'Chỉnh sửa biểu mẫu'}
@@ -198,7 +198,7 @@ const EditPanel = ({
         <div className="flex gap-2">
           <input value={state.fileUrl} onChange={(e) => onChange('fileUrl', e.target.value)} placeholder="https://drive.google.com/..." className={INPUT_CLS} />
           {state.fileUrl && (
-            <a href={state.fileUrl} target="_blank" rel="noopener noreferrer" className="px-2.5 rounded-lg border border-slate-200 dark:border-slate-600 flex items-center text-slate-400 hover:text-[#009CD1] transition-colors shrink-0">
+            <a href={state.fileUrl} target="_blank" rel="noopener noreferrer" className="px-2.5 rounded-lg border border-slate-200 dark:border-slate-600 flex items-center text-slate-400 hover:text-[#4040aa] transition-colors shrink-0">
               <ExternalLink size={13} />
             </a>
           )}
@@ -211,7 +211,7 @@ const EditPanel = ({
       <button
         onClick={onSave}
         disabled={isSaving || !state.title.trim() || !state.fileUrl.trim() || !state.fileName.trim()}
-        className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold text-white bg-[#009CD1] hover:bg-[#0087b3] transition-colors disabled:opacity-60"
+        className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold text-white bg-[#323393] hover:bg-[#0087b3] transition-colors disabled:opacity-60"
       >
         {isSaving ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />}
         {isNew ? 'Thêm biểu mẫu' : 'Lưu thay đổi'}
@@ -329,7 +329,7 @@ const FormsPage = () => {
     { id: 'my-requests', label: 'Yêu cầu của tôi', icon: Send, badge: pendingCount || undefined },
   ];
 
-  const searchInputCls = 'w-full pl-7 pr-3 py-1.5 text-xs rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#009CD1]/20 focus:border-[#009CD1] transition-all';
+  const searchInputCls = 'w-full pl-7 pr-3 py-1.5 text-xs rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#323393]/20 focus:border-[#323393] transition-all';
 
   return (
     <div className="bg-[#F8FAFC] dark:bg-[#19191a]">
@@ -340,7 +340,7 @@ const FormsPage = () => {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => navigate('/home')}
-                className="flex items-center gap-1 text-[11px] text-slate-400 dark:text-slate-500 hover:text-[#009CD1] transition-colors font-mono"
+                className="flex items-center gap-1 text-[11px] text-slate-400 dark:text-slate-500 hover:text-[#4040aa] transition-colors font-mono"
               >
                 <Home size={11} /> HOME
               </button>
@@ -509,8 +509,8 @@ const FormsPage = () => {
                     <div className="divide-y divide-slate-50 dark:divide-slate-700/50">
                       {groupedForms[id].map((form) => (
                         editing?.$id === form.$id ? (
-                          <div key={form.$id} className="px-4 py-3 bg-[#009CD1]/4 dark:bg-[#009CD1]/6 border-l-2 border-[#009CD1]">
-                            <p className="text-xs text-[#009CD1] font-semibold mb-1 flex items-center gap-1">
+                          <div key={form.$id} className="px-4 py-3 bg-[#323393]/4 dark:bg-[#323393]/6 border-l-2 border-[#323393]">
+                            <p className="text-xs text-[#323393] font-semibold mb-1 flex items-center gap-1">
                               <Pencil size={11} /> Đang chỉnh sửa: {form.title}
                             </p>
                           </div>
@@ -556,7 +556,7 @@ const FormsPage = () => {
                       {mq ? `Không tìm thấy kết quả cho "${mySearch}"` : 'Chưa có yêu cầu nào'}
                     </p>
                     {!mq && (
-                      <button onClick={() => setPageTab('forms')} className="text-xs text-[#009CD1] hover:underline mt-1">
+                      <button onClick={() => setPageTab('forms')} className="text-xs text-[#323393] hover:underline mt-1">
                         Nộp biểu mẫu đầu tiên
                       </button>
                     )}

@@ -1,5 +1,5 @@
 ﻿export const COVER_GRADIENTS: Record<string, string> = {
-  '#009CD1': '#009CD1',
+  '#323393': '#323393',
   '#e74c3c': '#e74c3c',
   '#27ae60': '#27ae60',
   '#f39c12': '#f39c12',
@@ -10,7 +10,7 @@
 };
 
 export const COVER_OPTIONS = [
-  { color: '#009CD1', label: 'Xanh dương' },
+  { color: '#323393', label: 'Xanh dương' },
   { color: '#e74c3c', label: 'Đỏ' },
   { color: '#27ae60', label: 'Xanh lá' },
   { color: '#f39c12', label: 'Cam' },
@@ -28,4 +28,4 @@ export const SEMESTERS = [
 export const CIRCUIT_BG_STYLE: React.CSSProperties = {};
 
 export const INPUT_CLS =
-  'w-full px-3 py-2 text-sm rounded-lg bg-slate-50 dark:bg-slate-700/60 border border-slate-200 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#009CD1]/25 focus:border-[#009CD1] transition-all';
+  'w-full px-3 py-2 text-sm rounded-lg bg-slate-50 dark:bg-slate-700/60 border border-slate-200 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#323393]/25 focus:border-[#323393] transition-all';

@@ -50,7 +50,7 @@ const GridPostList = ({ posts, showUser = true }: GridPostListProps) => {
                 {showUser && creator && (
                   <div className="flex items-center gap-1.5">
                     <div className="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold"
-                      style={{ background: '#009CD1' }}>
+                      style={{ background: '#323393' }}>
                       {creator.name?.[0]?.toUpperCase() || '?'}
                     </div>
                   </div>

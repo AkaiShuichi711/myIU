@@ -16,7 +16,7 @@ const NOTIF_DOT: Record<string, string> = {
   form_approved: 'bg-green-500',
   form_rejected: 'bg-red-400',
   form_pending:  'bg-amber-400',
-  grade:         'bg-[#009CD1]',
+  grade:         'bg-[#323393]',
   course:        'bg-[#323393]',
   system:        'bg-slate-400',
 };
@@ -27,7 +27,7 @@ const SectionHeader = ({ title, to }: { title: string; to: string }) => (
     <h2 className="text-[15px] font-bold text-slate-900 dark:text-[#e8edf0] tracking-tight">{title}</h2>
     <Link
       to={to}
-      className="flex items-center gap-1 text-[12px] font-semibold text-[#009CD1] hover:opacity-80 transition-opacity"
+      className="flex items-center gap-1 text-[12px] font-semibold text-[#323393] hover:opacity-80 transition-opacity"
     >
       Xem tất cả <ArrowUpRight size={12} />
     </Link>
@@ -103,7 +103,7 @@ const Home = () => {
                 <p className="text-2xl font-extrabold text-slate-900 dark:text-[#e8edf0] leading-none tracking-tight">
                   {value}
                 </p>
-                <p className="text-[11px] text-[#009CD1] font-semibold mt-0.5">{sub}</p>
+                <p className="text-[11px] text-[#323393] font-semibold mt-0.5">{sub}</p>
               </div>
             ))}
           </div>
@@ -121,7 +121,7 @@ const Home = () => {
             <SectionHeader title="Khóa học đang học" to="/courses" />
             {loadingCourses ? (
               <div className="flex justify-center py-6">
-                <Loader2 size={20} className="animate-spin text-[#009CD1]" />
+                <Loader2 size={20} className="animate-spin text-[#323393]" />
               </div>
             ) : courses.length === 0 ? (
               <div className="bg-white dark:bg-[#1e2028] rounded-2xl border border-[#E0E4EB] dark:border-[#33485c] flex flex-col items-center py-6 gap-2">
@@ -139,15 +139,15 @@ const Home = () => {
                     {/* Color bar */}
                     <div
                       className="h-1.5 w-full"
-                      style={{ background: course.coverColor ?? '#009CD1' }}
+                      style={{ background: course.coverColor ?? '#323393' }}
                     />
                     <div className="p-4">
                       <div className="flex items-start justify-between mb-2">
                         <span
                           className="font-mono text-[10px] font-black tracking-widest px-1.5 py-0.5 rounded"
                           style={{
-                            background: `${course.coverColor ?? '#009CD1'}15`,
-                            color: course.coverColor ?? '#009CD1',
+                            background: `${course.coverColor ?? '#323393'}15`,
+                            color: course.coverColor ?? '#323393',
                           }}
                         >
                           {course.code}
@@ -158,7 +158,7 @@ const Home = () => {
                           </span>
                         )}
                       </div>
-                      <p className="text-[13px] font-semibold text-slate-800 dark:text-[#dce3e8] leading-snug line-clamp-2 group-hover:text-[#009CD1] transition-colors">
+                      <p className="text-[13px] font-semibold text-slate-800 dark:text-[#dce3e8] leading-snug line-clamp-2 group-hover:text-[#4040aa] transition-colors">
                         {course.name}
                       </p>
                       <p className="text-[11px] text-slate-400 dark:text-[#4d6070] mt-1.5 flex items-center gap-1">
@@ -177,7 +177,7 @@ const Home = () => {
             <div className="bg-white dark:bg-[#1e2028] rounded-2xl border border-[#E0E4EB] dark:border-[#33485c] flex flex-col items-center py-6 gap-2">
               <Star size={22} className="text-slate-200 dark:text-[#33485c]" />
               <p className="text-sm text-slate-400">Chưa có điểm nào</p>
-              <Link to="/courses" className="text-xs text-[#009CD1] hover:underline mt-0.5">
+              <Link to="/courses" className="text-xs text-[#323393] hover:underline mt-0.5">
                 Vào khóa học để xem điểm →
               </Link>
             </div>
@@ -196,7 +196,7 @@ const Home = () => {
             <div className="bg-white dark:bg-[#1e2028] rounded-2xl border border-[#E0E4EB] dark:border-[#33485c] overflow-hidden">
               {loadingNotifs ? (
                 <div className="flex justify-center py-6">
-                  <Loader2 size={18} className="animate-spin text-[#009CD1]" />
+                  <Loader2 size={18} className="animate-spin text-[#323393]" />
                 </div>
               ) : notifs.length === 0 ? (
                 <div className="flex flex-col items-center py-6 gap-2">
@@ -209,7 +209,7 @@ const Home = () => {
                     <Link
                       key={n.$id}
                       to={n.linkTo || '/notifications'}
-                      className={`flex items-start gap-3 px-4 py-3 hover:bg-[#F4F6F8] dark:hover:bg-[#0d2137] transition-colors ${!n.read ? 'bg-[#009CD1]/3' : ''}`}
+                      className={`flex items-start gap-3 px-4 py-3 hover:bg-[#F4F6F8] dark:hover:bg-[#0d2137] transition-colors ${!n.read ? 'bg-[#323393]/3' : ''}`}
                     >
                       <span className={`w-1.5 h-1.5 rounded-full shrink-0 mt-[5px] ${NOTIF_DOT[n.type] ?? 'bg-slate-300'}`} />
                       <div className="min-w-0 flex-1">
@@ -229,13 +229,13 @@ const Home = () => {
             <div className="bg-white dark:bg-[#1e2028] rounded-2xl border border-[#E0E4EB] dark:border-[#33485c] overflow-hidden">
               {loadingForms ? (
                 <div className="flex justify-center py-6">
-                  <Loader2 size={18} className="animate-spin text-[#009CD1]" />
+                  <Loader2 size={18} className="animate-spin text-[#323393]" />
                 </div>
               ) : forms.length === 0 ? (
                 <div className="flex flex-col items-center py-6 gap-2">
                   <FileText size={20} className="text-slate-200 dark:text-[#33485c]" />
                   <p className="text-xs text-slate-400">Chưa có biểu mẫu nào</p>
-                  <Link to="/forms" className="text-xs text-[#009CD1] hover:underline mt-0.5">
+                  <Link to="/forms" className="text-xs text-[#323393] hover:underline mt-0.5">
                     Nộp biểu mẫu →
                   </Link>
                 </div>

@@ -91,7 +91,7 @@ const AllUsers = () => {
               value={searchTerm}
               onChange={(e) => handleSearch(e.target.value)}
               placeholder={t('people.searchPlaceholder')}
-              className="w-full pl-9 pr-8 py-2.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#009CD1]/20 focus:border-[#009CD1] dark:focus:border-[#009CD1] transition-all"
+              className="w-full pl-9 pr-8 py-2.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#323393]/20 focus:border-[#323393] dark:focus:border-[#323393] transition-all"
             />
             {searchTerm && (
               <button

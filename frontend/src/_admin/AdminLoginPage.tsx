@@ -84,7 +84,7 @@ const AdminLoginPage = () => {
 
         <div className="mt-6 text-center text-sm text-gray-500">
           <p>Issues? Contact</p>
-          <a href="mailto:support@pas.vn" className="text-[#009CD1] hover:underline">support@pas.vn</a>
+          <a href="mailto:support@pas.vn" className="text-[#323393] hover:underline">support@pas.vn</a>
         </div>
       </div>
     </div>

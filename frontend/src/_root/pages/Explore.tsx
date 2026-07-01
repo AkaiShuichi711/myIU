@@ -7,7 +7,7 @@ import { useGetInfinitePosts, useSearchPosts } from '@/lib/react-query/queriesAn
 import { PostCard, GridPostList } from '@/components/shared';
 import { useDebounce } from '@/hooks/useDebounce';
 
-const searchInputCls = "w-full pl-9 pr-8 py-2.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#009CD1]/20 focus:border-[#009CD1] transition-all";
+const searchInputCls = "w-full pl-9 pr-8 py-2.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#323393]/20 focus:border-[#323393] transition-all";
 
 const Explore = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -43,7 +43,7 @@ const Explore = () => {
     <div className="min-h-full bg-[#F8FAFC] dark:bg-[#19191a]">
       <div className="sticky top-0 z-10 bg-white dark:bg-[#19191a] border-b border-slate-100 dark:border-slate-700 px-6 py-4">
         <div className="max-w-5xl mx-auto flex flex-col gap-2">
-          <Link to="/home" className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-[#009CD1] transition-colors font-mono w-fit">
+          <Link to="/home" className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-[#4040aa] transition-colors font-mono w-fit">
             <Home size={11} /> HOME
           </Link>
           <div className="flex items-center gap-3">
@@ -144,7 +144,7 @@ const Explore = () => {
         {!isSearchMode && (
           <div ref={loadMoreRef} className="py-8 flex justify-center">
             {isFetchingNextPage && (
-              <Loader2 size={20} className="animate-spin text-[#009CD1]" />
+              <Loader2 size={20} className="animate-spin text-[#323393]" />
             )}
             {!hasNextPage && posts.length > 0 && (
               <p className="text-xs text-slate-400 dark:text-slate-500">{t('explore.seenAll')}</p>

@@ -6,7 +6,7 @@ import { useCreateFormSubmission } from '@/lib/react-query/queriesAndMutations';
 import { api } from '@/lib/api/client';
 import type { IFormTemplate } from '@/types';
 
-const inputCls = 'w-full px-3 py-2 text-sm rounded-lg bg-slate-50 dark:bg-slate-700/60 border border-slate-200 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#009CD1]/25 focus:border-[#009CD1] transition-all';
+const inputCls = 'w-full px-3 py-2 text-sm rounded-lg bg-slate-50 dark:bg-slate-700/60 border border-slate-200 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#323393]/25 focus:border-[#323393] transition-all';
 
 type Suggestion = { name: string; email: string };
 
@@ -77,7 +77,7 @@ const FormSubmitModal = ({ template, onClose, onSuccess }: Props) => {
   const buildApproverEmail = (reviewUrl: string) => `
     <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f8fafc;padding:20px">
       <div style="background:white;border-radius:12px;padding:28px;border:1px solid #e2e8f0">
-        <div style="background:#009CD1;padding:16px 20px;border-radius:8px;margin-bottom:24px">
+        <div style="background:#323393;padding:16px 20px;border-radius:8px;margin-bottom:24px">
           <h1 style="color:white;margin:0;font-size:17px;font-weight:700">myIU Portal</h1>
           <p style="color:rgba(255,255,255,0.8);margin:3px 0 0;font-size:12px">Hệ thống biểu mẫu điện tử</p>
         </div>
@@ -89,7 +89,7 @@ const FormSubmitModal = ({ template, onClose, onSuccess }: Props) => {
           <tr><td style="padding:8px 12px;color:#64748b">Người nộp</td>
               <td style="padding:8px 12px;color:#19191a">${user.name} — ${user.email}</td></tr>
         </table>
-        <a href="${reviewUrl}" style="display:inline-block;background:#009CD1;color:white;text-decoration:none;padding:10px 24px;border-radius:8px;font-size:13px;font-weight:600">
+        <a href="${reviewUrl}" style="display:inline-block;background:#323393;color:white;text-decoration:none;padding:10px 24px;border-radius:8px;font-size:13px;font-weight:600">
           Xem &amp; Duyệt biểu mẫu →
         </a>
         <p style="color:#94a3b8;font-size:11px;margin-top:20px">Nếu bạn không phải người duyệt phù hợp, hãy đăng nhập và từ chối với lý do để người nộp tìm đúng người phụ trách.</p>
@@ -166,7 +166,7 @@ const FormSubmitModal = ({ template, onClose, onSuccess }: Props) => {
               <a
                 href={template.fileUrl}
                 download={template.fileName}
-                className="text-xs text-[#009CD1] hover:underline font-medium"
+                className="text-xs text-[#323393] hover:underline font-medium"
               >
                 Tải template gốc ({template.fileName || template.title})
               </a>
@@ -179,13 +179,13 @@ const FormSubmitModal = ({ template, onClose, onSuccess }: Props) => {
               File biểu mẫu đã điền *
             </label>
             <label className={`flex items-center gap-3 cursor-pointer px-3 py-2.5 rounded-lg border-2 border-dashed transition-colors ${
-              file ? 'border-[#009CD1]/40 bg-[#009CD1]/4' : 'border-slate-200 dark:border-slate-600 hover:border-[#009CD1]/40'
+              file ? 'border-[#323393]/40 bg-[#323393]/4' : 'border-slate-200 dark:border-slate-600 hover:border-[#4040aa]/40'
             }`}>
-              <Upload size={15} className={file ? 'text-[#009CD1]' : 'text-slate-400'} />
+              <Upload size={15} className={file ? 'text-[#323393]' : 'text-slate-400'} />
               <span className="text-sm text-slate-600 dark:text-slate-300 truncate flex-1">
                 {file ? file.name : 'Chọn file (PDF, DOCX, …)'}
               </span>
-              {file && <Check size={14} className="text-[#009CD1] shrink-0" />}
+              {file && <Check size={14} className="text-[#323393] shrink-0" />}
               <input
                 type="file"
                 className="hidden"
@@ -213,7 +213,7 @@ const FormSubmitModal = ({ template, onClose, onSuccess }: Props) => {
                 <Loader2 size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 animate-spin" />
               )}
               {approverName && !isSearching && (
-                <Check size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#009CD1]" />
+                <Check size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#323393]" />
               )}
             </div>
 
@@ -238,7 +238,7 @@ const FormSubmitModal = ({ template, onClose, onSuccess }: Props) => {
             )}
 
             {approverName && (
-              <p className="text-xs text-[#009CD1] mt-1 flex items-center gap-1">
+              <p className="text-xs text-[#323393] mt-1 flex items-center gap-1">
                 <Check size={11} /> {approverName}
               </p>
             )}
@@ -257,7 +257,7 @@ const FormSubmitModal = ({ template, onClose, onSuccess }: Props) => {
           <button
             onClick={handleSubmit}
             disabled={isSubmitting || !file || !approverEmail}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold text-white bg-[#009CD1] hover:bg-[#0087b3] transition-colors disabled:opacity-60"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold text-white bg-[#323393] hover:bg-[#0087b3] transition-colors disabled:opacity-60"
           >
             {isSubmitting ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />}
             {isSubmitting ? stepLabel : 'Nộp biểu mẫu'}

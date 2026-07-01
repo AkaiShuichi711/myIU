@@ -46,7 +46,7 @@ const ProfilePage = () => {
   if (isLoadingUser && !profileData) {
     return (
       <div className="min-h-full bg-[#F8FAFC] dark:bg-slate-900 flex items-center justify-center">
-        <Loader2 size={24} className="animate-spin text-[#009CD1]" />
+        <Loader2 size={24} className="animate-spin text-[#323393]" />
       </div>
     );
   }
@@ -94,14 +94,14 @@ const ProfilePage = () => {
         {/* Profile card */}
         <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
           {/* Cover */}
-          <div className="h-20" style={{ background: 'linear-gradient(135deg, #009CD1 0%, #323393 100%)' }} />
+          <div className="h-20" style={{ background: 'linear-gradient(135deg, #323393 0%, #323393 100%)' }} />
 
           <div className="px-5 pb-5">
             <div className="flex items-end justify-between -mt-7 mb-4">
               {/* Avatar */}
               <div
                 className="w-16 h-16 rounded-2xl border-4 border-white dark:border-slate-800 flex items-center justify-center text-white text-xl font-bold shadow-md overflow-hidden"
-                style={{ background: '#009CD1' }}
+                style={{ background: '#323393' }}
               >
                 {showAvatar ? (
                   <img
@@ -167,8 +167,8 @@ const ProfilePage = () => {
         {isOwnProfile && isMicrosoftUser && (
           <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
             <div className="flex items-center gap-3 px-5 py-4 border-b border-slate-50 dark:border-slate-700">
-              <div className="w-8 h-8 rounded-lg bg-[#009CD1]/10 dark:bg-[#009CD1]/20 flex items-center justify-center">
-                <User size={15} className="text-[#009CD1]" />
+              <div className="w-8 h-8 rounded-lg bg-[#323393]/10 dark:bg-[#323393]/20 flex items-center justify-center">
+                <User size={15} className="text-[#323393]" />
               </div>
               <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">{t('profile.microsoftIdentity')}</p>
               {isLoadingGraph && <Loader2 size={13} className="animate-spin text-slate-400 ml-auto" />}

@@ -85,7 +85,7 @@ const UpdateProfile = () => {
   if (isLoadingProfile && !profile) {
     return (
       <div className="min-h-full bg-[#F8FAFC] flex items-center justify-center">
-        <Loader2 size={24} className="animate-spin text-[#009CD1]" />
+        <Loader2 size={24} className="animate-spin text-[#323393]" />
       </div>
     );
   }
@@ -118,7 +118,7 @@ const UpdateProfile = () => {
                 <div className="relative shrink-0">
                   <div
                     className="w-20 h-20 rounded-2xl flex items-center justify-center text-white text-xl font-bold overflow-hidden shadow-md"
-                    style={{ background: '#009CD1' }}
+                    style={{ background: '#323393' }}
                   >
                     {currentAvatarUrl ? (
                       <img
@@ -200,7 +200,7 @@ const UpdateProfile = () => {
                       <input
                         {...field}
                         placeholder="Your full name"
-                        className="w-full px-3 py-2.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#009CD1]/20 focus:border-[#009CD1] transition-all"
+                        className="w-full px-3 py-2.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#323393]/20 focus:border-[#323393] transition-all"
                       />
                     </FormControl>
                     <FormMessage />
@@ -225,7 +225,7 @@ const UpdateProfile = () => {
                         rows={3}
                         placeholder="Write a short bio about yourself..."
                         maxLength={300}
-                        className="w-full px-3 py-2.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#009CD1]/20 focus:border-[#009CD1] transition-all resize-none"
+                        className="w-full px-3 py-2.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#323393]/20 focus:border-[#323393] transition-all resize-none"
                       />
                     </FormControl>
                     <FormMessage />
