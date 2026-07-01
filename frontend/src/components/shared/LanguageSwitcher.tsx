@@ -66,7 +66,7 @@ const LanguageSwitcher = ({ variant = 'light' }: LanguageSwitcherProps) => {
     : '0 8px 24px rgba(0,0,0,0.12)';
   const optionHover = isDark ? 'rgba(255,255,255,0.08)' : '#F8FAFC';
   const optionActive = isDark ? 'rgba(0,156,209,0.2)' : '#EEF2FF';
-  const optionActiveText = isDark ? '#F15A22' : '#F47A50';
+  const optionActiveText = isDark ? '#009CD1' : '#323393';
 
   return (
     <div ref={containerRef} style={{ position: 'relative' }}>

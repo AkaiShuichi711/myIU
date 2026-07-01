@@ -70,7 +70,7 @@ const SignInForm = () => {
           type="button"
           onClick={handleMicrosoftSignIn}
           disabled={isLoading}
-          className="w-full bg-[#F15A22] hover:bg-[#F47A50] text-white h-11 flex items-center justify-center gap-3 text-[14px] font-semibold rounded-lg shadow-none"
+          className="w-full bg-[#009CD1] hover:bg-[#323393] text-white h-11 flex items-center justify-center gap-3 text-[14px] font-semibold rounded-lg shadow-none"
         >
           {isLoading ? (
             <div className="flex items-center gap-2">
@@ -92,7 +92,7 @@ const SignInForm = () => {
         {/* Contact */}
         <div className="mt-8 text-center text-sm text-gray-500">
           <p>{t("auth.loginIssues")}</p>
-          <a href="mailto:support@pas.vn" className="text-[#F15A22] hover:underline">
+          <a href="mailto:support@pas.vn" className="text-[#009CD1] hover:underline">
             {t("auth.contactEmail")}
           </a>
         </div>

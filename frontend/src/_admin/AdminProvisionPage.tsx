@@ -126,7 +126,7 @@ const AdminProvisionPage = () => {
         onDrop={handleDrop}
         onClick={() => inputRef.current?.click()}
         className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
-          isDragging ? "border-[#F15A22] bg-blue-50" : "border-gray-300 hover:border-[#F15A22] hover:bg-gray-50"
+          isDragging ? "border-[#009CD1] bg-blue-50" : "border-gray-300 hover:border-[#009CD1] hover:bg-gray-50"
         }`}
       >
         <input ref={inputRef} type="file" accept=".xlsx" className="hidden" onChange={handleFileChange} />

@@ -151,7 +151,7 @@ const SignUpForm = () => {
             Already have an account?
             <Link
               to="/sign-in"
-              className="text-[#F15A22] text-small-semibold ml-1"
+              className="text-[#009CD1] text-small-semibold ml-1"
             >
               {" "}
               Log in

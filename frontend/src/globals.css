@@ -110,7 +110,7 @@ body { top: 0 !important; }
 
   /* Sidebar + topbar */
   .leftsidebar      { @apply hidden md:flex px-2 py-2.5 flex-col justify-between bg-white dark:bg-[#1e2028] border-r border-[#E0E4EB] dark:border-[#33485c]; }
-  .leftsidebar-link { @apply rounded-lg base-medium hover:bg-[#F15A22]/8 transition; }
+  .leftsidebar-link { @apply rounded-lg base-medium hover:bg-[#009CD1]/8 transition; }
   .topbar           { @apply sticky top-0 z-50 md:hidden bg-white dark:bg-[#1e2028] border-b border-[#E0E4EB] dark:border-[#33485c] w-full; }
 
   /* User card — ir.vng style */
@@ -122,9 +122,9 @@ body { top: 0 !important; }
 
 /* ── CSS Design Tokens ────────────────────────────────────────────────────── */
 :root {
-  --iu-primary:    #F15A22;
-  --iu-primary-dk: #F47A50;
-  --iu-navy:       #F47A50;
+  --iu-primary:    #009CD1;
+  --iu-primary-dk: #323393;
+  --iu-navy:       #323393;
   --bg-page:       #F4F6F8;
   --bg-surface:    #ffffff;
   --border:        #E0E4EB;
@@ -191,9 +191,9 @@ html.dark input, html.dark textarea {
 }
 html.dark input::placeholder, html.dark textarea::placeholder { color: #4d6070; }
 html.dark input:focus, html.dark textarea:focus {
-  border-color: #F15A22;
+  border-color: #009CD1;
   outline: none;
-  box-shadow: 0 0 0 3px rgba(241,90,34,0.12);
+  box-shadow: 0 0 0 3px rgba(0,156,209,0.12);
 }
 
 /* Dark shadows */
@@ -217,23 +217,23 @@ html.dark ::-webkit-scrollbar-thumb { background: #33485c; border-radius: 50px; 
     @apply h-10 bg-white dark:bg-[#1e2028] border border-[#E0E4EB] dark:border-[#33485c]
            text-slate-800 dark:text-[#bfc6cc] rounded-lg
            placeholder:text-slate-400 dark:placeholder:text-[#4d6070]
-           focus-visible:ring-1 focus-visible:ring-[#F15A22] focus-visible:ring-offset-0
-           focus-visible:border-[#F15A22] !important;
+           focus-visible:ring-1 focus-visible:ring-[#009CD1] focus-visible:ring-offset-0
+           focus-visible:border-[#009CD1] !important;
   }
 
   .shad-textarea {
     @apply min-h-[80px] bg-white dark:bg-[#1e2028] border border-[#E0E4EB] dark:border-[#33485c]
            text-slate-800 dark:text-[#bfc6cc] rounded-lg
            placeholder:text-slate-400 dark:placeholder:text-[#4d6070]
-           focus-visible:ring-1 focus-visible:ring-[#F15A22] focus-visible:ring-offset-0 !important;
+           focus-visible:ring-1 focus-visible:ring-[#009CD1] focus-visible:ring-offset-0 !important;
   }
 
   .shad-button_primary {
-    @apply bg-[#F15A22] hover:bg-[#F47A50] text-white rounded-lg flex gap-2 font-semibold !important;
+    @apply bg-[#323393] hover:bg-[#009CD1] text-white rounded-lg flex gap-2 font-semibold !important;
   }
 
   .shad-button_dark_4 {
-    @apply h-10 bg-[#F15A22] hover:bg-[#F47A50] px-5 text-white rounded-lg flex gap-2 font-semibold !important;
+    @apply h-10 bg-[#323393] hover:bg-[#009CD1] px-5 text-white rounded-lg flex gap-2 font-semibold !important;
   }
 
   .shad-button_ghost {

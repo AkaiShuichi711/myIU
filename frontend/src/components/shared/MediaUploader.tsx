@@ -135,7 +135,7 @@ const MediaUploader = ({ onChange, maxFiles = 5 }: MediaUploaderProps) => {
           {canAddMore && (
             <div
               {...getRootProps()}
-              className="h-28 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-600 flex flex-col items-center justify-center gap-1.5 cursor-pointer hover:border-[#F15A22] hover:bg-[#F15A22]/4 transition-all"
+              className="h-28 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-600 flex flex-col items-center justify-center gap-1.5 cursor-pointer hover:border-[#009CD1] hover:bg-[#009CD1]/4 transition-all"
             >
               <input {...getInputProps()} />
               <Plus size={20} className="text-slate-400 dark:text-slate-500" />
@@ -152,14 +152,14 @@ const MediaUploader = ({ onChange, maxFiles = 5 }: MediaUploaderProps) => {
           {...getRootProps()}
           className={`rounded-2xl border-2 border-dashed cursor-pointer transition-all duration-200 flex flex-col items-center justify-center py-14 px-8 text-center
             ${isDragActive
-              ? 'border-[#F15A22] bg-[#F15A22]/5'
+              ? 'border-[#009CD1] bg-[#009CD1]/5'
               : 'border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700/40 hover:border-slate-300 dark:hover:border-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700/60'
             }`}
         >
           <input {...getInputProps()} />
           <div className="w-14 h-14 rounded-2xl bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 flex items-center justify-center mb-4 shadow-sm">
             {isDragActive
-              ? <UploadCloud size={26} className="text-[#F15A22]" />
+              ? <UploadCloud size={26} className="text-[#009CD1]" />
               : <UploadCloud size={26} className="text-slate-400 dark:text-slate-500" />}
           </div>
           <p className="text-sm font-semibold text-slate-700 dark:text-slate-200 mb-1">

@@ -119,11 +119,11 @@ const LeftSidebar = () => {
                   {isActive && (
                     <span
                       className="absolute left-0 top-1/2 -translate-y-1/2"
-                      style={{ width: '3px', height: '16px', background: '#F15A22', borderRadius: '0 3px 3px 0' }}
+                      style={{ width: '3px', height: '16px', background: '#009CD1', borderRadius: '0 3px 3px 0' }}
                     />
                   )}
                   <div className="relative shrink-0">
-                    <Icon size={15} style={{ color: isActive ? '#F15A22' : '#272e35' }} />
+                    <Icon size={15} style={{ color: isActive ? '#009CD1' : '#272e35' }} />
                     {badge && collapsed && (
                       <span className="absolute -top-1 -right-1 w-[7px] h-[7px] rounded-full bg-red-500" />
                     )}
@@ -131,7 +131,7 @@ const LeftSidebar = () => {
                   {!collapsed && (
                     <span
                       className="flex-1 flex items-center justify-between leading-none text-[12.5px] font-medium truncate"
-                      style={{ color: isActive ? '#F15A22' : '#272e35' }}
+                      style={{ color: isActive ? '#009CD1' : '#272e35' }}
                     >
                       {t(link.labelKey as string)}
                       {badge && (
@@ -165,7 +165,7 @@ const LeftSidebar = () => {
       {/* ── Collapse toggle ───────────────────────────────────────── */}
       <button
         onClick={toggleCollapse}
-        className="flex items-center justify-center shrink-0 transition-colors border-t border-[#E0E4EB] dark:border-[#33485c] text-slate-400 hover:text-[#F15A22]"
+        className="flex items-center justify-center shrink-0 transition-colors border-t border-[#E0E4EB] dark:border-[#33485c] text-slate-400 hover:text-[#009CD1]"
         style={{ height: '36px' }}
         title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
       >
@@ -191,7 +191,7 @@ const LeftSidebar = () => {
         {!collapsed && (
           <Link
             to={`/update-profile/${user?.id}`}
-            className="min-w-0 flex-1 overflow-hidden hover:text-[#F15A22] transition-colors"
+            className="min-w-0 flex-1 overflow-hidden hover:text-[#009CD1] transition-colors"
           >
             <p
               className="text-[11.5px] font-semibold text-slate-700 dark:text-[#bfc6cc] truncate leading-none"
