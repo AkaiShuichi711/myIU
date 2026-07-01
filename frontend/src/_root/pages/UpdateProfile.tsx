@@ -95,7 +95,7 @@ const UpdateProfile = () => {
       {/* Header */}
       <div className="bg-white dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700 px-6 py-5">
         <div className="max-w-xl mx-auto flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-[#323393]/10 flex items-center justify-center">
+          <div className="w-9 h-9 rounded-xl bg-[#009CD1]/10 flex items-center justify-center">
             <UserCog size={18} className="text-[#009CD1]" />
           </div>
           <div>
@@ -118,7 +118,7 @@ const UpdateProfile = () => {
                 <div className="relative shrink-0">
                   <div
                     className="w-20 h-20 rounded-2xl flex items-center justify-center text-white text-xl font-bold overflow-hidden shadow-md"
-                    style={{ background: '#323393' }}
+                    style={{ background: '#009CD1' }}
                   >
                     {currentAvatarUrl ? (
                       <img
@@ -137,7 +137,7 @@ const UpdateProfile = () => {
                   {/* Camera button overlay */}
                   <label
                     htmlFor="avatar-input"
-                    className="absolute -bottom-1.5 -right-1.5 w-7 h-7 rounded-full bg-[#323393] hover:bg-[#1e2a6e] text-white flex items-center justify-center cursor-pointer shadow-md transition-colors"
+                    className="absolute -bottom-1.5 -right-1.5 w-7 h-7 rounded-full bg-[#009CD1] hover:bg-[#1e2a6e] text-white flex items-center justify-center cursor-pointer shadow-md transition-colors"
                     title="Change photo"
                   >
                     <Camera size={13} />
@@ -247,7 +247,7 @@ const UpdateProfile = () => {
                 type="submit"
                 disabled={isUpdating}
                 className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white flex items-center gap-2 transition-colors disabled:opacity-60"
-                style={{ background: '#323393' }}
+                style={{ background: '#009CD1' }}
               >
                 {isUpdating ? (
                   <><Loader2 size={15} className="animate-spin" /> Saving...</>

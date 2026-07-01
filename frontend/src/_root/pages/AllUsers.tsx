@@ -9,7 +9,7 @@ import { Paginator } from '@/components/shared';
 
 const PAGE_SIZE = 12;
 
-const PALETTE = ['#1D4ED8', '#7C3AED', '#0891B2', '#059669', '#B45309', '#DC2626', '#19191a', '#323393'];
+const PALETTE = ['#1D4ED8', '#7C3AED', '#0891B2', '#059669', '#B45309', '#DC2626', '#19191a', '#009CD1'];
 const avatarBg = (n: string) => PALETTE[(n?.charCodeAt(0) ?? 65) % PALETTE.length];
 
 const UserCard = ({ user }: { user: any }) => {
@@ -40,7 +40,7 @@ const UserCard = ({ user }: { user: any }) => {
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">{user.bio}</p>
         )}
         {user.roles?.length > 0 && (
-          <span className="inline-block mt-2 px-2 py-0.5 rounded-full bg-[#323393]/8 dark:bg-[#323393]/20 text-[#009CD1] dark:text-blue-400 text-xs font-medium">
+          <span className="inline-block mt-2 px-2 py-0.5 rounded-full bg-[#009CD1]/8 dark:bg-[#009CD1]/20 text-[#009CD1] dark:text-blue-400 text-xs font-medium">
             {user.roles[0]}
           </span>
         )}
@@ -78,7 +78,7 @@ const AllUsers = () => {
       <div className="sticky top-0 z-10 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-700 px-6 py-4">
         <div className="max-w-5xl mx-auto flex items-center gap-4">
           <div className="flex items-center gap-3 shrink-0">
-            <div className="w-9 h-9 rounded-xl bg-[#323393]/10 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-[#009CD1]/10 flex items-center justify-center">
               <Users size={18} className="text-[#009CD1]" />
             </div>
             <h1 className="text-lg font-bold text-slate-900 dark:text-slate-50 hidden sm:block">{t('people.title')}</h1>

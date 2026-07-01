@@ -76,7 +76,7 @@ export default function SupportPage() {
           <button
             onClick={() => { setSubmitted(false); setService(''); setNeed(''); setDesc(''); setFile(null); setTicketId(null); }}
             className="px-5 py-2 rounded-lg text-sm font-semibold text-white transition-colors"
-            style={{ background: '#323393' }}
+            style={{ background: '#009CD1' }}
           >
             Gửi yêu cầu khác
           </button>
@@ -167,7 +167,7 @@ export default function SupportPage() {
               <input ref={fileRef} type="file" className="hidden" onChange={handleFile} />
               {file ? (
                 <div className="flex items-center gap-2 px-3 py-2 rounded-xl border border-slate-200 dark:border-[#2a3a4a] bg-slate-50 dark:bg-dark-3">
-                  <Paperclip size={14} className="shrink-0" style={{ color: '#323393' }} />
+                  <Paperclip size={14} className="shrink-0" style={{ color: '#009CD1' }} />
                   <span className="text-[12.5px] text-slate-600 dark:text-light-3 truncate flex-1">{file.name}</span>
                   <button
                     type="button"
@@ -181,7 +181,7 @@ export default function SupportPage() {
                 <button
                   type="button"
                   onClick={() => fileRef.current?.click()}
-                  className="flex items-center gap-2 text-[13px] font-medium text-slate-400 dark:text-light-3 hover:text-[#4040aa] dark:hover:text-[#4040aa] transition-colors"
+                  className="flex items-center gap-2 text-[13px] font-medium text-slate-400 dark:text-light-3 hover:text-[#0085b3] dark:hover:text-[#0085b3] transition-colors"
                 >
                   <Paperclip size={15} />
                   Đính kèm tệp
@@ -199,7 +199,7 @@ export default function SupportPage() {
               disabled={!canSubmit || createTicket.isPending}
               className="w-full py-2.5 rounded-xl text-[13.5px] font-semibold transition-all mt-1"
               style={{
-                background: canSubmit && !createTicket.isPending ? '#323393' : '#F9C4AE',
+                background: canSubmit && !createTicket.isPending ? '#009CD1' : '#F9C4AE',
                 color: '#fff',
                 cursor: canSubmit && !createTicket.isPending ? 'pointer' : 'not-allowed',
               }}

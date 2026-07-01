@@ -187,7 +187,7 @@ const PostCard = ({ post, savedRecords = [] }: PostCardProps) => {
           {mediaUrls.length > 1 && (
             <div className="px-5 pt-2 flex items-center gap-1.5">
               {Array.from({ length: Math.min(mediaUrls.length, 5) }).map((_, i) => (
-                <div key={i} className={`h-1 rounded-full transition-all ${i === 0 ? 'w-4 bg-[#323393]' : 'w-1.5 bg-slate-200 dark:bg-slate-600'}`} />
+                <div key={i} className={`h-1 rounded-full transition-all ${i === 0 ? 'w-4 bg-[#009CD1]' : 'w-1.5 bg-slate-200 dark:bg-slate-600'}`} />
               ))}
               {mediaUrls.length > 5 && <span className="text-[10px] text-slate-400 dark:text-slate-500 ml-1">+{mediaUrls.length - 5}</span>}
             </div>
@@ -224,8 +224,8 @@ const PostCard = ({ post, savedRecords = [] }: PostCardProps) => {
           <Link to={`/posts/${post.$id}`} className="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 hover:text-slate-700 dark:hover:text-slate-200 transition-colors" onClick={(e) => e.stopPropagation()}>
             View
           </Link>
-          <button onClick={handleSave} disabled={isSaving || isDeletingSave} className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors" style={{ color: isSaved ? '#323393' : '#94a3b8' }} title={isSaved ? 'Unsave' : 'Save'}>
-            <Bookmark size={16} fill={isSaved ? '#323393' : 'none'} className="transition-transform active:scale-125" />
+          <button onClick={handleSave} disabled={isSaving || isDeletingSave} className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors" style={{ color: isSaved ? '#009CD1' : '#94a3b8' }} title={isSaved ? 'Unsave' : 'Save'}>
+            <Bookmark size={16} fill={isSaved ? '#009CD1' : 'none'} className="transition-transform active:scale-125" />
           </button>
         </div>
       </div>

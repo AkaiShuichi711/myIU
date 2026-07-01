@@ -128,7 +128,7 @@ const CommentSection = ({ postId, postOwnerId, postOwnerName }: CommentSectionPr
               <div key={c.$id} className="flex items-start gap-2.5 group">
                 <div
                   className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0 mt-0.5"
-                  style={{ background: '#323393' }}
+                  style={{ background: '#009CD1' }}
                 >
                   {initials}
                 </div>
@@ -159,7 +159,7 @@ const CommentSection = ({ postId, postOwnerId, postOwnerName }: CommentSectionPr
       <form onSubmit={handleSubmit} className="px-5 py-3 border-t border-slate-50 flex items-end gap-2">
         <div
           className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
-          style={{ background: '#323393' }}
+          style={{ background: '#009CD1' }}
         >
           {(user.name || '?').split(' ').map((w) => w[0]).slice(0, 2).join('').toUpperCase()}
         </div>
@@ -177,7 +177,7 @@ const CommentSection = ({ postId, postOwnerId, postOwnerName }: CommentSectionPr
           type="submit"
           disabled={isAdding || !body.trim()}
           className="w-8 h-8 rounded-xl flex items-center justify-center text-white shrink-0 transition-colors disabled:opacity-40"
-          style={{ background: '#323393' }}
+          style={{ background: '#009CD1' }}
         >
           {isAdding ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
         </button>

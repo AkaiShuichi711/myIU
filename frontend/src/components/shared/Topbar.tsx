@@ -117,7 +117,7 @@ const Topbar = () => {
                       ? (isDark ? 'rgba(241,90,34,0.15)' : 'rgba(241,90,34,0.08)')
                       : 'transparent',
                     border: 'none', cursor: 'pointer', fontSize: '12.5px',
-                    color: opt.code === currentLang ? '#323393' : c.text,
+                    color: opt.code === currentLang ? '#009CD1' : c.text,
                     fontWeight: opt.code === currentLang ? 600 : 400,
                     textAlign: 'left', transition: 'background 0.1s',
                   }}

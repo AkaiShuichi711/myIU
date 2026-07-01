@@ -110,7 +110,7 @@ body { top: 0 !important; }
 
   /* Sidebar + topbar */
   .leftsidebar      { @apply hidden md:flex px-2 py-2.5 flex-col justify-between bg-white dark:bg-[#1e2028] border-r border-[#E0E4EB] dark:border-[#33485c]; }
-  .leftsidebar-link { @apply rounded-lg base-medium hover:bg-[#4040aa]/8 transition; }
+  .leftsidebar-link { @apply rounded-lg base-medium hover:bg-[#0085b3]/8 transition; }
   .topbar           { @apply sticky top-0 z-50 md:hidden bg-white dark:bg-[#1e2028] border-b border-[#E0E4EB] dark:border-[#33485c] w-full; }
 
   /* User card — ir.vng style */
@@ -122,9 +122,9 @@ body { top: 0 !important; }
 
 /* ── CSS Design Tokens ────────────────────────────────────────────────────── */
 :root {
-  --iu-primary:    #323393;
+  --iu-primary:    #009CD1;
   --iu-primary-dk: #009CD1;
-  --iu-navy:       #323393;
+  --iu-navy:       #009CD1;
   --bg-page:       #F4F6F8;
   --bg-surface:    #ffffff;
   --border:        #E0E4EB;
@@ -229,11 +229,11 @@ html.dark ::-webkit-scrollbar-thumb { background: #33485c; border-radius: 50px; 
   }
 
   .shad-button_primary {
-    @apply bg-[#323393] hover:bg-[#4040aa] text-white rounded-lg flex gap-2 font-semibold !important;
+    @apply bg-[#009CD1] hover:bg-[#0085b3] text-white rounded-lg flex gap-2 font-semibold !important;
   }
 
   .shad-button_dark_4 {
-    @apply h-10 bg-[#323393] hover:bg-[#4040aa] px-5 text-white rounded-lg flex gap-2 font-semibold !important;
+    @apply h-10 bg-[#009CD1] hover:bg-[#0085b3] px-5 text-white rounded-lg flex gap-2 font-semibold !important;
   }
 
   .shad-button_ghost {

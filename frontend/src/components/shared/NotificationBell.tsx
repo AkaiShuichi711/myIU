@@ -80,7 +80,7 @@ const NotificationBell = () => {
             {unreadCount > 0 && (
               <button
                 onClick={() => markAll(user.id)}
-                className="flex items-center gap-1 text-xs text-slate-400 hover:text-[#4040aa] transition-colors"
+                className="flex items-center gap-1 text-xs text-slate-400 hover:text-[#0085b3] transition-colors"
               >
                 <CheckCheck size={13} /> Đọc tất cả
               </button>
@@ -104,13 +104,13 @@ const NotificationBell = () => {
                   key={n.$id}
                   onClick={() => handleClickNotif(n)}
                   className={`w-full flex items-start gap-3 px-4 py-3 text-left hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0 ${
-                    !n.read ? 'bg-[#323393]/4' : ''
+                    !n.read ? 'bg-[#009CD1]/4' : ''
                   }`}
                 >
                   {/* Actor avatar */}
                   <div
                     className="w-9 h-9 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
-                    style={{ background: '#323393' }}
+                    style={{ background: '#009CD1' }}
                   >
                     {(n.actorName || '?').split(' ').map((w: string) => w[0]).slice(0, 2).join('').toUpperCase()}
                   </div>
@@ -127,7 +127,7 @@ const NotificationBell = () => {
                   <div className="mt-0.5 shrink-0">{ICON_MAP[n.type] ?? <Bell size={13} className="text-slate-300" />}</div>
 
                   {/* Unread dot */}
-                  {!n.read && <span className="w-2 h-2 rounded-full bg-[#323393] shrink-0 mt-1.5" />}
+                  {!n.read && <span className="w-2 h-2 rounded-full bg-[#009CD1] shrink-0 mt-1.5" />}
                 </button>
               ))
             )}

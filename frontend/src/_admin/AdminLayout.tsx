@@ -91,7 +91,7 @@ const AdminLayout = () => {
             )?.label ?? 'Admin'}
           </h1>
           <div className="flex items-center gap-2 text-sm text-gray-600">
-            <span className="bg-[#323393]/10 text-[#009CD1] px-2 py-0.5 rounded text-xs font-medium">
+            <span className="bg-[#009CD1]/10 text-[#009CD1] px-2 py-0.5 rounded text-xs font-medium">
               {admin?.role}
             </span>
             <span>{admin?.name}</span>

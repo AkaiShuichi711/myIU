@@ -133,7 +133,7 @@ const TenantPage = () => {
         </p>
         <button onClick={() => (window.location.href = "/sign-in")} style={{
           width: "100%", padding: "12px",
-          background: "#323393",
+          background: "#009CD1",
           border: "none", borderRadius: "12px",
           color: "#fff", fontWeight: 600, fontSize: "14px", cursor: "pointer",
         }}>
@@ -148,7 +148,7 @@ const TenantPage = () => {
       <div style={{ width: "100%", height: "100%", display: "flex" }}>
         <div style={{
           width: "40%", minHeight: "100vh", flexShrink: 0,
-          background: "#323393",
+          background: "#009CD1",
           display: "flex", alignItems: "center", justifyContent: "center", padding: "40px",
         }}>
           <div style={{ color: "#fff", textAlign: "center" }}>
@@ -228,7 +228,7 @@ const TenantPage = () => {
                 width: "48px", height: "48px", borderRadius: "14px",
                 display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
               }}>
-                <GraduationCap size={22} color="#323393" />
+                <GraduationCap size={22} color="#009CD1" />
               </div>
               <div>
                 <h1 style={{ color: c.heading, fontSize: "17px", fontWeight: 700, margin: "0 0 3px" }}>
@@ -254,7 +254,7 @@ const TenantPage = () => {
             <div style={{ background: c.cardBg, borderRadius: "16px", border: `1px solid ${c.border}`, padding: "60px", textAlign: "center" }}>
               <div style={{
                 width: "40px", height: "40px", margin: "0 auto 16px",
-                border: `3px solid ${isDark ? "#1E3A5F" : "#e0f2fe"}`, borderTop: "3px solid #323393",
+                border: `3px solid ${isDark ? "#1E3A5F" : "#e0f2fe"}`, borderTop: "3px solid #009CD1",
                 borderRadius: "50%", animation: "spin 0.8s linear infinite",
               }} />
               <p style={{ color: c.label, fontSize: "13px", margin: 0 }}>{t('tenant.fetching')}</p>
@@ -274,8 +274,8 @@ const TenantPage = () => {
           ) : tenant ? (
             <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
 
-              <Section title={t('tenant.sessionClaims')} accent="#323393"
-                icon={<Fingerprint size={15} color="#323393" />}>
+              <Section title={t('tenant.sessionClaims')} accent="#009CD1"
+                icon={<Fingerprint size={15} color="#009CD1" />}>
                 {[
                   { label: t('tenant.tenantId'),  value: tenant.tenantId,  id: "tid"  },
                   { label: t('tenant.clientId'),  value: tenant.clientId,  id: "cid"  },
@@ -286,8 +286,8 @@ const TenantPage = () => {
                 ].map((r) => <Row key={r.id} {...r} />)}
               </Section>
 
-              <Section title={t('tenant.identityMetadata')} accent="#323393"
-                icon={<ShieldCheck size={15} color="#323393" />}>
+              <Section title={t('tenant.identityMetadata')} accent="#009CD1"
+                icon={<ShieldCheck size={15} color="#009CD1" />}>
                 <Row label={t('tenant.provider')}     value={tenant.issuer}      id="issuer" />
                 <Row label={t('tenant.displayName')}  value={tenant.displayName} id="dname"  mono={false} />
                 <div style={{
@@ -308,8 +308,8 @@ const TenantPage = () => {
               </Section>
 
               {tenant.graphProfile && (
-                <Section title={t('tenant.graphProfile')} accent="#323393"
-                  icon={<User size={15} color="#323393" />}>
+                <Section title={t('tenant.graphProfile')} accent="#009CD1"
+                  icon={<User size={15} color="#009CD1" />}>
                   {[
                     { label: t('tenant.displayName'),   value: tenant.graphProfile.displayName,       id: "gdn",  mono: false },
                     { label: t('tenant.principalName'), value: tenant.graphProfile.userPrincipalName, id: "gpn"  },
@@ -320,8 +320,8 @@ const TenantPage = () => {
               )}
 
               {tenant.armTenant && (
-                <Section title={t('tenant.armResponse')} accent="#323393"
-                  icon={<Network size={15} color="#323393" />}>
+                <Section title={t('tenant.armResponse')} accent="#009CD1"
+                  icon={<Network size={15} color="#009CD1" />}>
                   <div style={{ marginTop: "10px", borderRadius: "12px", overflow: "hidden", border: `1px solid ${c.border}` }}>
                     <div style={{
                       background: "#1e293b",

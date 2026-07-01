@@ -37,9 +37,9 @@ const SignInForm = () => {
 
   return (
     <div className="flex flex-col items-center">
-      <div className="relative bg-white/95 backdrop-blur-sm px-8 py-8 w-[400px] max-w-full rounded-2xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.18)', boxShadow: '0 25px 60px rgba(15,13,61,0.5), 0 8px 24px rgba(50,51,147,0.3)' }}>
+      <div className="relative bg-white/95 backdrop-blur-sm px-8 py-8 w-[400px] max-w-full rounded-2xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.18)', boxShadow: '0 25px 60px rgba(15,13,61,0.5), 0 8px 24px rgba(0,156,209,0.3)' }}>
         {/* Accent bar */}
-        <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#323393] via-[#4040aa] to-[#009CD1]" />
+        <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#009CD1] via-[#0085b3] to-[#009CD1]" />
         {/* Logo */}
         <div className="flex justify-center mb-6">
           <img src="/assets/images/logo_beforesignin.svg" alt="myIU" />
@@ -72,7 +72,7 @@ const SignInForm = () => {
           type="button"
           onClick={handleMicrosoftSignIn}
           disabled={isLoading}
-          className="w-full bg-gradient-to-r from-[#323393] to-[#4040aa] hover:from-[#4040aa] hover:to-[#5252bb] text-white h-12 flex items-center justify-center gap-3 text-[14px] font-semibold rounded-xl transition-all duration-200 hover:-translate-y-0.5" style={{ boxShadow: '0 4px 20px rgba(50,51,147,0.45)' }}
+          className="w-full bg-gradient-to-r from-[#009CD1] to-[#0085b3] hover:from-[#0085b3] hover:to-[#006fa3] text-white h-12 flex items-center justify-center gap-3 text-[14px] font-semibold rounded-xl transition-all duration-200 hover:-translate-y-0.5" style={{ boxShadow: '0 4px 20px rgba(0,156,209,0.45)' }}
         >
           {isLoading ? (
             <div className="flex items-center gap-2">

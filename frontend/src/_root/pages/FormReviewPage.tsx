@@ -14,7 +14,7 @@ const BACKEND = (import.meta.env.VITE_OAUTH_BACKEND_URL || window.location.origi
 const buildResultEmail = (submitterName: string, formTitle: string, status: 'approved' | 'rejected', approverName: string, rejectionReason?: string) => `
   <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f8fafc;padding:20px">
     <div style="background:white;border-radius:12px;padding:28px;border:1px solid #e2e8f0">
-      <div style="background:#323393;padding:16px 20px;border-radius:8px;margin-bottom:24px">
+      <div style="background:#009CD1;padding:16px 20px;border-radius:8px;margin-bottom:24px">
         <h1 style="color:white;margin:0;font-size:17px;font-weight:700">myIU Portal</h1>
         <p style="color:rgba(255,255,255,0.8);margin:3px 0 0;font-size:12px">Hệ thống biểu mẫu điện tử</p>
       </div>
@@ -36,7 +36,7 @@ const buildResultEmail = (submitterName: string, formTitle: string, status: 'app
             <td style="padding:8px 12px;color:#ef4444">${rejectionReason}</td></tr>` : ''}
       </table>
       ${status === 'rejected' ? '<p style="color:#475569;font-size:13px">Vui lòng xem lại thông tin và nộp lại biểu mẫu với người duyệt phù hợp.</p>' : ''}
-      <a href="${window.location.origin}/forms" style="display:inline-block;background:#323393;color:white;text-decoration:none;padding:10px 24px;border-radius:8px;font-size:13px;font-weight:600">
+      <a href="${window.location.origin}/forms" style="display:inline-block;background:#009CD1;color:white;text-decoration:none;padding:10px 24px;border-radius:8px;font-size:13px;font-weight:600">
         Xem danh sách biểu mẫu →
       </a>
     </div>
@@ -94,7 +94,7 @@ const FormReviewPage = () => {
       <div className="min-h-full bg-[#F8FAFC] dark:bg-slate-900 flex items-center justify-center">
         <div className="text-center">
           <p className="text-slate-600 dark:text-slate-400 mb-4">Bạn cần đăng nhập để xem yêu cầu này.</p>
-          <Link to="/sign-in" className="px-4 py-2 rounded-lg bg-[#323393] text-white text-sm font-semibold">Đăng nhập</Link>
+          <Link to="/sign-in" className="px-4 py-2 rounded-lg bg-[#009CD1] text-white text-sm font-semibold">Đăng nhập</Link>
         </div>
       </div>
     );
@@ -190,11 +190,11 @@ const FormReviewPage = () => {
               href={submission.uploadedFileUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 hover:border-[#4040aa]/40 transition-colors group w-fit"
+              className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 hover:border-[#0085b3]/40 transition-colors group w-fit"
             >
               <FileText size={14} className="text-slate-400" />
               <span className="text-sm text-slate-700 dark:text-slate-200">Xem file biểu mẫu đã nộp</span>
-              <Download size={12} className="text-slate-400 group-hover:text-[#4040aa] transition-colors" />
+              <Download size={12} className="text-slate-400 group-hover:text-[#0085b3] transition-colors" />
             </a>
           </div>
         </div>

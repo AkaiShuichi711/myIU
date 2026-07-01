@@ -82,7 +82,7 @@ const ProfilePage = () => {
           {isOwnProfile && (
             <Link
               to={`/update-profile/${currentUser.id}`}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-[#009CD1] dark:text-blue-400 bg-[#323393]/8 dark:bg-[#323393]/20 hover:bg-[#323393]/12 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-[#009CD1] dark:text-blue-400 bg-[#009CD1]/8 dark:bg-[#009CD1]/20 hover:bg-[#009CD1]/12 transition-colors"
             >
               <Edit3 size={13} /> {t('profile.editProfile')}
             </Link>
@@ -94,14 +94,14 @@ const ProfilePage = () => {
         {/* Profile card */}
         <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
           {/* Cover */}
-          <div className="h-20" style={{ background: 'linear-gradient(135deg, #323393 0%, #323393 100%)' }} />
+          <div className="h-20" style={{ background: 'linear-gradient(135deg, #009CD1 0%, #009CD1 100%)' }} />
 
           <div className="px-5 pb-5">
             <div className="flex items-end justify-between -mt-7 mb-4">
               {/* Avatar */}
               <div
                 className="w-16 h-16 rounded-2xl border-4 border-white dark:border-slate-800 flex items-center justify-center text-white text-xl font-bold shadow-md overflow-hidden"
-                style={{ background: '#323393' }}
+                style={{ background: '#009CD1' }}
               >
                 {showAvatar ? (
                   <img
@@ -167,7 +167,7 @@ const ProfilePage = () => {
         {isOwnProfile && isMicrosoftUser && (
           <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
             <div className="flex items-center gap-3 px-5 py-4 border-b border-slate-50 dark:border-slate-700">
-              <div className="w-8 h-8 rounded-lg bg-[#323393]/10 dark:bg-[#323393]/20 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-[#009CD1]/10 dark:bg-[#009CD1]/20 flex items-center justify-center">
                 <User size={15} className="text-[#009CD1]" />
               </div>
               <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">{t('profile.microsoftIdentity')}</p>

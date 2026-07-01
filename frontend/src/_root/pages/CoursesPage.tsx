@@ -14,7 +14,7 @@ import {
 
 // ── Course Card ───────────────────────────────────────────────────────────────
 const CourseCard = ({ course, role }: { course: any; role: 'lecturer' | 'student' }) => {
-  const coverColor = course.coverColor ?? '#323393';
+  const coverColor = course.coverColor ?? '#009CD1';
   return (
     <Link
       to={`/courses/${course.$id}`}
@@ -36,7 +36,7 @@ const CourseCard = ({ course, role }: { course: any; role: 'lecturer' | 'student
       </div>
 
       <div className="p-3.5">
-        <h3 className="font-semibold text-slate-800 dark:text-slate-100 text-sm leading-snug line-clamp-2 mb-1 group-hover:text-[#4040aa] transition-colors">
+        <h3 className="font-semibold text-slate-800 dark:text-slate-100 text-sm leading-snug line-clamp-2 mb-1 group-hover:text-[#0085b3] transition-colors">
           {course.name}
         </h3>
         <p className="text-[11px] text-slate-400 dark:text-slate-500 font-mono mb-2.5">{course.semester}</p>
@@ -48,7 +48,7 @@ const CourseCard = ({ course, role }: { course: any; role: 'lecturer' | 'student
             {role === 'lecturer' && <span className="flex items-center gap-1"><Users size={10} /> Nhóm</span>}
             <span className="flex items-center gap-1"><FileText size={10} /> Bài đăng</span>
           </div>
-          <ChevronRight size={13} className="text-slate-300 dark:text-slate-600 group-hover:text-[#4040aa] transition-colors" />
+          <ChevronRight size={13} className="text-slate-300 dark:text-slate-600 group-hover:text-[#0085b3] transition-colors" />
         </div>
       </div>
     </Link>
@@ -86,7 +86,7 @@ const CoursesPage = () => {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => navigate('/home')}
-                className="flex items-center gap-1 text-[11px] text-slate-400 dark:text-slate-500 hover:text-[#4040aa] transition-colors font-mono"
+                className="flex items-center gap-1 text-[11px] text-slate-400 dark:text-slate-500 hover:text-[#0085b3] transition-colors font-mono"
               >
                 <Home size={11} /> HOME
               </button>
@@ -101,7 +101,7 @@ const CoursesPage = () => {
             {isLecturer && tab === 'teaching' && (
               <Link
                 to="/courses/create"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-[#323393] hover:bg-[#0087b3] transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-[#009CD1] hover:bg-[#0087b3] transition-colors"
               >
                 <Plus size={12} /> Tạo môn học
               </Link>
@@ -124,7 +124,7 @@ const CoursesPage = () => {
                   <Icon size={12} /> {label}
                   <span className={`ml-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-bold ${
                     tab === id
-                      ? 'bg-[#323393]/12 text-[#009CD1]'
+                      ? 'bg-[#009CD1]/12 text-[#009CD1]'
                       : 'bg-slate-200 dark:bg-slate-600 text-slate-500 dark:text-slate-400'
                   }`}>{count}</span>
                 </button>
@@ -144,7 +144,7 @@ const CoursesPage = () => {
         ) : courses.length === 0 ? (
           tab === 'teaching' ? (
             <div className="flex flex-col items-center py-20 gap-3 text-center">
-              <div className="w-14 h-14 rounded-xl border border-[#009CD1]/20 bg-[#323393]/5 flex items-center justify-center">
+              <div className="w-14 h-14 rounded-xl border border-[#009CD1]/20 bg-[#009CD1]/5 flex items-center justify-center">
                 <Briefcase size={24} className="text-[#009CD1]/60" />
               </div>
               <p className="font-semibold text-slate-700 dark:text-slate-300 text-sm">Chưa có môn học nào để giảng dạy</p>
@@ -153,7 +153,7 @@ const CoursesPage = () => {
               </p>
               <Link
                 to="/courses/create"
-                className="mt-1 px-4 py-2 rounded-lg text-xs font-semibold text-white bg-[#323393] hover:bg-[#0087b3] transition-colors"
+                className="mt-1 px-4 py-2 rounded-lg text-xs font-semibold text-white bg-[#009CD1] hover:bg-[#0087b3] transition-colors"
               >
                 + Tạo môn học đầu tiên
               </Link>
@@ -170,14 +170,14 @@ const CoursesPage = () => {
                 </p>
               </div>
 
-              <div className="w-full bg-[#323393]/5 dark:bg-[#323393]/8 border border-[#009CD1]/15 rounded-xl p-4 text-left">
+              <div className="w-full bg-[#009CD1]/5 dark:bg-[#009CD1]/8 border border-[#009CD1]/15 rounded-xl p-4 text-left">
                 <p className="text-[11px] font-bold text-[#009CD1] uppercase tracking-wider mb-2 flex items-center gap-1.5">
                   <Info size={11} /> Cách ghi danh
                 </p>
                 <ol className="flex flex-col gap-1.5 text-xs text-slate-600 dark:text-slate-400">
                   {['Giảng viên tạo môn học và nhóm học', 'GV thêm sinh viên vào nhóm bằng User ID', 'Môn học xuất hiện ở đây ngay lập tức'].map((step, i) => (
                     <li key={i} className="flex items-start gap-2">
-                      <span className="w-4 h-4 rounded-full bg-[#323393]/15 text-[#009CD1] flex items-center justify-center text-[9px] font-bold shrink-0 mt-0.5">{i + 1}</span>
+                      <span className="w-4 h-4 rounded-full bg-[#009CD1]/15 text-[#009CD1] flex items-center justify-center text-[9px] font-bold shrink-0 mt-0.5">{i + 1}</span>
                       {step}
                     </li>
                   ))}

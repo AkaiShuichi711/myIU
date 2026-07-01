@@ -43,7 +43,7 @@ const Explore = () => {
     <div className="min-h-full bg-[#F8FAFC] dark:bg-[#19191a]">
       <div className="sticky top-0 z-10 bg-white dark:bg-[#19191a] border-b border-slate-100 dark:border-slate-700 px-6 py-4">
         <div className="max-w-5xl mx-auto flex flex-col gap-2">
-          <Link to="/home" className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-[#4040aa] transition-colors font-mono w-fit">
+          <Link to="/home" className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-[#0085b3] transition-colors font-mono w-fit">
             <Home size={11} /> HOME
           </Link>
           <div className="flex items-center gap-3">

@@ -3,7 +3,7 @@
 type AvatarVariant = 'primary' | 'muted';
 
 const AVATAR_BG: Record<AvatarVariant, string> = {
-  primary: '#323393',
+  primary: '#009CD1',
   muted:   '#64748b',
 };
 

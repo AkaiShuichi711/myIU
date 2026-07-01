@@ -212,7 +212,7 @@ const Settings = () => {
                 onClick={() => setTab(tb.id)}
                 className={`flex-1 flex items-center justify-center gap-2 px-4 py-3.5 text-sm font-medium transition-colors border-b-2 ${
                   tab === tb.id
-                    ? 'border-[#009CD1] text-[#009CD1] bg-[#323393]/4 dark:bg-[#323393]/10'
+                    ? 'border-[#009CD1] text-[#009CD1] bg-[#009CD1]/4 dark:bg-[#009CD1]/10'
                     : 'border-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700'
                 }`}
               >
@@ -239,7 +239,7 @@ const Settings = () => {
                     onClick={() => handleLangChange(opt.code)}
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-xl border-2 text-left transition-all ${
                       currentLang === opt.code
-                        ? 'border-[#009CD1] bg-[#323393]/5 dark:bg-[#323393]/10'
+                        ? 'border-[#009CD1] bg-[#009CD1]/5 dark:bg-[#009CD1]/10'
                         : 'border-slate-100 dark:border-slate-600 hover:border-slate-200 dark:hover:border-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700'
                     }`}
                   >

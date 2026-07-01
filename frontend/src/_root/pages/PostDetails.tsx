@@ -143,7 +143,7 @@ const PostDetails = () => {
                 >
                   <div
                     className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0"
-                    style={{ background: '#323393' }}
+                    style={{ background: '#009CD1' }}
                   >
                     {creatorInitials}
                   </div>
@@ -169,7 +169,7 @@ const PostDetails = () => {
                 {Array.isArray(post.tags) && post.tags.filter(Boolean).length > 0 && (
                   <div className="flex flex-wrap gap-1.5">
                     {post.tags.filter(Boolean).map((tag: string) => (
-                      <span key={tag} className="px-2.5 py-1 rounded-full text-xs font-medium bg-[#323393]/8 dark:bg-[#323393]/20 text-[#009CD1]">
+                      <span key={tag} className="px-2.5 py-1 rounded-full text-xs font-medium bg-[#009CD1]/8 dark:bg-[#009CD1]/20 text-[#009CD1]">
                         #{tag}
                       </span>
                     ))}
@@ -193,9 +193,9 @@ const PostDetails = () => {
                   onClick={handleSave}
                   disabled={isSaving || isDeletingSave}
                   className="flex items-center gap-1.5 text-sm font-medium transition-colors px-3 py-1.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700"
-                  style={{ color: isSaved ? '#323393' : '#94a3b8' }}
+                  style={{ color: isSaved ? '#009CD1' : '#94a3b8' }}
                 >
-                  <Bookmark size={18} fill={isSaved ? '#323393' : 'none'} className="transition-transform active:scale-110" />
+                  <Bookmark size={18} fill={isSaved ? '#009CD1' : 'none'} className="transition-transform active:scale-110" />
                   {isSaved ? 'Saved' : 'Save'}
                 </button>
               </div>

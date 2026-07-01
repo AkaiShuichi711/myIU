@@ -16,8 +16,8 @@ const NOTIF_DOT: Record<string, string> = {
   form_approved: 'bg-green-500',
   form_rejected: 'bg-red-400',
   form_pending:  'bg-amber-400',
-  grade:         'bg-[#323393]',
-  course:        'bg-[#323393]',
+  grade:         'bg-[#009CD1]',
+  course:        'bg-[#009CD1]',
   system:        'bg-slate-400',
 };
 
@@ -139,15 +139,15 @@ const Home = () => {
                     {/* Color bar */}
                     <div
                       className="h-1.5 w-full"
-                      style={{ background: course.coverColor ?? '#323393' }}
+                      style={{ background: course.coverColor ?? '#009CD1' }}
                     />
                     <div className="p-4">
                       <div className="flex items-start justify-between mb-2">
                         <span
                           className="font-mono text-[10px] font-black tracking-widest px-1.5 py-0.5 rounded"
                           style={{
-                            background: `${course.coverColor ?? '#323393'}15`,
-                            color: course.coverColor ?? '#323393',
+                            background: `${course.coverColor ?? '#009CD1'}15`,
+                            color: course.coverColor ?? '#009CD1',
                           }}
                         >
                           {course.code}
@@ -158,7 +158,7 @@ const Home = () => {
                           </span>
                         )}
                       </div>
-                      <p className="text-[13px] font-semibold text-slate-800 dark:text-[#dce3e8] leading-snug line-clamp-2 group-hover:text-[#4040aa] transition-colors">
+                      <p className="text-[13px] font-semibold text-slate-800 dark:text-[#dce3e8] leading-snug line-clamp-2 group-hover:text-[#0085b3] transition-colors">
                         {course.name}
                       </p>
                       <p className="text-[11px] text-slate-400 dark:text-[#4d6070] mt-1.5 flex items-center gap-1">
@@ -209,7 +209,7 @@ const Home = () => {
                     <Link
                       key={n.$id}
                       to={n.linkTo || '/notifications'}
-                      className={`flex items-start gap-3 px-4 py-3 hover:bg-[#F4F6F8] dark:hover:bg-[#0d2137] transition-colors ${!n.read ? 'bg-[#323393]/3' : ''}`}
+                      className={`flex items-start gap-3 px-4 py-3 hover:bg-[#F4F6F8] dark:hover:bg-[#0d2137] transition-colors ${!n.read ? 'bg-[#009CD1]/3' : ''}`}
                     >
                       <span className={`w-1.5 h-1.5 rounded-full shrink-0 mt-[5px] ${NOTIF_DOT[n.type] ?? 'bg-slate-300'}`} />
                       <div className="min-w-0 flex-1">

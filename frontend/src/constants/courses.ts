@@ -1,5 +1,5 @@
 ﻿export const COVER_GRADIENTS: Record<string, string> = {
-  '#323393': '#323393',
+  '#009CD1': '#009CD1',
   '#e74c3c': '#e74c3c',
   '#27ae60': '#27ae60',
   '#f39c12': '#f39c12',
@@ -10,7 +10,7 @@
 };
 
 export const COVER_OPTIONS = [
-  { color: '#323393', label: 'Xanh dương' },
+  { color: '#009CD1', label: 'Xanh dương' },
   { color: '#e74c3c', label: 'Đỏ' },
   { color: '#27ae60', label: 'Xanh lá' },
   { color: '#f39c12', label: 'Cam' },
