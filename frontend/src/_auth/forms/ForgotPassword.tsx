@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+﻿import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
@@ -12,7 +12,7 @@ const ForgotPassword = () => {
           <img src="/assets/images/logo_beforesignin.svg" alt="myIU" />
         </div>
 
-        <h1 className="text-center text-2xl font-semibold text-[#323393] mb-4">
+        <h1 className="text-center text-2xl font-semibold text-[#009CD1] mb-4">
           {t("auth.forgotPasswordTitle")}
         </h1>
 

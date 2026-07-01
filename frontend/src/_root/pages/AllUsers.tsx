@@ -40,7 +40,7 @@ const UserCard = ({ user }: { user: any }) => {
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">{user.bio}</p>
         )}
         {user.roles?.length > 0 && (
-          <span className="inline-block mt-2 px-2 py-0.5 rounded-full bg-[#323393]/8 dark:bg-[#323393]/20 text-[#323393] dark:text-blue-400 text-xs font-medium">
+          <span className="inline-block mt-2 px-2 py-0.5 rounded-full bg-[#323393]/8 dark:bg-[#323393]/20 text-[#009CD1] dark:text-blue-400 text-xs font-medium">
             {user.roles[0]}
           </span>
         )}
@@ -79,7 +79,7 @@ const AllUsers = () => {
         <div className="max-w-5xl mx-auto flex items-center gap-4">
           <div className="flex items-center gap-3 shrink-0">
             <div className="w-9 h-9 rounded-xl bg-[#323393]/10 flex items-center justify-center">
-              <Users size={18} className="text-[#323393]" />
+              <Users size={18} className="text-[#009CD1]" />
             </div>
             <h1 className="text-lg font-bold text-slate-900 dark:text-slate-50 hidden sm:block">{t('people.title')}</h1>
           </div>
@@ -91,7 +91,7 @@ const AllUsers = () => {
               value={searchTerm}
               onChange={(e) => handleSearch(e.target.value)}
               placeholder={t('people.searchPlaceholder')}
-              className="w-full pl-9 pr-8 py-2.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#323393]/20 focus:border-[#323393] dark:focus:border-[#323393] transition-all"
+              className="w-full pl-9 pr-8 py-2.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#009CD1]/20 focus:border-[#009CD1] dark:focus:border-[#009CD1] transition-all"
             />
             {searchTerm && (
               <button

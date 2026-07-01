@@ -94,7 +94,7 @@ const SignInForm = () => {
         {/* Contact */}
         <div className="mt-8 text-center text-sm text-gray-500">
           <p>{t("auth.loginIssues")}</p>
-          <a href="mailto:support@pas.vn" className="text-[#323393] hover:underline">
+          <a href="mailto:support@pas.vn" className="text-[#009CD1] hover:underline">
             {t("auth.contactEmail")}
           </a>
         </div>

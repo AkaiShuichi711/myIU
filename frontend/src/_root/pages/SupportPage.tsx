@@ -22,7 +22,7 @@ const NEEDS = [
 const MAX_DESC = 2000;
 
 const inputBase =
-  'w-full rounded-xl border border-slate-200 dark:border-[#2a3a4a] bg-slate-50 dark:bg-dark-3 text-[13px] text-slate-700 dark:text-light-2 px-3.5 py-2.5 transition focus:outline-none focus:border-[#323393]/50 focus:bg-white dark:focus:bg-dark-2 focus:ring-2 focus:ring-[#323393]/10';
+  'w-full rounded-xl border border-slate-200 dark:border-[#2a3a4a] bg-slate-50 dark:bg-dark-3 text-[13px] text-slate-700 dark:text-light-2 px-3.5 py-2.5 transition focus:outline-none focus:border-[#009CD1]/50 focus:bg-white dark:focus:bg-dark-2 focus:ring-2 focus:ring-[#009CD1]/10';
 
 export default function SupportPage() {
   const navigate = useNavigate();

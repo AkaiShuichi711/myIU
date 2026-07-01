@@ -21,7 +21,7 @@ const Saved = () => {
           </Link>
           <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-[#323393]/10 flex items-center justify-center">
-            <Bookmark size={18} className="text-[#323393]" />
+            <Bookmark size={18} className="text-[#009CD1]" />
           </div>
           <div>
             <h1 className="text-lg font-bold text-slate-900 dark:text-slate-50">{t('saved.title')}</h1>
@@ -34,7 +34,7 @@ const Saved = () => {
       <div className="max-w-5xl mx-auto px-6 py-4">
         {isPending ? (
           <div className="flex justify-center py-20">
-            <Loader2 size={24} className="animate-spin text-[#323393]" />
+            <Loader2 size={24} className="animate-spin text-[#009CD1]" />
           </div>
         ) : savedPosts.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 text-center">

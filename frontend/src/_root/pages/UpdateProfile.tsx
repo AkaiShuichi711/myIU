@@ -85,7 +85,7 @@ const UpdateProfile = () => {
   if (isLoadingProfile && !profile) {
     return (
       <div className="min-h-full bg-[#F8FAFC] flex items-center justify-center">
-        <Loader2 size={24} className="animate-spin text-[#323393]" />
+        <Loader2 size={24} className="animate-spin text-[#009CD1]" />
       </div>
     );
   }
@@ -96,7 +96,7 @@ const UpdateProfile = () => {
       <div className="bg-white dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700 px-6 py-5">
         <div className="max-w-xl mx-auto flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-[#323393]/10 flex items-center justify-center">
-            <UserCog size={18} className="text-[#323393]" />
+            <UserCog size={18} className="text-[#009CD1]" />
           </div>
           <div>
             <h1 className="text-lg font-bold text-slate-900 dark:text-slate-50">Edit Profile</h1>
@@ -159,7 +159,7 @@ const UpdateProfile = () => {
                   <div className="flex items-center gap-2 mt-2">
                     <label
                       htmlFor="avatar-input"
-                      className="text-xs font-medium text-[#323393] dark:text-blue-400 cursor-pointer hover:underline"
+                      className="text-xs font-medium text-[#009CD1] dark:text-blue-400 cursor-pointer hover:underline"
                     >
                       {previewUrl ? 'Change photo' : 'Upload photo'}
                     </label>
@@ -200,7 +200,7 @@ const UpdateProfile = () => {
                       <input
                         {...field}
                         placeholder="Your full name"
-                        className="w-full px-3 py-2.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#323393]/20 focus:border-[#323393] transition-all"
+                        className="w-full px-3 py-2.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#009CD1]/20 focus:border-[#009CD1] transition-all"
                       />
                     </FormControl>
                     <FormMessage />
@@ -225,7 +225,7 @@ const UpdateProfile = () => {
                         rows={3}
                         placeholder="Write a short bio about yourself..."
                         maxLength={300}
-                        className="w-full px-3 py-2.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#323393]/20 focus:border-[#323393] transition-all resize-none"
+                        className="w-full px-3 py-2.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#009CD1]/20 focus:border-[#009CD1] transition-all resize-none"
                       />
                     </FormControl>
                     <FormMessage />

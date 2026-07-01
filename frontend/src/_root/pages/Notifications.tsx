@@ -16,8 +16,8 @@ const TYPE_META: Record<string, { icon: React.ReactNode; color: string }> = {
   form_approved: { icon: <FileText size={15} className="text-[#00c578]" />,  color: 'bg-[#00c578]/12' },
   form_rejected: { icon: <FileText size={15} className="text-[#ef4e49]" />,  color: 'bg-[#ef4e49]/12' },
   form_pending:  { icon: <FileText size={15} className="text-[#f5832f]" />,  color: 'bg-[#f5832f]/12' },
-  grade:         { icon: <Star size={15} className="text-[#323393]" />,      color: 'bg-[#323393]/10' },
-  course:        { icon: <BookOpen size={15} className="text-[#323393]" />,  color: 'bg-[#323393]/10' },
+  grade:         { icon: <Star size={15} className="text-[#009CD1]" />,      color: 'bg-[#323393]/10' },
+  course:        { icon: <BookOpen size={15} className="text-[#009CD1]" />,  color: 'bg-[#323393]/10' },
   system:        { icon: <GraduationCap size={15} className="text-[#99a3ad]" />, color: 'bg-[#33485c]/15' },
 };
 
@@ -45,7 +45,7 @@ const Notifications = () => {
         <div>
           <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Bell size={18} className="text-[#323393] dark:text-blue-400" />
+            <Bell size={18} className="text-[#009CD1] dark:text-blue-400" />
             <h1 className="text-base font-bold text-slate-900 dark:text-slate-50">
               {t('notifications.title')}
               {unreadCount > 0 && (
@@ -60,7 +60,7 @@ const Notifications = () => {
             <button
               onClick={() => markAll(user.id)}
               disabled={isMarkingAll}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-[#323393] bg-[#323393]/8 border border-[#323393]/20 hover:bg-[#4040aa]/12 transition-colors disabled:opacity-60"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-[#009CD1] bg-[#323393]/8 border border-[#009CD1]/20 hover:bg-[#4040aa]/12 transition-colors disabled:opacity-60"
             >
               {isMarkingAll ? <Loader2 size={12} className="animate-spin" /> : <CheckCheck size={13} />}
               {t('notifications.markAllRead')}
@@ -92,7 +92,7 @@ const Notifications = () => {
         <div className="bg-white dark:bg-[#19191a] rounded-xl border border-slate-200 dark:border-[#33485c]/50 overflow-hidden">
           {isPending ? (
             <div className="flex justify-center py-16">
-              <Loader2 size={24} className="animate-spin text-[#323393]" />
+              <Loader2 size={24} className="animate-spin text-[#009CD1]" />
             </div>
           ) : notifications.length === 0 ? (
             <div className="flex flex-col items-center py-10 gap-3 text-center">

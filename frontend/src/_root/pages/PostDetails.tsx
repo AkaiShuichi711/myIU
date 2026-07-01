@@ -31,7 +31,7 @@ const PostDetails = () => {
   if (isLoading) {
     return (
       <div className="min-h-full bg-[#F8FAFC] dark:bg-[#19191a] flex items-center justify-center">
-        <Loader2 size={24} className="animate-spin text-[#323393]" />
+        <Loader2 size={24} className="animate-spin text-[#009CD1]" />
       </div>
     );
   }
@@ -40,7 +40,7 @@ const PostDetails = () => {
     return (
       <div className="min-h-full bg-[#F8FAFC] dark:bg-[#19191a] flex flex-col items-center justify-center gap-4">
         <p className="text-slate-500 dark:text-slate-400 font-medium">Post not found</p>
-        <button onClick={() => navigate(-1)} className="text-sm text-[#323393] hover:underline">Go back</button>
+        <button onClick={() => navigate(-1)} className="text-sm text-[#009CD1] hover:underline">Go back</button>
       </div>
     );
   }
@@ -169,7 +169,7 @@ const PostDetails = () => {
                 {Array.isArray(post.tags) && post.tags.filter(Boolean).length > 0 && (
                   <div className="flex flex-wrap gap-1.5">
                     {post.tags.filter(Boolean).map((tag: string) => (
-                      <span key={tag} className="px-2.5 py-1 rounded-full text-xs font-medium bg-[#323393]/8 dark:bg-[#323393]/20 text-[#323393]">
+                      <span key={tag} className="px-2.5 py-1 rounded-full text-xs font-medium bg-[#323393]/8 dark:bg-[#323393]/20 text-[#009CD1]">
                         #{tag}
                       </span>
                     ))}

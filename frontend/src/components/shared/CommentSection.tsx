@@ -19,7 +19,7 @@ interface CommentSectionProps {
 const renderWithMentions = (text: string) =>
   text.split(/(@\w+)/g).map((part, i) =>
     part.startsWith('@') ? (
-      <span key={i} className="text-[#323393] font-medium">
+      <span key={i} className="text-[#009CD1] font-medium">
         {part}
       </span>
     ) : (
@@ -108,7 +108,7 @@ const CommentSection = ({ postId, postOwnerId, postOwnerName }: CommentSectionPr
       <div className="px-5 flex flex-col gap-3 max-h-72 overflow-y-auto pb-2">
         {isLoading ? (
           <div className="flex justify-center py-4">
-            <Loader2 size={18} className="animate-spin text-[#323393]" />
+            <Loader2 size={18} className="animate-spin text-[#009CD1]" />
           </div>
         ) : comments.length === 0 ? (
           <p className="text-xs text-slate-400 text-center py-4">
@@ -170,7 +170,7 @@ const CommentSection = ({ postId, postOwnerId, postOwnerName }: CommentSectionPr
             onMentionedUsers={setMentionedUsers}
             placeholder="Thêm bình luận... dùng @ để tag người"
             rows={1}
-            className="w-full px-3 py-2 text-sm rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#323393]/20 focus:border-[#323393] transition-all resize-none placeholder:text-slate-400"
+            className="w-full px-3 py-2 text-sm rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#009CD1]/20 focus:border-[#009CD1] transition-all resize-none placeholder:text-slate-400"
           />
         </div>
         <button

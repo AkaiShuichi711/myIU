@@ -154,7 +154,7 @@ const EditPanel = ({
   isSaving: boolean;
   isNew: boolean;
 }) => (
-  <div className="bg-white dark:bg-slate-800/80 rounded-xl border border-[#323393]/20 p-4 mb-4 flex flex-col gap-3">
+  <div className="bg-white dark:bg-slate-800/80 rounded-xl border border-[#009CD1]/20 p-4 mb-4 flex flex-col gap-3">
     <div className="flex items-center justify-between">
       <p className="text-sm font-bold text-slate-700 dark:text-slate-200">
         {isNew ? 'Thêm biểu mẫu mới' : 'Chỉnh sửa biểu mẫu'}
@@ -329,7 +329,7 @@ const FormsPage = () => {
     { id: 'my-requests', label: 'Yêu cầu của tôi', icon: Send, badge: pendingCount || undefined },
   ];
 
-  const searchInputCls = 'w-full pl-7 pr-3 py-1.5 text-xs rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#323393]/20 focus:border-[#323393] transition-all';
+  const searchInputCls = 'w-full pl-7 pr-3 py-1.5 text-xs rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#009CD1]/20 focus:border-[#009CD1] transition-all';
 
   return (
     <div className="bg-[#F8FAFC] dark:bg-[#19191a]">
@@ -509,8 +509,8 @@ const FormsPage = () => {
                     <div className="divide-y divide-slate-50 dark:divide-slate-700/50">
                       {groupedForms[id].map((form) => (
                         editing?.$id === form.$id ? (
-                          <div key={form.$id} className="px-4 py-3 bg-[#323393]/4 dark:bg-[#323393]/6 border-l-2 border-[#323393]">
-                            <p className="text-xs text-[#323393] font-semibold mb-1 flex items-center gap-1">
+                          <div key={form.$id} className="px-4 py-3 bg-[#323393]/4 dark:bg-[#323393]/6 border-l-2 border-[#009CD1]">
+                            <p className="text-xs text-[#009CD1] font-semibold mb-1 flex items-center gap-1">
                               <Pencil size={11} /> Đang chỉnh sửa: {form.title}
                             </p>
                           </div>
@@ -556,7 +556,7 @@ const FormsPage = () => {
                       {mq ? `Không tìm thấy kết quả cho "${mySearch}"` : 'Chưa có yêu cầu nào'}
                     </p>
                     {!mq && (
-                      <button onClick={() => setPageTab('forms')} className="text-xs text-[#323393] hover:underline mt-1">
+                      <button onClick={() => setPageTab('forms')} className="text-xs text-[#009CD1] hover:underline mt-1">
                         Nộp biểu mẫu đầu tiên
                       </button>
                     )}

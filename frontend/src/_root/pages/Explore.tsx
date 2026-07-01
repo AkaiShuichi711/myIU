@@ -7,7 +7,7 @@ import { useGetInfinitePosts, useSearchPosts } from '@/lib/react-query/queriesAn
 import { PostCard, GridPostList } from '@/components/shared';
 import { useDebounce } from '@/hooks/useDebounce';
 
-const searchInputCls = "w-full pl-9 pr-8 py-2.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#323393]/20 focus:border-[#323393] transition-all";
+const searchInputCls = "w-full pl-9 pr-8 py-2.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#009CD1]/20 focus:border-[#009CD1] transition-all";
 
 const Explore = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -69,14 +69,14 @@ const Explore = () => {
           <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-700 rounded-xl p-1 shrink-0">
             <button
               onClick={() => setViewMode('feed')}
-              className={`p-2 rounded-lg transition-all ${viewMode === 'feed' ? 'bg-white dark:bg-slate-600 shadow-sm text-[#323393]' : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'}`}
+              className={`p-2 rounded-lg transition-all ${viewMode === 'feed' ? 'bg-white dark:bg-slate-600 shadow-sm text-[#009CD1]' : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'}`}
               title="Feed view"
             >
               <List size={16} />
             </button>
             <button
               onClick={() => setViewMode('grid')}
-              className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-white dark:bg-slate-600 shadow-sm text-[#323393]' : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'}`}
+              className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-white dark:bg-slate-600 shadow-sm text-[#009CD1]' : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'}`}
               title="Grid view"
             >
               <LayoutGrid size={16} />
@@ -144,7 +144,7 @@ const Explore = () => {
         {!isSearchMode && (
           <div ref={loadMoreRef} className="py-8 flex justify-center">
             {isFetchingNextPage && (
-              <Loader2 size={20} className="animate-spin text-[#323393]" />
+              <Loader2 size={20} className="animate-spin text-[#009CD1]" />
             )}
             {!hasNextPage && posts.length > 0 && (
               <p className="text-xs text-slate-400 dark:text-slate-500">{t('explore.seenAll')}</p>

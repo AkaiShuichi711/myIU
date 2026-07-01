@@ -159,10 +159,10 @@ const AuthLayout = () => {
         </div>
 
         <span className="text-[#94A3B8] text-xs text-center sm:text-left leading-relaxed">
-          <strong className="text-[#323393] font-medium">{t("footer.request")}:</strong>{" "}
+          <strong className="text-[#009CD1] font-medium">{t("footer.request")}:</strong>{" "}
           http://cis.hcmiu.edu.vn/gui-yeu-cau
           <br />
-          <strong className="text-[#323393] font-medium">{t("footer.tel")}:</strong>{" "}
+          <strong className="text-[#009CD1] font-medium">{t("footer.tel")}:</strong>{" "}
           (08) 37244270 ext.3366
         </span>
       </div>

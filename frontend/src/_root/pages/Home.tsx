@@ -27,7 +27,7 @@ const SectionHeader = ({ title, to }: { title: string; to: string }) => (
     <h2 className="text-[15px] font-bold text-slate-900 dark:text-[#e8edf0] tracking-tight">{title}</h2>
     <Link
       to={to}
-      className="flex items-center gap-1 text-[12px] font-semibold text-[#323393] hover:opacity-80 transition-opacity"
+      className="flex items-center gap-1 text-[12px] font-semibold text-[#009CD1] hover:opacity-80 transition-opacity"
     >
       Xem tất cả <ArrowUpRight size={12} />
     </Link>
@@ -103,7 +103,7 @@ const Home = () => {
                 <p className="text-2xl font-extrabold text-slate-900 dark:text-[#e8edf0] leading-none tracking-tight">
                   {value}
                 </p>
-                <p className="text-[11px] text-[#323393] font-semibold mt-0.5">{sub}</p>
+                <p className="text-[11px] text-[#009CD1] font-semibold mt-0.5">{sub}</p>
               </div>
             ))}
           </div>
@@ -121,7 +121,7 @@ const Home = () => {
             <SectionHeader title="Khóa học đang học" to="/courses" />
             {loadingCourses ? (
               <div className="flex justify-center py-6">
-                <Loader2 size={20} className="animate-spin text-[#323393]" />
+                <Loader2 size={20} className="animate-spin text-[#009CD1]" />
               </div>
             ) : courses.length === 0 ? (
               <div className="bg-white dark:bg-[#1e2028] rounded-2xl border border-[#E0E4EB] dark:border-[#33485c] flex flex-col items-center py-6 gap-2">
@@ -177,7 +177,7 @@ const Home = () => {
             <div className="bg-white dark:bg-[#1e2028] rounded-2xl border border-[#E0E4EB] dark:border-[#33485c] flex flex-col items-center py-6 gap-2">
               <Star size={22} className="text-slate-200 dark:text-[#33485c]" />
               <p className="text-sm text-slate-400">Chưa có điểm nào</p>
-              <Link to="/courses" className="text-xs text-[#323393] hover:underline mt-0.5">
+              <Link to="/courses" className="text-xs text-[#009CD1] hover:underline mt-0.5">
                 Vào khóa học để xem điểm →
               </Link>
             </div>
@@ -196,7 +196,7 @@ const Home = () => {
             <div className="bg-white dark:bg-[#1e2028] rounded-2xl border border-[#E0E4EB] dark:border-[#33485c] overflow-hidden">
               {loadingNotifs ? (
                 <div className="flex justify-center py-6">
-                  <Loader2 size={18} className="animate-spin text-[#323393]" />
+                  <Loader2 size={18} className="animate-spin text-[#009CD1]" />
                 </div>
               ) : notifs.length === 0 ? (
                 <div className="flex flex-col items-center py-6 gap-2">
@@ -229,13 +229,13 @@ const Home = () => {
             <div className="bg-white dark:bg-[#1e2028] rounded-2xl border border-[#E0E4EB] dark:border-[#33485c] overflow-hidden">
               {loadingForms ? (
                 <div className="flex justify-center py-6">
-                  <Loader2 size={18} className="animate-spin text-[#323393]" />
+                  <Loader2 size={18} className="animate-spin text-[#009CD1]" />
                 </div>
               ) : forms.length === 0 ? (
                 <div className="flex flex-col items-center py-6 gap-2">
                   <FileText size={20} className="text-slate-200 dark:text-[#33485c]" />
                   <p className="text-xs text-slate-400">Chưa có biểu mẫu nào</p>
-                  <Link to="/forms" className="text-xs text-[#323393] hover:underline mt-0.5">
+                  <Link to="/forms" className="text-xs text-[#009CD1] hover:underline mt-0.5">
                     Nộp biểu mẫu →
                   </Link>
                 </div>

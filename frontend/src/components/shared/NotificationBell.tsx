@@ -13,7 +13,7 @@ import { QUERY_KEYS } from '@/lib/react-query/queriesAndMutations';
 
 const ICON_MAP: Record<string, React.ReactNode> = {
   like: <Heart size={13} className="text-red-400" fill="#f87171" />,
-  comment: <MessageCircle size={13} className="text-[#323393]" />,
+  comment: <MessageCircle size={13} className="text-[#009CD1]" />,
   mention: <AtSign size={13} className="text-purple-400" />,
   tag: <AtSign size={13} className="text-green-400" />,
 };
@@ -91,7 +91,7 @@ const NotificationBell = () => {
           <div className="max-h-[340px] overflow-y-auto">
             {isPending ? (
               <div className="flex justify-center py-8">
-                <Loader2 size={20} className="animate-spin text-[#323393]" />
+                <Loader2 size={20} className="animate-spin text-[#009CD1]" />
               </div>
             ) : preview.length === 0 ? (
               <div className="flex flex-col items-center py-10 gap-2 text-center">
@@ -139,7 +139,7 @@ const NotificationBell = () => {
               <Link
                 to="/notifications"
                 onClick={() => setOpen(false)}
-                className="block text-center text-xs font-semibold text-[#323393] hover:underline"
+                className="block text-center text-xs font-semibold text-[#009CD1] hover:underline"
               >
                 Xem tất cả thông báo
               </Link>

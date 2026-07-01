@@ -207,7 +207,7 @@ const PostCard = ({ post, savedRecords = [] }: PostCardProps) => {
           {Array.isArray(post.tags) && post.tags.filter(Boolean).length > 0 && (
             <div className="flex flex-wrap gap-1">
               {post.tags.filter(Boolean).map((tag: string) => (
-                <span key={tag} className="text-[#323393] font-medium">#{tag}</span>
+                <span key={tag} className="text-[#009CD1] font-medium">#{tag}</span>
               ))}
             </div>
           )}

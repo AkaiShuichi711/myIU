@@ -6,7 +6,7 @@ import { useCreateFormSubmission } from '@/lib/react-query/queriesAndMutations';
 import { api } from '@/lib/api/client';
 import type { IFormTemplate } from '@/types';
 
-const inputCls = 'w-full px-3 py-2 text-sm rounded-lg bg-slate-50 dark:bg-slate-700/60 border border-slate-200 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#323393]/25 focus:border-[#323393] transition-all';
+const inputCls = 'w-full px-3 py-2 text-sm rounded-lg bg-slate-50 dark:bg-slate-700/60 border border-slate-200 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#009CD1]/25 focus:border-[#009CD1] transition-all';
 
 type Suggestion = { name: string; email: string };
 
@@ -166,7 +166,7 @@ const FormSubmitModal = ({ template, onClose, onSuccess }: Props) => {
               <a
                 href={template.fileUrl}
                 download={template.fileName}
-                className="text-xs text-[#323393] hover:underline font-medium"
+                className="text-xs text-[#009CD1] hover:underline font-medium"
               >
                 Tải template gốc ({template.fileName || template.title})
               </a>
@@ -179,13 +179,13 @@ const FormSubmitModal = ({ template, onClose, onSuccess }: Props) => {
               File biểu mẫu đã điền *
             </label>
             <label className={`flex items-center gap-3 cursor-pointer px-3 py-2.5 rounded-lg border-2 border-dashed transition-colors ${
-              file ? 'border-[#323393]/40 bg-[#323393]/4' : 'border-slate-200 dark:border-slate-600 hover:border-[#4040aa]/40'
+              file ? 'border-[#009CD1]/40 bg-[#323393]/4' : 'border-slate-200 dark:border-slate-600 hover:border-[#4040aa]/40'
             }`}>
-              <Upload size={15} className={file ? 'text-[#323393]' : 'text-slate-400'} />
+              <Upload size={15} className={file ? 'text-[#009CD1]' : 'text-slate-400'} />
               <span className="text-sm text-slate-600 dark:text-slate-300 truncate flex-1">
                 {file ? file.name : 'Chọn file (PDF, DOCX, …)'}
               </span>
-              {file && <Check size={14} className="text-[#323393] shrink-0" />}
+              {file && <Check size={14} className="text-[#009CD1] shrink-0" />}
               <input
                 type="file"
                 className="hidden"
@@ -213,7 +213,7 @@ const FormSubmitModal = ({ template, onClose, onSuccess }: Props) => {
                 <Loader2 size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 animate-spin" />
               )}
               {approverName && !isSearching && (
-                <Check size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#323393]" />
+                <Check size={12} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#009CD1]" />
               )}
             </div>
 
@@ -238,7 +238,7 @@ const FormSubmitModal = ({ template, onClose, onSuccess }: Props) => {
             )}
 
             {approverName && (
-              <p className="text-xs text-[#323393] mt-1 flex items-center gap-1">
+              <p className="text-xs text-[#009CD1] mt-1 flex items-center gap-1">
                 <Check size={11} /> {approverName}
               </p>
             )}

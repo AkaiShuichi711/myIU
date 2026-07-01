@@ -103,7 +103,7 @@ const FormReviewPage = () => {
   if (isPending) {
     return (
       <div className="min-h-full bg-[#F8FAFC] dark:bg-slate-900 flex items-center justify-center">
-        <Loader2 size={24} className="animate-spin text-[#323393]" />
+        <Loader2 size={24} className="animate-spin text-[#009CD1]" />
       </div>
     );
   }
@@ -114,7 +114,7 @@ const FormReviewPage = () => {
         <div className="text-center">
           <AlertTriangle size={32} className="text-slate-300 mx-auto mb-3" />
           <p className="text-slate-500 dark:text-slate-400">Không tìm thấy yêu cầu này.</p>
-          <button onClick={() => navigate(-1)} className="mt-3 text-sm text-[#323393] hover:underline">Quay lại</button>
+          <button onClick={() => navigate(-1)} className="mt-3 text-sm text-[#009CD1] hover:underline">Quay lại</button>
         </div>
       </div>
     );
@@ -203,7 +203,7 @@ const FormReviewPage = () => {
         {isApprover && isStatusPending && !actionDone && (
           <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-5">
             <div className="flex items-center gap-2 mb-3">
-              <User size={14} className="text-[#323393]" />
+              <User size={14} className="text-[#009CD1]" />
               <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Bạn là người được chỉ định duyệt</p>
             </div>
 

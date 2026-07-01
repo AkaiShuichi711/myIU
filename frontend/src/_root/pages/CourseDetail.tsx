@@ -34,8 +34,8 @@ type PostType = 'announcement' | 'material' | 'assignment';
 const TYPE_META: Record<PostType, { label: string; color: string; border: string; bg: string; icon: typeof Megaphone }> = {
   announcement: {
     label: 'THÔNG BÁO',
-    color: 'text-[#323393]',
-    border: 'border-l-[3px] border-[#323393]',
+    color: 'text-[#009CD1]',
+    border: 'border-l-[3px] border-[#009CD1]',
     bg: 'bg-[#323393]/6 dark:bg-[#323393]/10',
     icon: Megaphone,
   },
@@ -424,14 +424,14 @@ const CourseDetail = () => {
               onClick={() => setTab(tid)}
               className={`px-4 py-2.5 text-xs font-semibold border-b-2 transition-all ${
                 tab === tid
-                  ? 'border-[#323393] text-[#323393]'
+                  ? 'border-[#009CD1] text-[#009CD1]'
                   : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
               }`}
             >
               {label}
               {count !== undefined && count > 0 && (
                 <span className={`ml-1.5 px-1.5 py-0.5 rounded-full text-[9px] font-bold ${
-                  tab === tid ? 'bg-[#323393]/12 text-[#323393]' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
+                  tab === tid ? 'bg-[#323393]/12 text-[#009CD1]' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
                 }`}>{count}</span>
               )}
             </button>
@@ -652,7 +652,7 @@ const CourseDetail = () => {
                 {GRADE_COMPONENTS.map((c) => (
                   <div key={c.key} className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600">
                     <span className="text-xs font-semibold text-slate-700 dark:text-slate-200">{c.label}</span>
-                    <span className="text-[10px] font-bold text-[#323393] bg-[#323393]/10 px-1.5 py-0.5 rounded-full">{c.weight}%</span>
+                    <span className="text-[10px] font-bold text-[#009CD1] bg-[#323393]/10 px-1.5 py-0.5 rounded-full">{c.weight}%</span>
                   </div>
                 ))}
               </div>
@@ -717,7 +717,7 @@ const CourseDetail = () => {
                                           [st.studentId]: { ...(prev[st.studentId] ?? scores), [c.key]: v },
                                         }));
                                       }}
-                                      className="w-14 text-center text-xs px-1 py-1 rounded-md bg-slate-50 dark:bg-slate-700/60 border border-slate-200 dark:border-slate-600 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-[#323393]/40 focus:border-[#323393]"
+                                      className="w-14 text-center text-xs px-1 py-1 rounded-md bg-slate-50 dark:bg-slate-700/60 border border-slate-200 dark:border-slate-600 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-[#009CD1]/40 focus:border-[#009CD1]"
                                     />
                                   </td>
                                 );
@@ -731,7 +731,7 @@ const CourseDetail = () => {
                                   return (
                                     <span className={`px-1.5 py-0.5 rounded text-[10px] font-black ${
                                       g >= 8.5 ? 'bg-[#00c578]/12 text-[#00c578]'
-                                      : g >= 7.0 ? 'bg-[#323393]/12 text-[#323393]'
+                                      : g >= 7.0 ? 'bg-[#323393]/12 text-[#009CD1]'
                                       : g >= 5.5 ? 'bg-[#f5832f]/12 text-[#f5832f]'
                                       : 'bg-[#ef4e49]/12 text-[#ef4e49]'
                                     }`}>{gradeLabel(g)}</span>
@@ -757,7 +757,7 @@ const CourseDetail = () => {
                                 </td>
                               );
                             })}
-                            <td className="px-3 py-2 text-center text-[11px] font-bold text-[#323393]">
+                            <td className="px-3 py-2 text-center text-[11px] font-bold text-[#009CD1]">
                               {(allGrades.reduce((s, st) => {
                                 const merged = { quiz: st.quiz ?? 0, exercise: st.exercise ?? 0, lab: st.lab ?? 0, midterm: st.midterm ?? 0, project: st.project ?? 0, final: st.final ?? 0, ...(editedScores[st.studentId] ?? {}) };
                                 return s + calcGpa(merged);
@@ -816,7 +816,7 @@ const CourseDetail = () => {
                   <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60">
                     <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Điểm của bạn — {myGrade.studentId}</p>
                     <span className={`px-2 py-0.5 rounded text-[11px] font-black ${
-                      gpa >= 8.5 ? 'bg-[#00c578]/12 text-[#00c578]' : gpa >= 7.0 ? 'bg-[#323393]/12 text-[#323393]' : gpa >= 5.5 ? 'bg-[#f5832f]/12 text-[#f5832f]' : 'bg-[#ef4e49]/12 text-[#ef4e49]'
+                      gpa >= 8.5 ? 'bg-[#00c578]/12 text-[#00c578]' : gpa >= 7.0 ? 'bg-[#323393]/12 text-[#009CD1]' : gpa >= 5.5 ? 'bg-[#f5832f]/12 text-[#f5832f]' : 'bg-[#ef4e49]/12 text-[#ef4e49]'
                     }`}>{gradeLabel(gpa)} — {gpa.toFixed(2)}</span>
                   </div>
                   <div className="divide-y divide-slate-50 dark:divide-slate-700/40">
@@ -849,7 +849,7 @@ const CourseDetail = () => {
                     <div className="flex items-center gap-3">
                       <span className="text-lg font-black text-slate-800 dark:text-slate-100">{gpa.toFixed(2)}<span className="text-sm font-normal text-slate-400"> / 10</span></span>
                       <span className={`px-2.5 py-1 rounded-lg text-sm font-black ${
-                        gpa >= 8.5 ? 'bg-[#00c578]/15 text-[#00c578]' : gpa >= 7.0 ? 'bg-[#323393]/15 text-[#323393]' : gpa >= 5.5 ? 'bg-[#f5832f]/15 text-[#f5832f]' : 'bg-[#ef4e49]/15 text-[#ef4e49]'
+                        gpa >= 8.5 ? 'bg-[#00c578]/15 text-[#00c578]' : gpa >= 7.0 ? 'bg-[#323393]/15 text-[#009CD1]' : gpa >= 5.5 ? 'bg-[#f5832f]/15 text-[#f5832f]' : 'bg-[#ef4e49]/15 text-[#ef4e49]'
                       }`}>{gradeLabel(gpa)}</span>
                     </div>
                   </div>

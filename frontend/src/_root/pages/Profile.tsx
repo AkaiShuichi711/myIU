@@ -46,7 +46,7 @@ const ProfilePage = () => {
   if (isLoadingUser && !profileData) {
     return (
       <div className="min-h-full bg-[#F8FAFC] dark:bg-slate-900 flex items-center justify-center">
-        <Loader2 size={24} className="animate-spin text-[#323393]" />
+        <Loader2 size={24} className="animate-spin text-[#009CD1]" />
       </div>
     );
   }
@@ -82,7 +82,7 @@ const ProfilePage = () => {
           {isOwnProfile && (
             <Link
               to={`/update-profile/${currentUser.id}`}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-[#323393] dark:text-blue-400 bg-[#323393]/8 dark:bg-[#323393]/20 hover:bg-[#323393]/12 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-[#009CD1] dark:text-blue-400 bg-[#323393]/8 dark:bg-[#323393]/20 hover:bg-[#323393]/12 transition-colors"
             >
               <Edit3 size={13} /> {t('profile.editProfile')}
             </Link>
@@ -168,7 +168,7 @@ const ProfilePage = () => {
           <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
             <div className="flex items-center gap-3 px-5 py-4 border-b border-slate-50 dark:border-slate-700">
               <div className="w-8 h-8 rounded-lg bg-[#323393]/10 dark:bg-[#323393]/20 flex items-center justify-center">
-                <User size={15} className="text-[#323393]" />
+                <User size={15} className="text-[#009CD1]" />
               </div>
               <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">{t('profile.microsoftIdentity')}</p>
               {isLoadingGraph && <Loader2 size={13} className="animate-spin text-slate-400 ml-auto" />}

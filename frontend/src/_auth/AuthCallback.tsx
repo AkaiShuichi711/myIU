@@ -25,7 +25,7 @@ const AuthCallback = () => {
 
   return (
     <div className="h-screen w-full flex items-center justify-center bg-white">
-      <Loader2 className="h-8 w-8 animate-spin text-[#323393]" />
+      <Loader2 className="h-8 w-8 animate-spin text-[#009CD1]" />
     </div>
   );
 };
