@@ -66,7 +66,7 @@ const AuthLayout = () => {
       {/* === MAIN CONTENT SECTION === */}
       <main className="flex flex-1 w-full min-h-0">
         {/* === LEFT SIDE: AUTH FORM === */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center px-6 bg-gradient-to-br from-[#050d1f] via-[#0a1a35] to-[#0d2d55] overflow-auto">
+        <div className="w-full lg:w-1/2 flex items-center justify-center px-6 bg-gradient-to-br from-[#0f0d3d] via-[#1e1b6e] to-[#2e2c8e] overflow-auto">
           <div className="w-full max-w-md overflow-auto">
             <Outlet />
           </div>
