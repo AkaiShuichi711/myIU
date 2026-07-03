@@ -82,7 +82,7 @@ const AuthLayout = () => {
               spaceBetween={0}
               slidesPerView={1}
               pagination={{ type: "progressbar" }}
-              autoplay={{ delay: 1000, disableOnInteraction: false }}
+              autoplay={{ delay: 3500, disableOnInteraction: false }}
               loop={carouselImages.length > 1}
               className="w-full h-full [&_.swiper-pagination-progressbar]:bottom-0"
               style={swiperStyle}
