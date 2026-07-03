@@ -1,5 +1,5 @@
 ﻿import { Link } from 'react-router-dom';
-import { BookOpen, Bell, FileText, ChevronRight, GraduationCap, Star, Loader2, ArrowUpRight } from 'lucide-react';
+import { BookOpen, Bell, FileText, GraduationCap, Star, Loader2, ArrowUpRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useUserContext } from '@/context/AuthContext';
 import {
@@ -58,7 +58,8 @@ const Home = () => {
   const pendingCount  = forms.filter((f: any) => f.status === 'pending').length;
   const activeCourses = courses.filter((c: any) => c.isActive !== false).length;
 
-  const firstName = user.name?.trim().split(/\s+/).at(-1) ?? user.name;
+  const nameParts = user.name?.trim().split(/\s+/) ?? [];
+  const firstName = nameParts[nameParts.length - 1] ?? user.name;
   const now = new Date();
   const dateStr = now.toLocaleDateString('vi-VN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
@@ -263,8 +264,8 @@ const Home = () => {
                           <p className="text-[12.5px] font-medium text-slate-700 dark:text-[#bfc6cc] truncate">{f.formTitle}</p>
                           <p className="text-[10px] text-slate-400 dark:text-[#4d6070] mt-0.5">{formatTimeAgo(f.$createdAt)}</p>
                         </div>
-                        <span className={`flex items-center justify-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold shrink-0 w-[118px] ${st.cls}`}>
-                          <StatusIcon size={10} /> {st.label}
+                        <span className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold shrink-0 whitespace-nowrap ${st.cls}`}>
+                          <StatusIcon size={9} /> {st.label}
                         </span>
                       </Link>
                     );
