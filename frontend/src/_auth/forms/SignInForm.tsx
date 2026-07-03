@@ -37,7 +37,7 @@ const SignInForm = () => {
 
   return (
     <div className="flex flex-col items-center">
-      <div className="relative bg-white px-8 py-8 w-[400px] max-w-full rounded-2xl overflow-hidden" >
+      <div className="relative bg-white px-8 py-8 w-[400px] max-w-full rounded-2xl overflow-hidden" style={{ boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}>
         {/* Logo */}
         <div className="flex justify-center mb-6">
           <img src="/assets/images/logo_beforesignin.svg" alt="myIU" className="max-w-full h-auto" />
@@ -70,7 +70,7 @@ const SignInForm = () => {
           type="button"
           onClick={handleMicrosoftSignIn}
           disabled={isLoading}
-          className="w-full bg-gradient-to-r from-[#393323] to-[#009CD1] hover:from-[#393323] hover:to-[#009CD1] text-white h-12 flex items-center justify-center gap-3 text-[14px] font-semibold rounded-xl transition-all duration-200 hover:-translate-y-0.5"         >
+          className="w-full bg-gradient-to-r from-[#0068ff] to-[#009CD1] text-white h-12 flex items-center justify-center gap-3 text-[14px] font-semibold rounded-xl transition-all duration-200 hover:-translate-y-0.5"         >
           {isLoading ? (
             <div className="flex items-center gap-2">
               <Loader />
