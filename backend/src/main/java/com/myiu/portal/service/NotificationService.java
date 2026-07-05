@@ -4,6 +4,7 @@ import com.myiu.portal.dto.NotificationDTO;
 import com.myiu.portal.entity.*;
 import com.myiu.portal.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +17,7 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
     public List<NotificationDTO> getForUser(UUID userId) {
         return notificationRepository.findByUserIdOrderByCreatedAtDesc(userId)
@@ -41,6 +43,17 @@ public class NotificationService {
                 .message(message).read(false).linkTo(linkTo)
                 .build();
         notificationRepository.save(n);
+
+        // Push real-time via WebSocket — principal name = email (JWT subject)
+        try {
+            messagingTemplate.convertAndSendToUser(
+                user.getEmail(),
+                "/queue/notifications",
+                toDTO(n)
+            );
+        } catch (Exception ignored) {
+            // WebSocket push is best-effort; notification is already persisted
+        }
     }
 
     private NotificationDTO toDTO(Notification n) {

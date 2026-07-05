@@ -6,7 +6,7 @@ import {
   UserCheck, Info,
 } from 'lucide-react';
 import { useUserContext } from '@/context/AuthContext';
-import { isLecturerRole } from '@/lib/utils';
+import { isAdminRole, isLecturerRole } from '@/lib/utils';
 import {
   useGetCoursesByLecturer,
   useGetCoursesByStudent,
@@ -61,12 +61,13 @@ const CoursesPage = () => {
   const navigate = useNavigate();
 
   const isLecturer = isLecturerRole(user.roles);
+  const isAdmin    = isAdminRole(user.roles);
   const isStudent  = !isLecturer;
 
   const [tab, setTab] = useState<'teaching' | 'learning'>(isLecturer ? 'teaching' : 'learning');
 
-  const { data: teachingCourses = [], isPending: loadingTeaching } = useGetCoursesByLecturer(user.id);
-  const { data: learningCourses  = [], isPending: loadingLearning  } = useGetCoursesByStudent(user.id);
+  const { data: teachingCourses = [], isPending: loadingTeaching } = useGetCoursesByLecturer(user.id, isLecturer || isAdmin);
+  const { data: learningCourses  = [], isPending: loadingLearning  } = useGetCoursesByStudent(user.id, !isLecturer && !isAdmin);
 
   const isLoading = tab === 'teaching' ? loadingTeaching : loadingLearning;
   const rawCourses = (tab === 'teaching' ? teachingCourses : learningCourses) as any[];

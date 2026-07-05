@@ -349,8 +349,11 @@ export async function getNotifications(_userId: string) {
 }
 
 export async function markNotificationRead(_notificationId: string) {
-  // backend only supports mark-all; individual mark can be added later
-  return null;
+  // Backend has no per-notification mark-read endpoint yet.
+  // Fall back to mark-all so the UI state stays consistent after refetch.
+  try {
+    await api.post('/api/notifications/mark-all-read');
+  } catch { /* silent */ }
 }
 
 export async function markAllNotificationsRead(_userId: string) {
@@ -588,4 +591,28 @@ export async function getMySupportTickets() {
   try {
     return normList(await api.get<any[]>('/api/support/mine'));
   } catch { return []; }
+}
+
+// ─── TIMETABLE ────────────────────────────────────────────────────────────────
+
+export async function getTimetable() {
+  try {
+    return await api.get<any[]>('/api/timetable');
+  } catch { return []; }
+}
+
+export async function getCourseSchedules(courseId: string) {
+  try {
+    return await api.get<any[]>(`/api/courses/${courseId}/schedules`);
+  } catch { return []; }
+}
+
+export async function createCourseSchedule(courseId: string, data: {
+  dayOfWeek: string; startTime: string; endTime: string; room?: string;
+}) {
+  return api.post<any>(`/api/courses/${courseId}/schedules`, data);
+}
+
+export async function deleteCourseSchedule(scheduleId: string) {
+  return api.delete(`/api/course-schedules/${scheduleId}`);
 }

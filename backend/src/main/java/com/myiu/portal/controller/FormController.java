@@ -3,6 +3,7 @@ package com.myiu.portal.controller;
 import com.myiu.portal.dto.ApiResponse;
 import com.myiu.portal.entity.*;
 import com.myiu.portal.repository.*;
+import com.myiu.portal.service.EmailService;
 import com.myiu.portal.service.StorageService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ public class FormController {
     private final FormSubmissionRepository formSubmissionRepository;
     private final UserRepository userRepository;
     private final StorageService storageService;
+    private final EmailService emailService;
 
     private UUID currentUserId(UserDetails principal) {
         return userRepository.findByEmail(principal.getUsername()).orElseThrow().getId();
@@ -119,7 +121,19 @@ public class FormController {
                 .orElseThrow(() -> new RuntimeException("Submission not found"));
         s.setStatus(req.getStatus());
         if (req.getRejectionReason() != null) s.setRejectionReason(req.getRejectionReason());
-        return ResponseEntity.ok(ApiResponse.ok(formSubmissionRepository.save(s)));
+        FormSubmission saved = formSubmissionRepository.save(s);
+
+        String email = saved.getSubmitterEmail();
+        String name  = saved.getSubmitterName() != null ? saved.getSubmitterName() : "Sinh viên";
+        String title = saved.getFormTitle() != null ? saved.getFormTitle() : "Đơn của bạn";
+        String sid   = saved.getId().toString();
+        if ("approved".equalsIgnoreCase(saved.getStatus()) && email != null) {
+            emailService.sendFormApproved(email, name, title, sid);
+        } else if ("rejected".equalsIgnoreCase(saved.getStatus()) && email != null) {
+            emailService.sendFormRejected(email, name, title, saved.getRejectionReason(), sid);
+        }
+
+        return ResponseEntity.ok(ApiResponse.ok(saved));
     }
 
     @PostMapping("/submissions/{id}/upload")

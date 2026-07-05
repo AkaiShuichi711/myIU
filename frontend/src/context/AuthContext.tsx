@@ -90,7 +90,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const TENANT = 'a7380202-eb54-415a-9b66-4d9806cfab42';
+  const TENANT = import.meta.env.VITE_AD_TENANT_ID || 'a7380202-eb54-415a-9b66-4d9806cfab42';
   const MS_LOGOUT = `https://login.microsoftonline.com/${TENANT}/oauth2/v2.0/logout`
     + `?post_logout_redirect_uri=${encodeURIComponent(`${import.meta.env.VITE_APP_URL || window.location.origin}/sign-in`)}`;
 
@@ -117,7 +117,14 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     checkAuthUser,
     signIn: signIn as any,
     signOut,
+    // TODO: implement via MSAL — call msalInstance.acquireTokenSilent() then
+    //   GET https://graph.microsoft.com/v1.0/me
+    //   Expected shape: { displayName, userPrincipalName, jobTitle, mail }
     getProfileData: async () => ({}),
+    // TODO: implement via MSAL — combine account idTokenClaims, Graph /me, and ARM
+    //   GET https://management.azure.com/tenants?api-version=2020-01-01
+    //   Expected shape: { tenantId, clientId, objectId, name, email, username,
+    //                     issuer, displayName, idTokenClaims, graphProfile, armTenant }
     getTenantData: async () => ({}),
   };
 

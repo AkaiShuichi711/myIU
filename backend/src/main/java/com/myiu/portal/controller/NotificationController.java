@@ -41,4 +41,15 @@ public class NotificationController {
         notificationService.markAllRead(currentUserId(principal));
         return ResponseEntity.ok(ApiResponse.ok(null));
     }
+
+    /** DEV ONLY — tạo notification test cho chính mình */
+    @PostMapping("/test")
+    public ResponseEntity<ApiResponse<Void>> createTest(
+            @AuthenticationPrincipal UserDetails principal,
+            @RequestParam(defaultValue = "system") String type,
+            @RequestParam(defaultValue = "Test notification") String message,
+            @RequestParam(defaultValue = "/home") String linkTo) {
+        notificationService.create(currentUserId(principal), type, null, null, null, null, message, linkTo);
+        return ResponseEntity.ok(ApiResponse.ok(null));
+    }
 }

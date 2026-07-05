@@ -87,16 +87,6 @@ export type IUpdateUser = {
   file: File[];
 };
 
-export type PaspdatePost = {
-  postId: string;
-  file: FileList | File[];
-  imageUrl?: string;
-  imageId: string;
-  caption?: string;
-  location?: string;
-  tags?: string;
-};
-
 // ─── Phase 2 Types ─────────────────────────────────────────────────────────────
 
 export type IComment = {
@@ -120,14 +110,6 @@ export type INotification = {
   commentId?: string;
   message: string;
   read: boolean;
-  $createdAt: string;
-};
-
-export type IBlock = {
-  $id: string;
-  blockerId: string;
-  blockedId: string;
-  blockedName: string;
   $createdAt: string;
 };
 

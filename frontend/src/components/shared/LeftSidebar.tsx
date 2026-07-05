@@ -2,7 +2,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import {
   User, Network, Bell, Settings, BookOpen, FileText, Home,
-  ChevronLeft, ChevronRight, GraduationCap, Headset, Mail,
+  ChevronLeft, ChevronRight, GraduationCap, Headset, Mail, CalendarDays,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useUserContext } from '@/context/AuthContext';
@@ -13,10 +13,11 @@ const NAV_SECTIONS = [
   {
     sectionKey: 'nav.sectionAcademic',
     links: [
-      { labelKey: 'nav.home',    route: '/home',    icon: Home },
-      { labelKey: 'nav.courses', route: '/courses', icon: BookOpen },
-      { labelKey: 'nav.forms',   route: '/forms',   icon: FileText },
-      { labelKey: 'nav.mail',    route: '',         icon: Mail, href: 'https://outlook.office365.com/mail/' },
+      { labelKey: 'nav.home',      route: '/home',      icon: Home },
+      { labelKey: 'nav.timetable', route: '/timetable', icon: CalendarDays },
+      { labelKey: 'nav.courses',   route: '/courses',   icon: BookOpen },
+      { labelKey: 'nav.forms',     route: '/forms',     icon: FileText },
+      { labelKey: 'nav.mail',      route: '',           icon: Mail, href: 'https://outlook.office365.com/mail/' },
     ],
   },
   {
@@ -87,8 +88,9 @@ const LeftSidebar = () => {
               const Icon = link.icon;
               const isActive =
                 pathname === link.route ||
-                (link.route === '/courses' && pathname.startsWith('/courses')) ||
-                (link.route === '/forms'   && pathname.startsWith('/forms'));
+                (link.route === '/courses'   && pathname.startsWith('/courses')) ||
+                (link.route === '/forms'     && pathname.startsWith('/forms')) ||
+                (link.route === '/timetable' && pathname.startsWith('/timetable'));
 
               const badge =
                 (link as any).badge === 'notifs' && unreadCount > 0 ? unreadCount : null;

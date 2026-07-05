@@ -1,8 +1,9 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import {
-  Home, FileText, Download, Plus, Pencil, Trash2,
+  FileText, Download, Plus, Pencil, Trash2,
   Loader2, X, Check, ExternalLink, Send, Inbox, Search, FolderOpen,
+  Clock, CheckCircle2, XCircle, ChevronRight, ArrowUpDown,
 } from 'lucide-react';
 import { useUserContext } from '@/context/AuthContext';
 import { isAdminRole } from '@/lib/utils';
@@ -18,50 +19,35 @@ import type { FormCategory, FormFileType, IFormTemplate, IFormSubmission } from 
 import FormSubmitModal from '@/components/shared/FormSubmitModal';
 import { FORM_STATUS, FILE_TYPE_META, FORM_CATEGORIES, INPUT_CLS } from '@/constants/ui';
 
-const SubmissionRow = ({ sub, mode = 'mine' }: { sub: IFormSubmission; mode?: 'mine' | 'review' }) => {
-  const meta = FORM_STATUS[sub.status] ?? FORM_STATUS.pending;
-  const StatusIcon = meta.Icon;
-  const dateStr = sub.$createdAt
-    ? (() => { try { return new Date(sub.$createdAt).toLocaleDateString('vi-VN'); } catch { return '—'; } })()
-    : '—';
-  return (
-    <Link
-      to={`/forms/review/${sub.$id}`}
-      className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors"
-    >
-      <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-700 flex items-center justify-center shrink-0">
-        <FileText size={14} className="text-slate-400 dark:text-slate-500" />
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 truncate">{sub.formTitle ?? '—'}</p>
-        <p className="text-xs text-slate-400 dark:text-slate-500 truncate mt-0.5">
-          {mode === 'review'
-            ? `Từ: ${sub.submitterName || sub.submitterEmail || '—'}`
-            : `Người duyệt: ${sub.approverName || sub.approverEmail || '—'}`}
-        </p>
-      </div>
-      <div className="flex items-center gap-2 shrink-0">
-        <span className={`flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold ${meta.color} ${meta.bg}`}>
-          <StatusIcon size={10} /> {meta.label}
-        </span>
-        <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono">{dateStr}</span>
-      </div>
-    </Link>
-  );
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function fmtDate(iso: string | undefined): string {
+  if (!iso) return '—';
+  try {
+    const d = new Date(iso);
+    return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+  } catch { return '—'; }
+}
+
+// ── Stat card ─────────────────────────────────────────────────────────────────
+const STAT_COLORS = {
+  sky:     { text: 'text-sky-600 dark:text-sky-400'     },
+  amber:   { text: 'text-amber-600 dark:text-amber-400'   },
+  emerald: { text: 'text-emerald-600 dark:text-emerald-400' },
+  rose:    { text: 'text-rose-600 dark:text-rose-400'    },
 };
+type StatColor = keyof typeof STAT_COLORS;
 
-// ── Constants ─────────────────────────────────────────────────────────────────
-
-const BLANK_FORM = {
-  title: '',
-  description: '',
-  fileUrl: '',
-  fileName: '',
-  fileType: 'pdf' as FormFileType,
-  category: 'academic' as FormCategory,
-  sortOrder: 0,
-  isActive: true,
-  createdBy: '',
+const StatCard = ({ label, value, color, icon: Icon }: { label: string; value: number; color: StatColor; icon: typeof Clock }) => {
+  const c = STAT_COLORS[color];
+  return (
+    <div className="flex items-center gap-3 px-4 py-3 rounded-xl border border-slate-100 dark:border-slate-700/40 bg-white dark:bg-[#19191a]">
+      <Icon size={18} className={c.text} />
+      <div>
+        <p className={`text-xl font-bold leading-none ${c.text}`}>{value}</p>
+        <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{label}</p>
+      </div>
+    </div>
+  );
 };
 
 // ── File type badge ────────────────────────────────────────────────────────────
@@ -74,94 +60,146 @@ const FileTypeBadge = ({ type }: { type: FormFileType }) => {
   );
 };
 
-// ── Inline edit form ───────────────────────────────────────────────────────────
-type EditState = typeof BLANK_FORM;
+// ── Table column header ────────────────────────────────────────────────────────
+const TH = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
+  <th className={`px-4 py-2.5 text-left text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 whitespace-nowrap ${className}`}>
+    {children}
+  </th>
+);
 
+// ── Submission table row ───────────────────────────────────────────────────────
+const SubmissionRow = ({ sub, mode = 'mine' }: { sub: IFormSubmission; mode?: 'mine' | 'review' }) => {
+  const meta = FORM_STATUS[sub.status] ?? FORM_STATUS.pending;
+  const StatusIcon = meta.Icon;
+  return (
+    <tr className="group border-b border-slate-50 dark:border-slate-700/40 hover:bg-slate-50/80 dark:hover:bg-slate-700/20 transition-colors">
+      {/* Form name */}
+      <td className="px-4 py-3">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-700 flex items-center justify-center shrink-0">
+            <FileText size={13} className="text-slate-400 dark:text-slate-500" />
+          </div>
+          <Link
+            to={`/forms/review/${sub.$id}`}
+            className="text-[13px] font-semibold text-slate-800 dark:text-slate-100 hover:text-[#009CD1] transition-colors truncate max-w-[260px]"
+          >
+            {sub.formTitle ?? '—'}
+          </Link>
+        </div>
+      </td>
+
+      {/* Reviewer / Submitter */}
+      <td className="px-4 py-3">
+        <span className="text-xs text-slate-500 dark:text-slate-400 truncate block max-w-[180px]">
+          {mode === 'review'
+            ? (sub.submitterName || sub.submitterEmail || '—')
+            : (sub.approverName || sub.approverEmail || '—')}
+        </span>
+      </td>
+
+      {/* Date */}
+      <td className="px-4 py-3">
+        <span translate="no" className="text-xs text-slate-500 dark:text-slate-400 font-mono tabular-nums">
+          {fmtDate(sub.$createdAt)}
+        </span>
+      </td>
+
+      {/* Status */}
+      <td className="px-4 py-3">
+        <span translate="no" className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold ${meta.cls}`}>
+          <StatusIcon size={10} /> {meta.label}
+        </span>
+      </td>
+
+      {/* Action */}
+      <td className="px-4 py-3 text-right">
+        <Link
+          to={`/forms/review/${sub.$id}`}
+          className="inline-flex items-center gap-1 text-[11px] text-slate-400 hover:text-[#009CD1] font-medium transition-colors opacity-0 group-hover:opacity-100"
+        >
+          Chi tiết <ChevronRight size={12} />
+        </Link>
+      </td>
+    </tr>
+  );
+};
+
+// ── Form row (catalog tab) ─────────────────────────────────────────────────────
 const FormRow = ({
-  form,
-  isAdmin,
-  onEdit,
-  onDelete,
-  onSubmit,
+  form, isAdmin, onEdit, onDelete, onSubmit,
 }: {
-  form: IFormTemplate;
-  isAdmin: boolean;
+  form: IFormTemplate; isAdmin: boolean;
   onEdit: (f: IFormTemplate) => void;
   onDelete: (id: string) => void;
   onSubmit: (f: IFormTemplate) => void;
 }) => (
-  <div className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors group">
-    <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-700 flex items-center justify-center shrink-0">
-      <FileText size={14} className="text-slate-400 dark:text-slate-500" />
-    </div>
-    <div className="flex-1 min-w-0">
-      <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 truncate">{form.title}</p>
-      {form.description && (
-        <p className="text-xs text-slate-400 dark:text-slate-500 truncate mt-0.5">{form.description}</p>
-      )}
-    </div>
-    <div className="flex items-center gap-2 shrink-0">
-      <FileTypeBadge type={form.fileType} />
-      <a
-        href={form.fileUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        download={form.fileName || true}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition-all"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <Download size={12} /> Tải về
-      </a>
-      <button
-        onClick={() => onSubmit(form)}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-[#009CD1] hover:bg-[#0087b3] transition-all"
-      >
-        <Send size={12} /> Nộp
-      </button>
-      {isAdmin && (
-        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-          <button
-            onClick={() => onEdit(form)}
-            className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
-          >
-            <Pencil size={12} />
-          </button>
-          <button
-            onClick={() => onDelete(form.$id)}
-            className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:bg-red-100 dark:hover:bg-red-900/30 hover:text-red-500 transition-colors"
-          >
-            <Trash2 size={12} />
-          </button>
+  <tr className="group border-b border-slate-50 dark:border-slate-700/40 hover:bg-slate-50/80 dark:hover:bg-slate-700/20 transition-colors">
+    <td className="px-4 py-3">
+      <div className="flex items-center gap-2.5 min-w-0">
+        <div className="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-700 flex items-center justify-center shrink-0">
+          <FileText size={13} className="text-slate-400 dark:text-slate-500" />
         </div>
-      )}
-    </div>
-  </div>
+        <div className="min-w-0">
+          <p className="text-[13px] font-semibold text-slate-800 dark:text-slate-100 truncate">{form.title}</p>
+          {form.description && (
+            <p className="text-[11px] text-slate-400 dark:text-slate-500 truncate mt-0.5">{form.description}</p>
+          )}
+        </div>
+      </div>
+    </td>
+    <td className="px-4 py-3">
+      <FileTypeBadge type={form.fileType} />
+    </td>
+    <td className="px-4 py-3">
+      {(() => { const c = FORM_CATEGORIES.find(c => c.id === form.category); return c ? (
+        <span className="text-[11px] text-slate-500 dark:text-slate-400">{c.label}</span>
+      ) : null; })()}
+    </td>
+    <td className="px-4 py-3 text-right">
+      <div className="flex items-center justify-end gap-1.5">
+        <a
+          href={form.fileUrl} target="_blank" rel="noopener noreferrer" download={form.fileName || true}
+          onClick={(e) => e.stopPropagation()}
+          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition-all"
+        >
+          <Download size={11} /> Tải về
+        </a>
+        <button
+          onClick={() => onSubmit(form)}
+          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold text-white bg-[#009CD1] hover:bg-[#0087b3] transition-all"
+        >
+          <Send size={11} /> Nộp
+        </button>
+        {isAdmin && (
+          <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button onClick={() => onEdit(form)} className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600 hover:text-slate-600 transition-colors">
+              <Pencil size={12} />
+            </button>
+            <button onClick={() => onDelete(form.$id)} className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:bg-red-100 dark:hover:bg-red-900/30 hover:text-red-500 transition-colors">
+              <Trash2 size={12} />
+            </button>
+          </div>
+        )}
+      </div>
+    </td>
+  </tr>
 );
 
-// ── Edit / Create Panel ────────────────────────────────────────────────────────
-const EditPanel = ({
-  state,
-  onChange,
-  onSave,
-  onCancel,
-  isSaving,
-  isNew,
-}: {
-  state: EditState;
-  onChange: (k: keyof EditState, v: any) => void;
-  onSave: () => void;
-  onCancel: () => void;
-  isSaving: boolean;
-  isNew: boolean;
+// ── Edit panel ─────────────────────────────────────────────────────────────────
+const BLANK_FORM = { title:'', description:'', fileUrl:'', fileName:'', fileType:'pdf' as FormFileType, category:'academic' as FormCategory, sortOrder:0, isActive:true, createdBy:'' };
+type EditState = typeof BLANK_FORM;
+
+const EditPanel = ({ state, onChange, onSave, onCancel, isSaving, isNew }: {
+  state: EditState; onChange: (k: keyof EditState, v: any) => void;
+  onSave: () => void; onCancel: () => void; isSaving: boolean; isNew: boolean;
 }) => (
-  <div className="bg-white dark:bg-slate-800/80 rounded-xl border border-[#009CD1]/20 p-4 mb-4 flex flex-col gap-3">
-    <div className="flex items-center justify-between">
+  <div className="bg-white dark:bg-slate-800/80 rounded-xl border border-[#009CD1]/20 p-5 mb-4">
+    <div className="flex items-center justify-between mb-4">
       <p className="text-sm font-bold text-slate-700 dark:text-slate-200">
         {isNew ? 'Thêm biểu mẫu mới' : 'Chỉnh sửa biểu mẫu'}
       </p>
       <button onClick={onCancel} className="text-slate-400 hover:text-slate-600 transition-colors"><X size={16} /></button>
     </div>
-
     <div className="grid grid-cols-2 gap-3">
       <div className="col-span-2">
         <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Tiêu đề *</label>
@@ -169,7 +207,7 @@ const EditPanel = ({
       </div>
       <div className="col-span-2">
         <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Mô tả (tùy chọn)</label>
-        <input value={state.description} onChange={(e) => onChange('description', e.target.value)} placeholder="Mô tả ngắn về biểu mẫu..." className={INPUT_CLS} />
+        <input value={state.description} onChange={(e) => onChange('description', e.target.value)} placeholder="Mô tả ngắn..." className={INPUT_CLS} />
       </div>
       <div>
         <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Danh mục</label>
@@ -180,20 +218,20 @@ const EditPanel = ({
       <div>
         <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Loại file</label>
         <select value={state.fileType} onChange={(e) => onChange('fileType', e.target.value as FormFileType)} className={INPUT_CLS}>
-          {Object.entries(FILE_TYPE_META).map(([value, { label }]) => <option key={value} value={value}>{label}</option>)}
+          {Object.entries(FILE_TYPE_META).map(([v, { label }]) => <option key={v} value={v}>{label}</option>)}
         </select>
       </div>
       <div>
         <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Tên file hiển thị *</label>
-        <input value={state.fileName} onChange={(e) => onChange('fileName', e.target.value)} placeholder="VD: don_xin_nghi_hoc.pdf" className={INPUT_CLS + ' text-xs'} />
+        <input value={state.fileName} onChange={(e) => onChange('fileName', e.target.value)} placeholder="don_xin_nghi_hoc.pdf" className={INPUT_CLS} />
       </div>
       <div>
         <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Thứ tự hiển thị</label>
-        <input type="number" value={state.sortOrder} onChange={(e) => onChange('sortOrder', parseInt(e.target.value) || 0)} className={INPUT_CLS} min={0} />
+        <input type="number" value={state.sortOrder} onChange={(e) => onChange('sortOrder', parseInt(e.target.value)||0)} className={INPUT_CLS} min={0} />
       </div>
       <div className="col-span-2">
         <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
-          Link tải file * <span className="text-slate-300 font-normal">(Google Drive, SharePoint, OneDrive...)</span>
+          Link tải file * <span className="text-slate-300 font-normal">(Google Drive, SharePoint...)</span>
         </label>
         <div className="flex gap-2">
           <input value={state.fileUrl} onChange={(e) => onChange('fileUrl', e.target.value)} placeholder="https://drive.google.com/..." className={INPUT_CLS} />
@@ -205,8 +243,7 @@ const EditPanel = ({
         </div>
       </div>
     </div>
-
-    <div className="flex justify-end gap-2">
+    <div className="flex justify-end gap-2 mt-4">
       <button onClick={onCancel} className="px-4 py-2 rounded-lg text-xs text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">Hủy</button>
       <button
         onClick={onSave}
@@ -220,10 +257,51 @@ const EditPanel = ({
   </div>
 );
 
+// ── Empty state ────────────────────────────────────────────────────────────────
+const Empty = ({ icon: Icon, label, action }: { icon: typeof Inbox; label: string; action?: React.ReactNode }) => (
+  <tr><td colSpan={5}>
+    <div className="flex flex-col items-center py-14 gap-2 text-center">
+      <Icon size={28} className="text-slate-200 dark:text-slate-700" />
+      <p className="text-sm text-slate-400 dark:text-slate-500">{label}</p>
+      {action}
+    </div>
+  </td></tr>
+);
+
+// ── Table wrapper ──────────────────────────────────────────────────────────────
+const TableWrap = ({ children }: { children: React.ReactNode }) => (
+  <div className="bg-white dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700/60 overflow-hidden">
+    <div className="overflow-x-auto">
+      <table className="w-full min-w-[580px]">{children}</table>
+    </div>
+  </div>
+);
+
+const TableHead = ({ cols }: { cols: string[] }) => (
+  <thead className="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-100 dark:border-slate-700">
+    <tr>{cols.map((c, i) => <TH key={i} className={i === cols.length - 1 ? 'text-right' : ''}>{c}</TH>)}</tr>
+  </thead>
+);
+
+// ── Section label row ──────────────────────────────────────────────────────────
+const SectionRow = ({ icon: Icon, label, count, badge }: { icon: typeof Inbox; label: string; count: number; badge?: React.ReactNode }) => (
+  <tr className="bg-slate-50/60 dark:bg-slate-800/40">
+    <td colSpan={5} className="px-4 py-2 border-y border-slate-100 dark:border-slate-700">
+      <div className="flex items-center gap-2">
+        <Icon size={13} className="text-slate-400" />
+        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{label}</span>
+        {badge}
+        <span className="ml-auto text-[10px] text-slate-400 font-mono tabular-nums">{count} yêu cầu</span>
+      </div>
+    </td>
+  </tr>
+);
+
+// ── Types ──────────────────────────────────────────────────────────────────────
 type PageTab  = 'forms' | 'my-requests';
 type MyFilter = 'all' | 'pending' | 'approved' | 'rejected' | 'to-review';
 
-// ── Main Page ──────────────────────────────────────────────────────────────────
+// ── Main page ──────────────────────────────────────────────────────────────────
 const FormsPage = () => {
   const { user } = useUserContext();
   const navigate = useNavigate();
@@ -244,18 +322,17 @@ const FormsPage = () => {
   const { mutate: updateForm, isPending: isUpdating } = useUpdateFormTemplate();
   const { mutate: deleteForm } = useDeleteFormTemplate();
 
-  const { data: mySubmissionsRaw = [] }   = useGetFormSubmissionsByUser(user.id);
-  const { data: toReviewRaw = [] }        = useGetFormSubmissionsForApprover(user.email);
-
+  const { data: mySubmissionsRaw = [] } = useGetFormSubmissionsByUser(user.id);
+  const { data: toReviewRaw = [] }      = useGetFormSubmissionsForApprover(user.email);
   const mySubmissions = mySubmissionsRaw as unknown as IFormSubmission[];
   const toReview      = toReviewRaw      as unknown as IFormSubmission[];
 
-  const pendingCount   = toReview.filter((s) => s.status === 'pending').length;
+  const pendingMine  = mySubmissions.filter(s => s.status === 'pending').length;
+  const approvedMine = mySubmissions.filter(s => s.status === 'approved').length;
+  const rejectedMine = mySubmissions.filter(s => s.status === 'rejected').length;
+  const pendingCount = toReview.filter(s => s.status === 'pending').length;
 
-  const allForms = templates as unknown as IFormTemplate[];
-
-  const handleChange = (k: keyof EditState, v: any) =>
-    setEditState((s) => ({ ...s, [k]: v }));
+  const handleChange = (k: keyof EditState, v: any) => setEditState(s => ({ ...s, [k]: v }));
 
   const handleCreate = () => {
     if (!editState.title.trim() || !editState.fileUrl.trim()) return;
@@ -263,42 +340,23 @@ const FormsPage = () => {
       onSuccess: () => { setShowCreate(false); setEditState(BLANK_FORM); },
     });
   };
-
   const handleUpdate = () => {
     if (!editing || !editState.title.trim() || !editState.fileUrl.trim()) return;
     updateForm({ id: editing.$id, ...editState }, {
       onSuccess: () => { setEditing(null); setEditState(BLANK_FORM); },
     });
   };
-
   const startEdit = (form: IFormTemplate) => {
-    setShowCreate(false);
-    setEditing(form);
-    setEditState({
-      title:       form.title,
-      description: form.description ?? '',
-      fileUrl:     form.fileUrl,
-      fileName:    form.fileName,
-      fileType:    form.fileType,
-      category:    form.category,
-      sortOrder:   form.sortOrder,
-      isActive:    form.isActive,
-      createdBy:   form.createdBy,
-    });
+    setShowCreate(false); setEditing(form);
+    setEditState({ title:form.title, description:form.description??'', fileUrl:form.fileUrl, fileName:form.fileName, fileType:form.fileType, category:form.category, sortOrder:form.sortOrder, isActive:form.isActive, createdBy:form.createdBy });
   };
+  const startCreate = () => { setEditing(null); setShowCreate(true); setEditState({ ...BLANK_FORM, createdBy: user.id }); };
 
-  const startCreate = () => {
-    setEditing(null);
-    setShowCreate(true);
-    setEditState({ ...BLANK_FORM, createdBy: user.id });
-  };
-
-  // ── Derived / filtered data ────────────────────────────────────────────────
   const q = formSearch.trim().toLowerCase();
   const groupedForms = FORM_CATEGORIES.reduce<Record<string, IFormTemplate[]>>((acc, cat) => {
-    const items = allForms.filter((f) => {
-      const matchCat  = filter === 'all' || filter === cat.id;
-      const matchSearch = !q || f.title.toLowerCase().includes(q) || (f.description ?? '').toLowerCase().includes(q);
+    const items = (templates as unknown as IFormTemplate[]).filter(f => {
+      const matchCat    = filter === 'all' || filter === cat.id;
+      const matchSearch = !q || f.title.toLowerCase().includes(q) || (f.description??'').toLowerCase().includes(q);
       return f.category === cat.id && matchCat && matchSearch;
     });
     if (items.length > 0) acc[cat.id] = items;
@@ -306,67 +364,62 @@ const FormsPage = () => {
   }, {});
 
   const mq = mySearch.trim().toLowerCase();
-  const filteredMy = mySubmissions.filter((s) => {
-    const matchStatus = myFilter === 'all' || myFilter === s.status;
-    const matchSearch = !mq || (s.formTitle ?? '').toLowerCase().includes(mq);
+  const filteredMy = mySubmissions.filter(s => {
+    const matchStatus = myFilter === 'all' || myFilter === 'to-review' || myFilter === s.status;
+    const matchSearch = !mq || (s.formTitle??'').toLowerCase().includes(mq);
     return matchStatus && matchSearch;
   });
-  const filteredReview = toReview.filter((s) => {
-    const matchSearch = !mq || (s.formTitle ?? '').toLowerCase().includes(mq) || (s.submitterName ?? '').toLowerCase().includes(mq);
-    return matchSearch;
-  });
+  const filteredReview = toReview.filter(s =>
+    !mq || (s.formTitle??'').toLowerCase().includes(mq) || (s.submitterName??'').toLowerCase().includes(mq)
+  );
 
   const MY_STATUS_FILTERS: { id: MyFilter; label: string }[] = [
     { id: 'all',       label: 'Tất cả' },
     { id: 'pending',   label: 'Chờ duyệt' },
     { id: 'approved',  label: 'Đã duyệt' },
-    { id: 'rejected',  label: 'Từ chối' },
+    { id: 'rejected',  label: 'Đã từ chối' },
     { id: 'to-review', label: `Cần tôi duyệt${pendingCount > 0 ? ` (${pendingCount})` : ''}` },
   ];
 
-  const PAGE_TABS: { id: PageTab; label: string; icon: typeof FileText; badge?: number }[] = [
-    { id: 'forms',       label: 'Biểu mẫu',       icon: FileText },
-    { id: 'my-requests', label: 'Yêu cầu của tôi', icon: Send, badge: pendingCount || undefined },
+  const PAGE_TABS = [
+    { id: 'forms'      as PageTab, label: 'Biểu mẫu',       icon: FileText },
+    { id: 'my-requests'as PageTab, label: 'Yêu cầu của tôi', icon: Send, badge: pendingCount || undefined },
   ];
 
-  const searchInputCls = 'w-full pl-7 pr-3 py-1.5 text-xs rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#009CD1]/20 focus:border-[#009CD1] transition-all';
+  const searchCls = 'w-full pl-7 pr-3 py-1.5 text-xs rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#009CD1]/20 focus:border-[#009CD1] transition-all';
 
   return (
-    <div className="bg-[#F8FAFC] dark:bg-[#19191a]">
-      {/* Header */}
-      <div className="sticky top-0 z-10 bg-white dark:bg-[#19191a] border-b border-slate-200 dark:border-slate-800 px-6 py-3">
-        <div>
+    <div className="min-h-full bg-[#F8FAFC] dark:bg-[#19191a]">
+
+      {/* ── Sticky header ── */}
+      <div className="sticky top-0 z-10 bg-white dark:bg-[#19191a] border-b border-slate-200 dark:border-slate-800">
+        <div className="px-6 pt-4 pb-3">
+
+          {/* Breadcrumb + action */}
           <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => navigate('/home')}
-                className="flex items-center gap-1 text-[11px] text-slate-400 dark:text-slate-500 hover:text-[#0085b3] transition-colors font-mono"
-              >
-                <Home size={11} /> HOME
-              </button>
-              <span className="text-slate-300 dark:text-slate-700 text-[11px]">/</span>
-              <div className="flex items-center gap-2">
-                <FileText size={16} className="text-slate-700 dark:text-slate-300" />
-                <h1 className="text-sm font-bold text-slate-800 dark:text-slate-100 tracking-wide">BIỂU MẪU</h1>
-              </div>
+            <div className="flex items-center gap-1.5 text-[11px] font-mono">
+              <button onClick={() => navigate('/home')} className="text-slate-400 hover:text-[#0085b3] transition-colors">HOME</button>
+              <span className="text-slate-300 dark:text-slate-700">/</span>
+              <span className="text-slate-600 dark:text-slate-300 font-semibold flex items-center gap-1.5">
+                <FileText size={13} /> BIỂU MẪU
+              </span>
             </div>
             {isAdmin && pageTab === 'forms' && !showCreate && !editing && (
               <button
                 onClick={startCreate}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-slate-800 hover:bg-slate-700 dark:bg-slate-600 dark:hover:bg-slate-500 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-[#009CD1] hover:bg-[#0087b3] transition-colors"
               >
                 <Plus size={12} /> Thêm biểu mẫu
               </button>
             )}
           </div>
 
-          {/* Page tabs */}
+          {/* Page tabs + search */}
           <div className="flex items-center gap-3 flex-wrap">
             <div className="flex gap-0.5 bg-slate-100 dark:bg-slate-800/80 p-0.5 rounded-lg border border-slate-200 dark:border-slate-700/60">
               {PAGE_TABS.map(({ id, label, icon: Icon, badge }) => (
                 <button
-                  key={id}
-                  onClick={() => setPageTab(id)}
+                  key={id} onClick={() => setPageTab(id)}
                   className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
                     pageTab === id
                       ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 shadow-sm'
@@ -375,7 +428,7 @@ const FormsPage = () => {
                 >
                   <Icon size={11} /> {label}
                   {badge && badge > 0 && (
-                    <span className="ml-0.5 min-w-[16px] h-4 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center px-1">
+                    <span className="min-w-[16px] h-4 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center px-1">
                       {badge}
                     </span>
                   )}
@@ -383,76 +436,39 @@ const FormsPage = () => {
               ))}
             </div>
 
-            {/* Search bar — inline next to tabs */}
-            {pageTab === 'forms' && (
-              <div className="relative flex-1 min-w-[160px] max-w-xs">
-                <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-                <input
-                  value={formSearch}
-                  onChange={(e) => setFormSearch(e.target.value)}
-                  placeholder="Tìm biểu mẫu..."
-                  className={searchInputCls}
-                />
-              </div>
-            )}
-            {pageTab === 'my-requests' && (
-              <div className="relative flex-1 min-w-[160px] max-w-xs">
-                <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-                <input
-                  value={mySearch}
-                  onChange={(e) => setMySearch(e.target.value)}
-                  placeholder="Tìm theo tên biểu mẫu..."
-                  className={searchInputCls}
-                />
-              </div>
-            )}
+            <div className="relative flex-1 min-w-[160px] max-w-xs">
+              <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+              <input
+                value={pageTab === 'forms' ? formSearch : mySearch}
+                onChange={(e) => pageTab === 'forms' ? setFormSearch(e.target.value) : setMySearch(e.target.value)}
+                placeholder={pageTab === 'forms' ? 'Tìm biểu mẫu...' : 'Tìm yêu cầu...'}
+                className={searchCls}
+              />
+            </div>
           </div>
 
-          {/* Category filter — forms tab */}
+          {/* Sub-filters */}
           {pageTab === 'forms' && (
-            <div className="flex gap-0.5 bg-slate-50 dark:bg-slate-800/50 p-0.5 rounded-lg w-fit border border-slate-100 dark:border-slate-700/40 mt-2">
-              <button
-                onClick={() => setFilter('all')}
-                className={`px-3 py-1 rounded-md text-[11px] font-semibold transition-all ${
-                  filter === 'all'
-                    ? 'bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 shadow-sm'
-                    : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
-                }`}
-              >
-                Tất cả
-              </button>
-              {FORM_CATEGORIES.map(({ id, label, icon: Icon }) => (
-                <button
-                  key={id}
-                  onClick={() => setFilter(id)}
-                  className={`flex items-center gap-1 px-3 py-1 rounded-md text-[11px] font-semibold transition-all ${
-                    filter === id
-                      ? 'bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 shadow-sm'
-                      : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+            <div className="flex gap-0.5 bg-slate-50 dark:bg-slate-800/50 p-0.5 rounded-lg w-fit border border-slate-100 dark:border-slate-700/40 mt-2.5">
+              {[{ id: 'all' as FormCategory|'all', label: 'Tất cả' }, ...FORM_CATEGORIES.map(c => ({ id: c.id as FormCategory|'all', label: c.label }))].map(({ id, label }) => (
+                <button key={id} onClick={() => setFilter(id as any)}
+                  className={`px-3 py-1 rounded-md text-[11px] font-semibold transition-all ${
+                    filter === id ? 'bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 shadow-sm' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
                   }`}
-                >
-                  <Icon size={10} /> {label}
-                </button>
+                >{label}</button>
               ))}
             </div>
           )}
 
-          {/* Status filter — my-requests tab */}
           {pageTab === 'my-requests' && (
-            <div className="flex gap-0.5 bg-slate-50 dark:bg-slate-800/50 p-0.5 rounded-lg w-fit border border-slate-100 dark:border-slate-700/40 mt-2 flex-wrap">
+            <div className="flex gap-0.5 bg-slate-50 dark:bg-slate-800/50 p-0.5 rounded-lg w-fit border border-slate-100 dark:border-slate-700/40 mt-2.5 flex-wrap">
               {MY_STATUS_FILTERS.map(({ id, label }) => (
-                <button
-                  key={id}
-                  onClick={() => setMyFilter(id)}
+                <button key={id} onClick={() => setMyFilter(id)}
                   className={`flex items-center gap-1 px-3 py-1 rounded-md text-[11px] font-semibold transition-all ${
-                    myFilter === id
-                      ? 'bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 shadow-sm'
-                      : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+                    myFilter === id ? 'bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 shadow-sm' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
                   }`}
                 >
-                  {id === 'to-review' && pendingCount > 0 && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
-                  )}
+                  {id === 'to-review' && pendingCount > 0 && <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />}
                   {label}
                 </button>
               ))}
@@ -461,154 +477,147 @@ const FormsPage = () => {
         </div>
       </div>
 
-      {/* Content */}
-      <div className="px-6 py-4">
+      {/* ── Content ── */}
+      <div className="px-6 py-5 flex flex-col gap-5">
 
         {/* ── Tab: Biểu mẫu ── */}
         {pageTab === 'forms' && (
           <>
             {(showCreate || editing) && (
               <EditPanel
-                state={editState}
-                onChange={handleChange}
+                state={editState} onChange={handleChange}
                 onSave={editing ? handleUpdate : handleCreate}
                 onCancel={() => { setEditing(null); setShowCreate(false); setEditState(BLANK_FORM); }}
-                isSaving={editing ? isUpdating : isCreating}
-                isNew={!editing}
+                isSaving={editing ? isUpdating : isCreating} isNew={!editing}
               />
             )}
+
             {isPending ? (
-              <div className="flex justify-center py-10">
-                <Loader2 size={24} className="animate-spin text-slate-400" />
-              </div>
+              <div className="flex justify-center py-16"><Loader2 size={24} className="animate-spin text-slate-300" /></div>
             ) : Object.keys(groupedForms).length === 0 ? (
-              <div className="flex flex-col items-center py-10 gap-3 text-center">
+              <div className="flex flex-col items-center py-16 gap-3 text-center">
                 <div className="w-14 h-14 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center">
                   <FolderOpen size={24} className="text-slate-300 dark:text-slate-600" />
                 </div>
-                <p className="font-semibold text-slate-600 dark:text-slate-400 text-sm">
+                <p className="font-semibold text-slate-500 dark:text-slate-400 text-sm">
                   {q ? `Không tìm thấy kết quả cho "${formSearch}"` : 'Chưa có biểu mẫu nào'}
                 </p>
                 {isAdmin && !q && (
-                  <button onClick={startCreate} className="text-xs text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors">
-                    + Thêm biểu mẫu đầu tiên
-                  </button>
+                  <button onClick={startCreate} className="text-xs text-[#009CD1] hover:underline">+ Thêm biểu mẫu đầu tiên</button>
                 )}
               </div>
             ) : (
               <div className="flex flex-col gap-4">
-                {FORM_CATEGORIES.filter((c) => groupedForms[c.id]).map(({ id, label, icon: Icon }) => (
-                  <div key={id} className="bg-white dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700/60 overflow-hidden">
-                    <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60">
-                      <Icon size={13} className="text-slate-400 dark:text-slate-500" />
-                      <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{label}</span>
-                      <span className="ml-auto text-[10px] text-slate-400 dark:text-slate-500 font-mono">
-                        {groupedForms[id].length} biểu mẫu
-                      </span>
-                    </div>
-                    <div className="divide-y divide-slate-50 dark:divide-slate-700/50">
-                      {groupedForms[id].map((form) => (
-                        editing?.$id === form.$id ? (
-                          <div key={form.$id} className="px-4 py-3 bg-[#009CD1]/4 dark:bg-[#009CD1]/6 border-l-2 border-[#009CD1]">
-                            <p className="text-xs text-[#009CD1] font-semibold mb-1 flex items-center gap-1">
-                              <Pencil size={11} /> Đang chỉnh sửa: {form.title}
-                            </p>
+                {FORM_CATEGORIES.filter(c => groupedForms[c.id]).map(({ id, label, icon: Icon }) => (
+                  <TableWrap key={id}>
+                    <thead className="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-100 dark:border-slate-700">
+                      <tr>
+                        <td colSpan={4} className="px-4 py-2.5">
+                          <div className="flex items-center gap-2">
+                            <Icon size={13} className="text-slate-400" />
+                            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{label}</span>
+                            <span className="ml-auto text-[10px] text-slate-400 font-mono">{groupedForms[id].length} biểu mẫu</span>
                           </div>
+                        </td>
+                      </tr>
+                      <tr className="border-t border-slate-100 dark:border-slate-700">
+                        <TH>Tên biểu mẫu</TH>
+                        <TH>Loại</TH>
+                        <TH>Danh mục</TH>
+                        <TH className="text-right">Thao tác</TH>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {groupedForms[id].map(form =>
+                        editing?.$id === form.$id ? (
+                          <tr key={form.$id} className="bg-[#009CD1]/5 border-b border-slate-50 dark:border-slate-700/40">
+                            <td colSpan={4} className="px-4 py-2.5">
+                              <p className="text-xs text-[#009CD1] font-semibold flex items-center gap-1">
+                                <Pencil size={11} /> Đang chỉnh sửa: {form.title}
+                              </p>
+                            </td>
+                          </tr>
                         ) : (
-                          <FormRow
-                            key={form.$id}
-                            form={form}
-                            isAdmin={isAdmin}
-                            onEdit={startEdit}
-                            onDelete={(fid) => deleteForm(fid)}
-                            onSubmit={setSubmitTarget}
+                          <FormRow key={form.$id} form={form} isAdmin={isAdmin}
+                            onEdit={startEdit} onDelete={(fid) => deleteForm(fid)} onSubmit={setSubmitTarget}
                           />
                         )
-                      ))}
-                    </div>
-                  </div>
+                      )}
+                    </tbody>
+                  </TableWrap>
                 ))}
               </div>
-            )}
-            {isAdmin && (
-              <p className="mt-6 text-center text-[11px] text-slate-300 dark:text-slate-600 font-mono">
-                ADMIN MODE — AZURE AD ROLE DETECTED
-              </p>
             )}
           </>
         )}
 
         {/* ── Tab: Yêu cầu của tôi ── */}
         {pageTab === 'my-requests' && (
-          <div className="flex flex-col gap-4">
-            {/* My submissions (hidden when filter = to-review) */}
-            {myFilter !== 'to-review' && (
-              <div className="bg-white dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700/60 overflow-hidden">
-                <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60">
-                  <Send size={13} className="text-slate-400 dark:text-slate-500" />
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Yêu cầu đã nộp</span>
-                  <span className="ml-auto text-[10px] text-slate-400 font-mono">{filteredMy.length} yêu cầu</span>
-                </div>
-                {filteredMy.length === 0 ? (
-                  <div className="flex flex-col items-center py-12 gap-2 text-center">
-                    <Send size={22} className="text-slate-200 dark:text-slate-700" />
-                    <p className="text-sm text-slate-400 dark:text-slate-500">
-                      {mq ? `Không tìm thấy kết quả cho "${mySearch}"` : 'Chưa có yêu cầu nào'}
-                    </p>
-                    {!mq && (
-                      <button onClick={() => setPageTab('forms')} className="text-xs text-[#009CD1] hover:underline mt-1">
-                        Nộp biểu mẫu đầu tiên
-                      </button>
-                    )}
-                  </div>
-                ) : (
-                  <div className="divide-y divide-slate-50 dark:divide-slate-700/50">
-                    {filteredMy.map((sub) => <SubmissionRow key={sub.$id} sub={sub} mode="mine" />)}
-                  </div>
-                )}
+          <>
+            {/* Stat cards */}
+            {myFilter === 'all' && mySubmissions.length > 0 && (
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <StatCard label="Tổng cộng"    value={mySubmissions.length} color="sky"     icon={ArrowUpDown}   />
+                <StatCard label="Chờ duyệt"    value={pendingMine}          color="amber"   icon={Clock}         />
+                <StatCard label="Đã duyệt"     value={approvedMine}         color="emerald" icon={CheckCircle2}  />
+                <StatCard label="Đã từ chối"   value={rejectedMine}         color="rose"    icon={XCircle}       />
               </div>
             )}
 
-            {/* To-review section (shown when filter = all or to-review) */}
-            {(myFilter === 'all' || myFilter === 'to-review') && (
-              <div className="bg-white dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700/60 overflow-hidden">
-                <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/60">
-                  <Inbox size={13} className="text-slate-400 dark:text-slate-500" />
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                    Cần tôi duyệt
-                  </span>
-                  {pendingCount > 0 && (
-                    <span className="ml-1 px-1.5 py-0.5 rounded-full bg-red-500 text-white text-[9px] font-bold">{pendingCount}</span>
-                  )}
-                  <span className="ml-auto text-[10px] text-slate-400 font-mono">{filteredReview.length} yêu cầu</span>
-                </div>
-                {filteredReview.length === 0 ? (
-                  <div className="flex flex-col items-center py-12 gap-2 text-center">
-                    <Inbox size={22} className="text-slate-200 dark:text-slate-700" />
-                    <p className="text-sm text-slate-400 dark:text-slate-500">
-                      {mq ? `Không tìm thấy kết quả cho "${mySearch}"` : 'Không có yêu cầu nào cần duyệt'}
-                    </p>
-                  </div>
-                ) : (
-                  <div className="divide-y divide-slate-50 dark:divide-slate-700/50">
-                    {filteredReview.map((sub) => <SubmissionRow key={sub.$id} sub={sub} mode="review" />)}
-                  </div>
+            {/* Submissions table */}
+            <TableWrap>
+              <thead className="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-100 dark:border-slate-700">
+                <tr>
+                  <TH>Biểu mẫu</TH>
+                  <TH>{myFilter === 'to-review' ? 'Người nộp' : 'Người duyệt'}</TH>
+                  <TH>Ngày nộp</TH>
+                  <TH>Trạng thái</TH>
+                  <TH className="text-right"></TH>
+                </tr>
+              </thead>
+              <tbody>
+                {/* My submissions section */}
+                {myFilter !== 'to-review' && (
+                  <>
+                    <SectionRow icon={Send} label="Yêu cầu đã nộp" count={filteredMy.length} />
+                    {filteredMy.length === 0 ? (
+                      <Empty icon={Send}
+                        label={mq ? `Không tìm thấy "${mySearch}"` : 'Chưa có yêu cầu nào'}
+                        action={!mq ? (
+                          <button onClick={() => setPageTab('forms')} className="text-xs text-[#009CD1] hover:underline mt-1">
+                            Nộp biểu mẫu đầu tiên
+                          </button>
+                        ) : undefined}
+                      />
+                    ) : filteredMy.map(sub => <SubmissionRow key={sub.$id} sub={sub} mode="mine" />)}
+                  </>
                 )}
-              </div>
-            )}
-          </div>
+
+                {/* To-review section */}
+                {(myFilter === 'all' || myFilter === 'to-review') && (
+                  <>
+                    <SectionRow
+                      icon={Inbox} label="Cần tôi duyệt" count={filteredReview.length}
+                      badge={pendingCount > 0 ? (
+                        <span className="px-1.5 py-0.5 rounded-full bg-red-500 text-white text-[9px] font-bold">{pendingCount}</span>
+                      ) : undefined}
+                    />
+                    {filteredReview.length === 0 ? (
+                      <Empty icon={Inbox} label={mq ? `Không tìm thấy "${mySearch}"` : 'Không có yêu cầu nào cần duyệt'} />
+                    ) : filteredReview.map(sub => <SubmissionRow key={sub.$id} sub={sub} mode="review" />)}
+                  </>
+                )}
+              </tbody>
+            </TableWrap>
+          </>
         )}
       </div>
 
-      {/* Submit modal */}
       {submitTarget && (
         <FormSubmitModal
           template={submitTarget}
           onClose={() => setSubmitTarget(null)}
-          onSuccess={() => {
-            setSubmitTarget(null);
-            setPageTab('my-requests');
-          }}
+          onSuccess={() => { setSubmitTarget(null); setPageTab('my-requests'); }}
         />
       )}
     </div>

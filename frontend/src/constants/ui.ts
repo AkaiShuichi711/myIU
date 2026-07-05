@@ -12,7 +12,7 @@ export const FORM_STATUS: Record<SubmissionStatus, {
 }> = {
   pending:  { label: 'Chờ duyệt', color: 'text-[#f5832f]', bg: 'bg-[#f5832f]/10', cls: 'bg-[#f5832f]/10 text-[#f5832f]', hex: '#f5832f', Icon: Clock         },
   approved: { label: 'Đã duyệt',  color: 'text-[#00c578]', bg: 'bg-[#00c578]/10', cls: 'bg-[#00c578]/10 text-[#00c578]', hex: '#00c578', Icon: CheckCircle2   },
-  rejected: { label: 'Từ chối',   color: 'text-[#ef4e49]', bg: 'bg-[#ef4e49]/10', cls: 'bg-[#ef4e49]/10 text-[#ef4e49]', hex: '#ef4e49', Icon: XCircle        },
+  rejected: { label: 'Đã từ chối', color: 'text-[#ef4e49]', bg: 'bg-[#ef4e49]/10', cls: 'bg-[#ef4e49]/10 text-[#ef4e49]', hex: '#ef4e49', Icon: XCircle        },
 };
 
 // ── File type badges ──────────────────────────────────────────────────────────

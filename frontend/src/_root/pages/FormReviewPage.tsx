@@ -7,9 +7,8 @@ import {
 import { useUserContext } from '@/context/AuthContext';
 import { useGetFormSubmissionById, useUpdateFormSubmission } from '@/lib/react-query/queriesAndMutations';
 import { FORM_STATUS } from '@/constants/ui';
+import { api } from '@/lib/api/client';
 import type { IFormSubmission } from '@/types';
-
-const BACKEND = (import.meta.env.VITE_OAUTH_BACKEND_URL || window.location.origin).replace(/\/+$/, '');
 
 const buildResultEmail = (submitterName: string, formTitle: string, status: 'approved' | 'rejected', approverName: string, rejectionReason?: string) => `
   <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f8fafc;padding:20px">
@@ -58,12 +57,7 @@ const FormReviewPage = () => {
 
   const sendEmail = async (to: string, subject: string, html: string) => {
     try {
-      await fetch(`${BACKEND}/api/email/send`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ to, subject, html }),
-      });
+      await api.post('/api/email/send', { to, subject, html });
     } catch { /* best-effort */ }
   };
 

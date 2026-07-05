@@ -5,18 +5,8 @@ export interface LangOption {
 }
 
 export const LANGUAGES: LangOption[] = [
-  { code: 'vi',    label: 'Tiếng Việt', flagCode: 'vn' },
-  { code: 'en',    label: 'English',    flagCode: 'gb' },
-  { code: 'zh-CN', label: '中文',        flagCode: 'cn' },
-  { code: 'ja',    label: '日本語',      flagCode: 'jp' },
-  { code: 'ko',    label: '한국어',      flagCode: 'kr' },
-  { code: 'th',    label: 'ภาษาไทย',    flagCode: 'th' },
-  { code: 'fr',    label: 'Français',   flagCode: 'fr' },
-  { code: 'de',    label: 'Deutsch',    flagCode: 'de' },
-  { code: 'es',    label: 'Español',    flagCode: 'es' },
-  { code: 'ru',    label: 'Русский',    flagCode: 'ru' },
-  { code: 'ar',    label: 'العربية',    flagCode: 'sa' },
-  { code: 'id',    label: 'Indonesia',  flagCode: 'id' },
+  { code: 'vi', label: 'Tiếng Việt', flagCode: 'vn' },
+  { code: 'en', label: 'English',    flagCode: 'gb' },
 ];
 
 const BASE_LANG = 'vi';

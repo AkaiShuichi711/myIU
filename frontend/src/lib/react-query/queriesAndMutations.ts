@@ -78,6 +78,10 @@ import {
   // Support
   createSupportTicket,
   getMySupportTickets,
+  getTimetable,
+  getCourseSchedules,
+  createCourseSchedule,
+  deleteCourseSchedule,
 } from '../appwrite/api';
 import { INewNotification, INewPost, INewUser, IUpdatePost, IUpdateUser, INewCourse, INewCourseGroup, INewGroupMember, INewCoursePost, INewFormTemplate, IUpdateFormTemplate, INewFormSubmission, IUpdateFormSubmission, IUpsertCourseGrade, INewSupportTicket } from '@/types';
 
@@ -340,7 +344,7 @@ export const useGetNotifications = (userId: string) =>
     queryKey: [QUERY_KEYS.GET_NOTIFICATIONS, userId],
     queryFn: () => getNotifications(userId),
     enabled: !!userId,
-    refetchInterval: 30_000, // poll every 30s as lightweight realtime fallback
+    refetchInterval: 300_000, // 5-min fallback — WebSocket handles real-time
   });
 
 export const useCreateNotification = () =>
@@ -446,18 +450,18 @@ export const useRevokeOtherSessions = () => {
 
 // ─── COURSES ──────────────────────────────────────────────────────────────────
 
-export const useGetCoursesByLecturer = (userId: string) =>
+export const useGetCoursesByLecturer = (userId: string, enabled = true) =>
   useQuery({
     queryKey: [QUERY_KEYS.GET_COURSES_BY_LECTURER, userId],
     queryFn: () => getCoursesByLecturer(userId),
-    enabled: !!userId,
+    enabled: !!userId && enabled,
   });
 
-export const useGetCoursesByStudent = (userId: string) =>
+export const useGetCoursesByStudent = (userId: string, enabled = true) =>
   useQuery({
     queryKey: [QUERY_KEYS.GET_COURSES_BY_STUDENT, userId],
     queryFn: () => getCoursesByStudent(userId),
-    enabled: !!userId,
+    enabled: !!userId && enabled,
   });
 
 export const useGetAllCourses = () =>
@@ -716,3 +720,42 @@ export const useGetMySupportTickets = () =>
     queryKey: [QUERY_KEYS.GET_MY_SUPPORT_TICKETS],
     queryFn: getMySupportTickets,
   });
+
+// ─── Timetable ────────────────────────────────────────────────────────────────
+
+export const useGetTimetable = () =>
+  useQuery({
+    queryKey: ['timetable'],
+    queryFn: getTimetable,
+  });
+
+export const useGetCourseSchedules = (courseId: string) =>
+  useQuery({
+    queryKey: ['courseSchedules', courseId],
+    queryFn: () => getCourseSchedules(courseId),
+    enabled: !!courseId,
+  });
+
+export const useCreateCourseSchedule = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ courseId, data }: { courseId: string; data: any }) =>
+      createCourseSchedule(courseId, data),
+    onSuccess: (_d, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['courseSchedules', vars.courseId] });
+      queryClient.invalidateQueries({ queryKey: ['timetable'] });
+    },
+  });
+};
+
+export const useDeleteCourseSchedule = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ scheduleId, courseId }: { scheduleId: string; courseId: string }) =>
+      deleteCourseSchedule(scheduleId),
+    onSuccess: (_d, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['courseSchedules', vars.courseId] });
+      queryClient.invalidateQueries({ queryKey: ['timetable'] });
+    },
+  });
+};

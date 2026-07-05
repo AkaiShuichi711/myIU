@@ -286,7 +286,7 @@ const CourseDetail = () => {
 
   const roles: string[] = (user as any).roles ?? [];
   const isLecturerByRole = isLecturerRole(roles) || isAdminRole(roles);
-  const isLecturer  = (myLecturerGroups as any[]).length > 0 || isLecturerByRole;
+  const isLecturer  = isAdminRole(roles) || ((myLecturerGroups as any[]).length > 0 && isLecturerByRole);
   const isStudent   = (myStudentGroups  as any[]).length > 0 || !isLecturerByRole;
   const myStudentId = isStudent ? (myStudentGroups as any[])[0]?.studentId ?? user.id : user.id;
 
