@@ -1,11 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 68" fill="none" role="img" aria-label="myIU">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 330 48" fill="none" role="img" aria-label="International University">
+
+  <!-- SEAL: outer ring -->
+  <circle cx="24" cy="24" r="22" stroke="white" stroke-width="1.1" fill="none"/>
+  <!-- SEAL: decorative dashed ring (simulates engraved text band) -->
+  <circle cx="24" cy="24" r="18.5" stroke="white" stroke-width="0.7" stroke-dasharray="2.2 2.1" fill="none" opacity="0.55"/>
+  <!-- SEAL: inner ring -->
+  <circle cx="24" cy="24" r="15.5" stroke="white" stroke-width="0.6" fill="none" opacity="0.80"/>
+
+  <!-- IU MARK: upper sphere element -->
+  <circle cx="24" cy="19" r="5" fill="white"/>
+  <!-- IU MARK: lower rectangular element -->
+  <rect x="18" y="26" width="12" height="8" rx="1.5" fill="white"/>
+
+  <!-- TEXT: subtitle -->
   <text
-    x="2"
-    y="56"
-    font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif"
-    font-weight="900"
-    font-size="62"
-    letter-spacing="-2"
-  ><tspan fill="#0491D4">m</tspan><tspan fill="#1771BB">y</tspan><tspan fill="#235BA9">I</tspan><tspan fill="#2F4396">U</tspan></text>
+    x="52" y="19"
+    font-family="Arial, 'Helvetica Neue', sans-serif"
+    font-size="8.5" font-weight="400" letter-spacing="0.4"
+    fill="rgba(255,255,255,0.72)"
+  >VIET NAM NATIONAL UNIVERSITY HO CHI MINH CITY</text>
+
+  <!-- TEXT: main title -->
+  <text
+    x="52" y="37"
+    font-family="Arial, 'Helvetica Neue', sans-serif"
+    font-size="17" font-weight="700" letter-spacing="0.4"
+    fill="white"
+  >INTERNATIONAL UNIVERSITY</text>
+
 </svg>

@@ -33,12 +33,12 @@ const Topbar = () => {
   }, []);
 
   const c = {
-    bg:             isDark ? '#19191a' : '#ffffff',
-    border:         isDark ? '#33485c' : '#E0E4EB',
-    text:           isDark ? '#e8edf0' : '#272e35',
-    textMuted:      isDark ? '#99a3ad' : '#272e35',
-    divider:        isDark ? '#33485c' : '#E0E4EB',
-    btnHoverBg:     isDark ? '#0d2137' : '#F4F6F8',
+    bg:             '#163878',
+    border:         'rgba(255,255,255,0.18)',
+    text:           'rgba(255,255,255,0.92)',
+    textMuted:      'rgba(255,255,255,0.68)',
+    divider:        'rgba(255,255,255,0.20)',
+    btnHoverBg:     'rgba(255,255,255,0.10)',
     dropdownBg:     isDark ? '#1e2028' : '#ffffff',
     dropdownBorder: isDark ? '#33485c' : '#E0E4EB',
     optionHover:    isDark ? '#0d2137' : '#F8FAFC',
@@ -61,8 +61,8 @@ const Topbar = () => {
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
         <img
           src="/assets/images/logo_aftersignin.svg"
-          alt="myIU"
-          style={{ height: '34px', width: 'auto' }}
+          alt="International University"
+          style={{ height: '36px', width: 'auto', maxWidth: '252px' }}
         />
       </div>
 
@@ -146,10 +146,10 @@ const Topbar = () => {
           title="Sign out"
           style={{
             display: 'flex', alignItems: 'center', gap: '6px',
-            background: logoutHover ? '#FEF2F2' : 'transparent',
-            border: `1px solid ${logoutHover ? '#FCA5A5' : c.border}`,
+            background: logoutHover ? 'rgba(239,68,68,0.20)' : 'transparent',
+            border: `1px solid ${logoutHover ? 'rgba(239,68,68,0.5)' : c.border}`,
             borderRadius: '6px', padding: '5px 10px',
-            color: logoutHover ? '#ef4444' : c.textMuted,
+            color: logoutHover ? '#fca5a5' : c.textMuted,
             fontSize: '12px', fontWeight: 500, cursor: 'pointer',
             transition: 'all 0.15s',
           }}

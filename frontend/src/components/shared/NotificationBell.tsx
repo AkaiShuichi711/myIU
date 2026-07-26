@@ -51,7 +51,7 @@ const NotificationBell = () => {
       {/* Bell button */}
       <button
         onClick={() => setOpen((v) => !v)}
-        className="relative w-9 h-9 rounded-xl flex items-center justify-center text-slate-500 hover:bg-slate-100 transition-colors"
+        className="relative w-9 h-9 rounded-xl flex items-center justify-center text-white/80 hover:bg-white/10 transition-colors"
       >
         <Bell size={18} />
         {unreadCount > 0 && (
