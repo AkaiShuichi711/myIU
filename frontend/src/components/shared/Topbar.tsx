@@ -60,10 +60,30 @@ const Topbar = () => {
       {/* Left: Logo */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
         <img
-          src="/assets/images/logo_aftersignin.svg"
-          alt="International University"
-          style={{ height: '36px', width: 'auto', maxWidth: '260px' }}
+          src="/assets/images/iu_seal.png"
+          alt="IU Seal"
+          style={{ height: '42px', width: '42px', objectFit: 'contain' }}
         />
+        <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.25 }}>
+          <span style={{
+            fontSize: '7.5px', fontWeight: 400,
+            color: 'rgba(255,255,255,0.75)',
+            letterSpacing: '0.5px',
+            fontFamily: "Arial, 'Helvetica Neue', sans-serif",
+            whiteSpace: 'nowrap',
+          }}>
+            VIET NAM NATIONAL UNIVERSITY HO CHI MINH CITY
+          </span>
+          <span style={{
+            fontSize: '14px', fontWeight: 700,
+            color: 'white',
+            letterSpacing: '0.4px',
+            fontFamily: "Arial, 'Helvetica Neue', sans-serif",
+            whiteSpace: 'nowrap',
+          }}>
+            INTERNATIONAL UNIVERSITY
+          </span>
+        </div>
       </div>
 
       {/* Right: controls */}
