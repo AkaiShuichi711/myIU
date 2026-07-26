@@ -25,7 +25,7 @@ function timeToPx(time: string): number {
 }
 
 function hexToRgb(hex: string): string {
-  const c = (hex || '#009CD1').replace('#', '').padEnd(6, '0');
+  const c = (hex || '#0057A8').replace('#', '').padEnd(6, '0');
   return `${parseInt(c.slice(0,2),16)},${parseInt(c.slice(2,4),16)},${parseInt(c.slice(4,6),16)}`;
 }
 
@@ -63,7 +63,7 @@ export default function TimetablePage() {
       {/* Header */}
       <div className="bg-white dark:bg-[#1e2028] border-b border-[#E0E4EB] dark:border-[#33485c]">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center gap-3">
-          <Calendar size={18} className="text-[#009CD1]" />
+          <Calendar size={18} className="text-[#0057A8]" />
           <div>
             <h1 className="text-[17px] font-bold text-slate-900 dark:text-[#e8edf0]">Thời khóa biểu</h1>
             <p className="text-[12px] text-slate-400 dark:text-[#4d6070] mt-0.5">
@@ -77,7 +77,7 @@ export default function TimetablePage() {
 
         {isPending && (
           <div className="flex justify-center py-20">
-            <Loader2 size={24} className="animate-spin text-[#009CD1]" />
+            <Loader2 size={24} className="animate-spin text-[#0057A8]" />
           </div>
         )}
 
@@ -107,13 +107,13 @@ export default function TimetablePage() {
                     key={d.key}
                     className={`h-11 flex flex-col items-center justify-center text-[11.5px] font-bold border-l border-[#E0E4EB] dark:border-[#33485c] ${
                       d.key === todayKey
-                        ? 'text-[#009CD1] bg-[#009CD1]/5'
+                        ? 'text-[#0057A8] bg-[#0057A8]/5'
                         : 'text-slate-500 dark:text-[#4d6070]'
                     }`}
                   >
                     {d.label}
                     {d.key === todayKey && (
-                      <span className="w-1 h-1 rounded-full bg-[#009CD1] mt-0.5" />
+                      <span className="w-1 h-1 rounded-full bg-[#0057A8] mt-0.5" />
                     )}
                   </div>
                 ))}
@@ -142,7 +142,7 @@ export default function TimetablePage() {
                   <div
                     key={d.key}
                     className={`relative border-l border-[#E0E4EB] dark:border-[#33485c] ${
-                      d.key === todayKey ? 'bg-[#009CD1]/[0.015]' : ''
+                      d.key === todayKey ? 'bg-[#0057A8]/[0.015]' : ''
                     }`}
                     style={{ height: `${HOURS.length * HOUR_PX}px` }}
                   >
@@ -159,7 +159,7 @@ export default function TimetablePage() {
                     {byDay[d.key].map(e => {
                       const top    = timeToPx(e.startTime);
                       const height = timeToPx(e.endTime) - top;
-                      const color  = e.coverColor || '#009CD1';
+                      const color  = e.coverColor || '#0057A8';
                       const rgb    = hexToRgb(color);
                       const isTall     = height >= 56;
                       const isVeryTall = height >= 90;
@@ -213,21 +213,21 @@ export default function TimetablePage() {
                 >
                   <div
                     className={`px-4 py-2.5 border-b border-[#E0E4EB] dark:border-[#33485c] flex items-center gap-2 ${
-                      d.key === todayKey ? 'bg-[#009CD1]/5' : ''
+                      d.key === todayKey ? 'bg-[#0057A8]/5' : ''
                     }`}
                   >
-                    <span className={`text-[12.5px] font-bold ${d.key === todayKey ? 'text-[#009CD1]' : 'text-slate-600 dark:text-[#99a3ad]'}`}>
+                    <span className={`text-[12.5px] font-bold ${d.key === todayKey ? 'text-[#0057A8]' : 'text-slate-600 dark:text-[#99a3ad]'}`}>
                       {d.label}
                     </span>
                     {d.key === todayKey && (
-                      <span className="text-[10px] text-[#009CD1] font-semibold">Hôm nay</span>
+                      <span className="text-[10px] text-[#0057A8] font-semibold">Hôm nay</span>
                     )}
                   </div>
                   <div className="divide-y divide-[#F4F6F8] dark:divide-[#243447]">
                     {[...byDay[d.key]]
                       .sort((a, b) => a.startTime.localeCompare(b.startTime))
                       .map(e => {
-                        const color = e.coverColor || '#009CD1';
+                        const color = e.coverColor || '#0057A8';
                         return (
                           <div key={e.scheduleId} className="flex items-center gap-3 px-4 py-3">
                             <div

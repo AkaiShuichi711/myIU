@@ -66,14 +66,14 @@ const FileUploader = ({ fieldChange, mediaUrl }: FileUploaderProps) => {
       {...getRootProps()}
       className={`rounded-2xl border-2 border-dashed cursor-pointer transition-all duration-200 flex flex-col items-center justify-center py-16 px-8 text-center
         ${isDragActive
-          ? 'border-[#009CD1] bg-[#009CD1]/5'
+          ? 'border-[#0057A8] bg-[#0057A8]/5'
           : 'border-slate-200 bg-slate-50 hover:border-slate-300 hover:bg-slate-100'
         }`}
     >
       <input {...getInputProps()} />
       <div className="w-16 h-16 rounded-2xl bg-white border border-slate-200 flex items-center justify-center mb-4 shadow-sm">
         {isDragActive ? (
-          <UploadCloud size={28} className="text-[#009CD1]" />
+          <UploadCloud size={28} className="text-[#0057A8]" />
         ) : (
           <Image size={28} className="text-slate-400" />
         )}

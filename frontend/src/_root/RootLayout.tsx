@@ -20,7 +20,7 @@ const RootLayout = () => {
   if (isLoading) {
     return (
       <div className="h-screen w-full flex items-center justify-center bg-slate-50 dark:bg-slate-900">
-        <Loader2 className="h-8 w-8 animate-spin text-[#009CD1]" />
+        <Loader2 className="h-8 w-8 animate-spin text-[#0057A8]" />
       </div>
     );
   }

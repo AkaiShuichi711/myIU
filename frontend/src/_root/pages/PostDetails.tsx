@@ -31,7 +31,7 @@ const PostDetails = () => {
   if (isLoading) {
     return (
       <div className="min-h-full bg-[#F8FAFC] dark:bg-[#19191a] flex items-center justify-center">
-        <Loader2 size={24} className="animate-spin text-[#009CD1]" />
+        <Loader2 size={24} className="animate-spin text-[#0057A8]" />
       </div>
     );
   }
@@ -40,7 +40,7 @@ const PostDetails = () => {
     return (
       <div className="min-h-full bg-[#F8FAFC] dark:bg-[#19191a] flex flex-col items-center justify-center gap-4">
         <p className="text-slate-500 dark:text-slate-400 font-medium">Post not found</p>
-        <button onClick={() => navigate(-1)} className="text-sm text-[#009CD1] hover:underline">Go back</button>
+        <button onClick={() => navigate(-1)} className="text-sm text-[#0057A8] hover:underline">Go back</button>
       </div>
     );
   }
@@ -143,7 +143,7 @@ const PostDetails = () => {
                 >
                   <div
                     className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0"
-                    style={{ background: '#009CD1' }}
+                    style={{ background: '#0057A8' }}
                   >
                     {creatorInitials}
                   </div>
@@ -169,7 +169,7 @@ const PostDetails = () => {
                 {Array.isArray(post.tags) && post.tags.filter(Boolean).length > 0 && (
                   <div className="flex flex-wrap gap-1.5">
                     {post.tags.filter(Boolean).map((tag: string) => (
-                      <span key={tag} className="px-2.5 py-1 rounded-full text-xs font-medium bg-[#009CD1]/8 dark:bg-[#009CD1]/20 text-[#009CD1]">
+                      <span key={tag} className="px-2.5 py-1 rounded-full text-xs font-medium bg-[#0057A8]/8 dark:bg-[#0057A8]/20 text-[#0057A8]">
                         #{tag}
                       </span>
                     ))}
@@ -193,9 +193,9 @@ const PostDetails = () => {
                   onClick={handleSave}
                   disabled={isSaving || isDeletingSave}
                   className="flex items-center gap-1.5 text-sm font-medium transition-colors px-3 py-1.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700"
-                  style={{ color: isSaved ? '#009CD1' : '#94a3b8' }}
+                  style={{ color: isSaved ? '#0057A8' : '#94a3b8' }}
                 >
-                  <Bookmark size={18} fill={isSaved ? '#009CD1' : 'none'} className="transition-transform active:scale-110" />
+                  <Bookmark size={18} fill={isSaved ? '#0057A8' : 'none'} className="transition-transform active:scale-110" />
                   {isSaved ? 'Saved' : 'Save'}
                 </button>
               </div>

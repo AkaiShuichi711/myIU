@@ -121,11 +121,11 @@ const LeftSidebar = () => {
                   {isActive && (
                     <span
                       className="absolute left-0 top-1/2 -translate-y-1/2"
-                      style={{ width: '3px', height: '16px', background: '#009CD1', borderRadius: '0 3px 3px 0' }}
+                      style={{ width: '3px', height: '16px', background: '#0057A8', borderRadius: '0 3px 3px 0' }}
                     />
                   )}
                   <div className="relative shrink-0">
-                    <Icon size={15} style={{ color: isActive ? '#009CD1' : '#272e35' }} />
+                    <Icon size={15} style={{ color: isActive ? '#0057A8' : '#272e35' }} />
                     {badge && collapsed && (
                       <span className="absolute -top-1 -right-1 w-[7px] h-[7px] rounded-full bg-red-500" />
                     )}
@@ -133,7 +133,7 @@ const LeftSidebar = () => {
                   {!collapsed && (
                     <span
                       className="flex-1 flex items-center justify-between leading-none text-[12.5px] font-medium truncate"
-                      style={{ color: isActive ? '#009CD1' : '#272e35' }}
+                      style={{ color: isActive ? '#0057A8' : '#272e35' }}
                     >
                       {t(link.labelKey as string)}
                       {badge && (

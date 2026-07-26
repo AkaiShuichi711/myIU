@@ -20,7 +20,7 @@ const Paginator = ({ page, total, pageSize, onChange, isLoading }: PaginatorProp
   }
 
   const base = 'w-8 h-8 rounded-lg text-sm font-medium transition-all flex items-center justify-center';
-  const active = 'bg-[#009CD1] text-white';
+  const active = 'bg-[#0057A8] text-white';
   const idle = 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700';
   const disabled = 'text-slate-300 dark:text-slate-600 cursor-not-allowed';
 

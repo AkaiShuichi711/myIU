@@ -13,8 +13,8 @@ const TYPE_META: Record<string, { icon: React.ReactNode; color: string }> = {
   form_approved: { icon: <FileText size={15} className="text-[#00c578]" />,       color: 'bg-[#00c578]/12' },
   form_rejected: { icon: <FileText size={15} className="text-[#ef4e49]" />,       color: 'bg-[#ef4e49]/12' },
   form_pending:  { icon: <FileText size={15} className="text-[#f5832f]" />,       color: 'bg-[#f5832f]/12' },
-  grade:         { icon: <Star size={15} className="text-[#009CD1]" />,           color: 'bg-[#009CD1]/10' },
-  course:        { icon: <BookOpen size={15} className="text-[#009CD1]" />,       color: 'bg-[#009CD1]/10' },
+  grade:         { icon: <Star size={15} className="text-[#0057A8]" />,           color: 'bg-[#0057A8]/10' },
+  course:        { icon: <BookOpen size={15} className="text-[#0057A8]" />,       color: 'bg-[#0057A8]/10' },
   system:        { icon: <GraduationCap size={15} className="text-[#99a3ad]" />,  color: 'bg-[#33485c]/15' },
 };
 
@@ -81,7 +81,7 @@ const NotificationBell = () => {
           <div className="max-h-[340px] overflow-y-auto">
             {isPending ? (
               <div className="flex justify-center py-8">
-                <Loader2 size={20} className="animate-spin text-[#009CD1]" />
+                <Loader2 size={20} className="animate-spin text-[#0057A8]" />
               </div>
             ) : preview.length === 0 ? (
               <div className="flex flex-col items-center py-10 gap-2 text-center">
@@ -96,7 +96,7 @@ const NotificationBell = () => {
                     key={n.$id}
                     onClick={() => handleClickNotif(n)}
                     className={`w-full flex items-start gap-3 px-4 py-3 text-left hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0 ${
-                      !n.read ? 'bg-[#009CD1]/4' : ''
+                      !n.read ? 'bg-[#0057A8]/4' : ''
                     }`}
                   >
                     <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${meta.color}`}>
@@ -108,7 +108,7 @@ const NotificationBell = () => {
                       <p className="text-xs text-slate-400 mt-0.5">{formatTimeAgo(n.$createdAt)}</p>
                     </div>
 
-                    {!n.read && <span className="w-2 h-2 rounded-full bg-[#009CD1] shrink-0 mt-1.5" />}
+                    {!n.read && <span className="w-2 h-2 rounded-full bg-[#0057A8] shrink-0 mt-1.5" />}
                   </button>
                 );
               })
@@ -121,7 +121,7 @@ const NotificationBell = () => {
               <Link
                 to="/notifications"
                 onClick={() => setOpen(false)}
-                className="block text-center text-xs font-semibold text-[#009CD1] hover:underline"
+                className="block text-center text-xs font-semibold text-[#0057A8] hover:underline"
               >
                 Xem tất cả thông báo
               </Link>

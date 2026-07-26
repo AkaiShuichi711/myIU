@@ -33,7 +33,7 @@ const ALLOWED_TYPES = [
 ];
 
 const inputBase =
-  'w-full rounded-xl border border-slate-200 dark:border-[#2a3a4a] bg-slate-50 dark:bg-dark-3 text-[13px] text-slate-700 dark:text-light-2 px-3.5 py-2.5 transition focus:outline-none focus:border-[#009CD1]/50 focus:bg-white dark:focus:bg-dark-2 focus:ring-2 focus:ring-[#009CD1]/10';
+  'w-full rounded-xl border border-slate-200 dark:border-[#2a3a4a] bg-slate-50 dark:bg-dark-3 text-[13px] text-slate-700 dark:text-light-2 px-3.5 py-2.5 transition focus:outline-none focus:border-[#0057A8]/50 focus:bg-white dark:focus:bg-dark-2 focus:ring-2 focus:ring-[#0057A8]/10';
 
 export default function SupportPage() {
   const navigate = useNavigate();
@@ -125,7 +125,7 @@ export default function SupportPage() {
           <button
             onClick={resetForm}
             className="px-5 py-2 rounded-lg text-sm font-semibold text-white transition-colors"
-            style={{ background: '#009CD1' }}
+            style={{ background: '#0057A8' }}
           >
             Gửi yêu cầu khác
           </button>
@@ -213,8 +213,8 @@ export default function SupportPage() {
                 onChange={handleFileChange}
               />
               {file ? (
-                <div className="flex items-center gap-2 px-3 py-2 rounded-xl border border-[#009CD1]/30 bg-[#009CD1]/5">
-                  <Paperclip size={14} className="text-[#009CD1] shrink-0" />
+                <div className="flex items-center gap-2 px-3 py-2 rounded-xl border border-[#0057A8]/30 bg-[#0057A8]/5">
+                  <Paperclip size={14} className="text-[#0057A8] shrink-0" />
                   <span className="text-[12.5px] text-slate-700 dark:text-light-2 truncate flex-1">{file.name}</span>
                   <span className="text-[11px] text-slate-400 shrink-0">{(file.size / 1024).toFixed(0)} KB</span>
                   <button type="button" onClick={removeFile} className="text-slate-400 hover:text-red-400 transition-colors shrink-0">
@@ -225,7 +225,7 @@ export default function SupportPage() {
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="flex items-center gap-2 text-[13px] font-medium text-slate-400 hover:text-[#009CD1] transition-colors"
+                  className="flex items-center gap-2 text-[13px] font-medium text-slate-400 hover:text-[#0057A8] transition-colors"
                 >
                   <Paperclip size={15} />
                   Đính kèm tệp
@@ -242,7 +242,7 @@ export default function SupportPage() {
               disabled={!canSubmit || createTicket.isPending || uploading}
               className="w-full py-2.5 rounded-xl text-[13.5px] font-semibold transition-all mt-1"
               style={{
-                background: canSubmit && !createTicket.isPending && !uploading ? '#009CD1' : '#CBD5E1',
+                background: canSubmit && !createTicket.isPending && !uploading ? '#0057A8' : '#CBD5E1',
                 color: '#fff',
                 cursor: canSubmit && !createTicket.isPending && !uploading ? 'pointer' : 'not-allowed',
               }}

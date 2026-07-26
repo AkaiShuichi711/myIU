@@ -9,7 +9,7 @@ import { Paginator } from '@/components/shared';
 
 const PAGE_SIZE = 12;
 
-const PALETTE = ['#1D4ED8', '#7C3AED', '#0891B2', '#059669', '#B45309', '#DC2626', '#19191a', '#009CD1'];
+const PALETTE = ['#1D4ED8', '#7C3AED', '#0891B2', '#059669', '#B45309', '#DC2626', '#19191a', '#0057A8'];
 const avatarBg = (n: string) => PALETTE[(n?.charCodeAt(0) ?? 65) % PALETTE.length];
 
 const UserCard = ({ user }: { user: any }) => {
@@ -40,7 +40,7 @@ const UserCard = ({ user }: { user: any }) => {
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">{user.bio}</p>
         )}
         {user.roles?.length > 0 && (
-          <span className="inline-block mt-2 px-2 py-0.5 rounded-full bg-[#009CD1]/8 dark:bg-[#009CD1]/20 text-[#009CD1] dark:text-blue-400 text-xs font-medium">
+          <span className="inline-block mt-2 px-2 py-0.5 rounded-full bg-[#0057A8]/8 dark:bg-[#0057A8]/20 text-[#0057A8] dark:text-blue-400 text-xs font-medium">
             {user.roles[0]}
           </span>
         )}
@@ -78,8 +78,8 @@ const AllUsers = () => {
       <div className="sticky top-0 z-10 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-700 px-6 py-4">
         <div className="max-w-5xl mx-auto flex items-center gap-4">
           <div className="flex items-center gap-3 shrink-0">
-            <div className="w-9 h-9 rounded-xl bg-[#009CD1]/10 flex items-center justify-center">
-              <Users size={18} className="text-[#009CD1]" />
+            <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-700 flex items-center justify-center">
+              <Users size={18} className="text-[#0057A8]" />
             </div>
             <h1 className="text-lg font-bold text-slate-900 dark:text-slate-50 hidden sm:block">{t('people.title')}</h1>
           </div>
@@ -91,7 +91,7 @@ const AllUsers = () => {
               value={searchTerm}
               onChange={(e) => handleSearch(e.target.value)}
               placeholder={t('people.searchPlaceholder')}
-              className="w-full pl-9 pr-8 py-2.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#009CD1]/20 focus:border-[#009CD1] dark:focus:border-[#009CD1] transition-all"
+              className="w-full pl-9 pr-8 py-2.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#0057A8]/20 focus:border-[#0057A8] dark:focus:border-[#0057A8] transition-all"
             />
             {searchTerm && (
               <button

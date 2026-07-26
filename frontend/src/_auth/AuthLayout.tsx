@@ -30,7 +30,7 @@ const socialIcons = ["facebook", "instagram", "outlook", "linkedin"] as const;
 
 
 const swiperStyle = {
-  "--swiper-pagination-color": "linear-gradient(to right, #009CD1, #009CD1)",
+  "--swiper-pagination-color": "linear-gradient(to right, #0057A8, #0057A8)",
   "--swiper-pagination-progressbar-bg-color": "rgba(255, 255, 255, 0.3)",
   "--swiper-pagination-bottom": "0px",
 } as Record<string, string>;
@@ -66,7 +66,7 @@ const AuthLayout = () => {
       {/* === MAIN CONTENT SECTION === */}
       <main className="flex flex-1 w-full min-h-0">
         {/* === LEFT SIDE: AUTH FORM === */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center px-6 bg-gradient-to-br from-[#0f0d3d] via-[#1e1b6e] to-[#009CD1] overflow-auto">
+        <div className="w-full lg:w-1/2 flex items-center justify-center px-6 bg-gradient-to-br from-[#0f0d3d] via-[#1e1b6e] to-[#0057A8] overflow-auto">
           <div className="w-full max-w-md py-8">
             <Outlet />
           </div>
@@ -75,7 +75,7 @@ const AuthLayout = () => {
         {/* === RIGHT SIDE: CAROUSEL COMPONENT === */}
         {/* THÊM MỚI: Phần carousel chỉ hiện trên desktop (lg:) */}
         {carouselImages.length > 0 && (
-          <div className="hidden lg:flex lg:w-1/2 relative overflow-visible bg-gradient-to-br from-[#009CD1]/10 to-[#009CD1]/20 h-full z-10">
+          <div className="hidden lg:flex lg:w-1/2 relative overflow-visible bg-gradient-to-br from-[#0057A8]/10 to-[#0057A8]/20 h-full z-10">
             {/* THÊM h-full + z-10 để dots không bị che */}
             <Swiper
               modules={[Pagination, Autoplay]}
@@ -119,7 +119,7 @@ const AuthLayout = () => {
                 className="relative group inline-block px-1 py-1 hover:text-[#0085b3] transition-colors duration-200"
               >
                 <span className="relative z-10">{t(`footer.${item}`)}</span>
-                <span className="absolute left-1/2 -bottom-2 h-1 w-1 rounded-full bg-[#009CD1] opacity-0 group-hover:opacity-100 transform -translate-x-1/2 transition-opacity duration-200" />
+                <span className="absolute left-1/2 -bottom-2 h-1 w-1 rounded-full bg-[#0057A8] opacity-0 group-hover:opacity-100 transform -translate-x-1/2 transition-opacity duration-200" />
               </a>
             ) : (
               <a
@@ -127,7 +127,7 @@ const AuthLayout = () => {
                 className="relative group inline-block px-1 py-1 hover:text-[#0085b3] transition-colors duration-200"
               >
                 <span className="relative z-10">{t(`footer.${item}`)}</span>
-                <span className="absolute left-1/2 -bottom-2 h-1 w-1 rounded-full bg-[#009CD1] opacity-0 group-hover:opacity-100 transform -translate-x-1/2 transition-opacity duration-200" />
+                <span className="absolute left-1/2 -bottom-2 h-1 w-1 rounded-full bg-[#0057A8] opacity-0 group-hover:opacity-100 transform -translate-x-1/2 transition-opacity duration-200" />
               </a>
             )}
           </li>
@@ -158,10 +158,10 @@ const AuthLayout = () => {
         </div>
 
         <span className="text-[#94A3B8] text-xs text-center sm:text-left leading-relaxed">
-          <strong className="text-[#009CD1] font-medium">{t("footer.request")}:</strong>{" "}
+          <strong className="text-[#0057A8] font-medium">{t("footer.request")}:</strong>{" "}
           http://cis.hcmiu.edu.vn/gui-yeu-cau
           <br />
-          <strong className="text-[#009CD1] font-medium">{t("footer.tel")}:</strong>{" "}
+          <strong className="text-[#0057A8] font-medium">{t("footer.tel")}:</strong>{" "}
           (08) 37244270 ext.3366
         </span>
       </div>

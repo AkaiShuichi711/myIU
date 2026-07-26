@@ -9,7 +9,7 @@ const ForgotPassword = () => {
           <img src="/assets/images/logo_beforesignin.svg" alt="myIU" />
         </div>
 
-        <h1 className="text-center text-2xl font-semibold text-[#009CD1] mb-4">
+        <h1 className="text-center text-2xl font-semibold text-[#0057A8] mb-4">
           Quên mật khẩu
         </h1>
 
@@ -30,7 +30,7 @@ const ForgotPassword = () => {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <Button className="w-full bg-[#009CD1] hover:bg-[#007BAA] text-white">
+            <Button className="w-full bg-[#0057A8] hover:bg-[#007BAA] text-white">
               Đặt lại mật khẩu Microsoft
             </Button>
           </a>

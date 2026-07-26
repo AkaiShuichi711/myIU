@@ -15,7 +15,7 @@ const CreateCoursePage = () => {
     name: '',
     semester: SEMESTERS[0],
     description: '',
-    coverColor: '#009CD1',
+    coverColor: '#0057A8',
   });
 
   const set = (key: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
@@ -32,7 +32,7 @@ const CreateCoursePage = () => {
     }
   };
 
-  const gradient = COVER_GRADIENTS[form.coverColor] ?? COVER_GRADIENTS['#009CD1'];
+  const gradient = COVER_GRADIENTS[form.coverColor] ?? COVER_GRADIENTS['#0057A8'];
 
   return (
     <div className="min-h-full bg-[#F8FAFC] dark:bg-[#19191a]">
@@ -135,7 +135,7 @@ const CreateCoursePage = () => {
           <button
             type="submit"
             disabled={isPending || !form.code.trim() || !form.name.trim()}
-            className="w-full py-2.5 rounded-xl text-sm font-semibold text-white flex items-center justify-center gap-2 disabled:opacity-60 bg-[#009CD1] hover:bg-[#0087b3] transition-colors"
+            className="w-full py-2.5 rounded-xl text-sm font-semibold text-white flex items-center justify-center gap-2 disabled:opacity-60 bg-[#0057A8] hover:bg-[#0087b3] transition-colors"
           >
             {isPending ? <Loader2 size={15} className="animate-spin" /> : <BookOpen size={15} />}
             {isPending ? 'Đang tạo...' : 'Tạo môn học'}
