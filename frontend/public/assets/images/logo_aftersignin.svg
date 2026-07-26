@@ -2,32 +2,38 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 330 48" fill="none" role="img" aria-label="International University">
 
   <defs>
-    <!-- Top arc: math 200°→340°, sweep=1 (screen CW over screen-top) — text reads L→R from outside ✓ -->
-    <path id="seal-top" d="M 7,18 A 18.5,18.5 0 0,1 41,18"/>
-    <!-- Bottom arc: math 140°→40°, sweep=0 (screen CCW through screen-bottom) — text reads L→R from outside ✓ -->
+    <!--
+      Top arc: math 170°→10° via 270° (screen-top), 200° arc, sweep=1 large-arc=1
+      At screen-top, sweep=1 direction = RIGHTWARD → text reads L-to-R from outside ✓
+    -->
+    <path id="seal-top" d="M 6,27 A 18.5,18.5 0 1,1 42,27"/>
+    <!--
+      Bottom arc: math 140°→40° via 90° (screen-bottom), 100° arc, sweep=0 small-arc
+      At screen-bottom, sweep=0 direction = RIGHTWARD → text reads L-to-R from outside ✓
+    -->
     <path id="seal-bot" d="M 10,36 A 18.5,18.5 0 0,0 38,36"/>
   </defs>
 
-  <!-- SEAL: outer ring -->
+  <!-- Outer ring -->
   <circle cx="24" cy="24" r="22" stroke="white" stroke-width="1.1" fill="none"/>
-  <!-- SEAL: inner ring (bounds the mark area) -->
-  <circle cx="24" cy="24" r="15.5" stroke="white" stroke-width="0.6" fill="none" opacity="0.80"/>
+  <!-- Inner ring -->
+  <circle cx="24" cy="24" r="15.5" stroke="white" stroke-width="0.7" fill="none" opacity="0.85"/>
 
-  <!-- SEAL: top circular text -->
-  <text font-size="2.6" fill="white" font-family="Arial, sans-serif" opacity="0.82" letter-spacing="0.08">
-    <textPath href="#seal-top" startOffset="3%">HOCHIMINH CITY INTERNATIONAL UNIVERSITY</textPath>
+  <!-- Top circular text: "HO CHI MINH CITY INTERNATIONAL UNIVERSITY" -->
+  <text font-size="2.6" fill="white" font-family="Arial, sans-serif" opacity="0.88" letter-spacing="-0.08">
+    <textPath href="#seal-top" startOffset="5%">HO CHI MINH CITY INTERNATIONAL UNIVERSITY</textPath>
   </text>
-  <!-- SEAL: bottom circular text -->
-  <text font-size="2.6" fill="white" font-family="Arial, sans-serif" opacity="0.82" letter-spacing="1.0">
-    <textPath href="#seal-bot" startOffset="14%">• HCM • IU •</textPath>
+  <!-- Bottom circular text: "• HCM - IU •" -->
+  <text font-size="2.6" fill="white" font-family="Arial, sans-serif" opacity="0.88" letter-spacing="0.9">
+    <textPath href="#seal-bot" startOffset="12%">• HCM - IU •</textPath>
   </text>
 
-  <!-- IU MARK: upper sphere — solid white (prominent, matches teal in official logo) -->
-  <circle cx="24" cy="18.5" r="5.5" fill="white"/>
-  <!-- IU MARK: lower rectangle — outline only (navy interior = background shows through, matches navy rect in official logo) -->
-  <rect x="18.5" y="24" width="11" height="9" rx="1.5" stroke="white" stroke-width="0.9" fill="none"/>
+  <!-- IU mark: teal sphere → solid white (lighter, prominent) -->
+  <circle cx="24" cy="20" r="6" fill="white"/>
+  <!-- IU mark: navy rect → outlined white (background shows through = dark, matches original navy rect) -->
+  <rect x="18" y="26" width="12" height="9" rx="1.5" stroke="white" stroke-width="1" fill="none"/>
 
-  <!-- TEXT: subtitle -->
+  <!-- Subtitle -->
   <text
     x="52" y="19"
     font-family="Arial, 'Helvetica Neue', sans-serif"
@@ -35,7 +41,7 @@
     fill="rgba(255,255,255,0.72)"
   >VIET NAM NATIONAL UNIVERSITY HO CHI MINH CITY</text>
 
-  <!-- TEXT: main title -->
+  <!-- Main title -->
   <text
     x="52" y="37"
     font-family="Arial, 'Helvetica Neue', sans-serif"
