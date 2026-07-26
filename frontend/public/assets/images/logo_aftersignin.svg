@@ -1,17 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 330 48" fill="none" role="img" aria-label="International University">
 
+  <defs>
+    <!-- Top arc: math 200°→340°, sweep=1 (screen CW over screen-top) — text reads L→R from outside ✓ -->
+    <path id="seal-top" d="M 7,18 A 18.5,18.5 0 0,1 41,18"/>
+    <!-- Bottom arc: math 140°→40°, sweep=0 (screen CCW through screen-bottom) — text reads L→R from outside ✓ -->
+    <path id="seal-bot" d="M 10,36 A 18.5,18.5 0 0,0 38,36"/>
+  </defs>
+
   <!-- SEAL: outer ring -->
   <circle cx="24" cy="24" r="22" stroke="white" stroke-width="1.1" fill="none"/>
-  <!-- SEAL: decorative dashed ring (simulates engraved text band) -->
-  <circle cx="24" cy="24" r="18.5" stroke="white" stroke-width="0.7" stroke-dasharray="2.2 2.1" fill="none" opacity="0.55"/>
-  <!-- SEAL: inner ring -->
+  <!-- SEAL: inner ring (bounds the mark area) -->
   <circle cx="24" cy="24" r="15.5" stroke="white" stroke-width="0.6" fill="none" opacity="0.80"/>
 
-  <!-- IU MARK: upper sphere element -->
-  <circle cx="24" cy="19" r="5" fill="white"/>
-  <!-- IU MARK: lower rectangular element -->
-  <rect x="18" y="26" width="12" height="8" rx="1.5" fill="white"/>
+  <!-- SEAL: top circular text -->
+  <text font-size="2.6" fill="white" font-family="Arial, sans-serif" opacity="0.82" letter-spacing="0.08">
+    <textPath href="#seal-top" startOffset="3%">HOCHIMINH CITY INTERNATIONAL UNIVERSITY</textPath>
+  </text>
+  <!-- SEAL: bottom circular text -->
+  <text font-size="2.6" fill="white" font-family="Arial, sans-serif" opacity="0.82" letter-spacing="1.0">
+    <textPath href="#seal-bot" startOffset="14%">• HCM • IU •</textPath>
+  </text>
+
+  <!-- IU MARK: upper sphere — solid white (prominent, matches teal in official logo) -->
+  <circle cx="24" cy="18.5" r="5.5" fill="white"/>
+  <!-- IU MARK: lower rectangle — outline only (navy interior = background shows through, matches navy rect in official logo) -->
+  <rect x="18.5" y="24" width="11" height="9" rx="1.5" stroke="white" stroke-width="0.9" fill="none"/>
 
   <!-- TEXT: subtitle -->
   <text
