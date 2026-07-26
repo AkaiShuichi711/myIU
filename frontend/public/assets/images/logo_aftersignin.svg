@@ -28,10 +28,10 @@
     <textPath href="#seal-bot" startOffset="12%">• HCM - IU •</textPath>
   </text>
 
-  <!-- IU mark: sphere — solid white fill -->
-  <circle cx="24" cy="20" r="6" fill="white"/>
-  <!-- IU mark: body — solid white fill, 2-unit gap so navy bg separates the two shapes -->
-  <rect x="18" y="28" width="12" height="9" rx="2" fill="white"/>
+  <!-- IU mark: sphere — teal/cyan matching actual IU logo color -->
+  <circle cx="24" cy="19" r="5.5" fill="#3DC5F5"/>
+  <!-- IU mark: body — white, gap separates from sphere -->
+  <rect x="18.5" y="27" width="11" height="9" rx="2" fill="white"/>
 
   <!-- Subtitle -->
   <text
