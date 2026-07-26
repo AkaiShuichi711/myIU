@@ -124,7 +124,7 @@ const AllUsers = () => {
                   <div className="h-2.5 bg-slate-100 dark:bg-slate-700 rounded w-1/2 mx-auto" />
                 </div>
               </div>
-            ))}I
+            ))}
           </div>
         ) : users.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 text-center">

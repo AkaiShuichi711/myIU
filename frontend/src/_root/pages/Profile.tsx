@@ -5,6 +5,7 @@ import {
   Loader2, ShieldAlert, Copy, CheckCheck,
   GraduationCap, BookOpen, Shield,
 } from 'lucide-react';
+import { PageLoader } from '@/components/shared';
 import { useTranslation } from 'react-i18next';
 import { useUserContext } from '@/context/AuthContext';
 import { useGetUserById } from '@/lib/react-query/queriesAndMutations';
@@ -43,13 +44,7 @@ const ProfilePage = () => {
     setTimeout(() => setCopied(null), 1800);
   };
 
-  if (isLoadingUser && !profileData) {
-    return (
-      <div className="min-h-full bg-[#F8FAFC] dark:bg-slate-900 flex items-center justify-center">
-        <Loader2 size={24} className="animate-spin text-[#0057A8]" />
-      </div>
-    );
-  }
+  if (isLoadingUser && !profileData) return <PageLoader />;
 
   const displayName  = profileData?.name  || (isOwnProfile ? currentUser.name  : 'Unknown User');
   const displayEmail = profileData?.email || (isOwnProfile ? currentUser.email : '');

@@ -52,7 +52,7 @@ const CommentSection = ({ postId, postOwnerId, postOwnerName }: CommentSectionPr
         taggedUsers: snapshot.mentioned,
       },
       {
-        onSuccess: (comment: any) => {
+        onSuccess: (comment: { $id?: string } | null) => {
           // Notify post owner (don't notify yourself)
           if (postOwnerId && postOwnerId !== user.id) {
             createNotif({

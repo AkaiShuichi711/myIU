@@ -115,6 +115,20 @@ export type INotification = {
 
 export type INewNotification = Omit<INotification, '$id' | '$createdAt' | 'read'>;
 
+export type AppNotifType =
+  | 'form_approved' | 'form_rejected' | 'form_pending'
+  | 'grade' | 'course' | 'system';
+
+export type IAppNotification = {
+  $id: string;
+  userId: string;
+  type: AppNotifType;
+  message: string;
+  read: boolean;
+  linkTo?: string;
+  $createdAt: string;
+};
+
 // ─── Phase 4 – Forms ──────────────────────────────────────────────────────────
 
 export type FormCategory = 'academic' | 'finance' | 'administrative' | 'other';

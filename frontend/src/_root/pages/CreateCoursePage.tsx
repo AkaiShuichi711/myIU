@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, BookOpen, Check, Loader2 } from 'lucide-react';
 import { useUserContext } from '@/context/AuthContext';
 import { useCreateCourse } from '@/lib/react-query/queriesAndMutations';
-import { COVER_OPTIONS, COVER_GRADIENTS, SEMESTERS, CIRCUIT_BG_STYLE, INPUT_CLS } from '@/constants/courses';
+import { COVER_OPTIONS, COVER_GRADIENTS, SEMESTERS, INPUT_CLS } from '@/constants/courses';
 
 const CreateCoursePage = () => {
   const { user } = useUserContext();
@@ -147,7 +147,6 @@ const CreateCoursePage = () => {
           <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">Xem trước</p>
           <div className="bg-white dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700/60 overflow-hidden shadow-sm">
             <div className="h-[72px] relative" style={{ background: gradient }}>
-              <div className="absolute inset-0 opacity-10" style={CIRCUIT_BG_STYLE} />
               <div className="absolute inset-0 flex items-center px-4">
                 <span className="font-mono text-xl font-black text-white tracking-widest drop-shadow">
                   {form.code || 'CODE'}

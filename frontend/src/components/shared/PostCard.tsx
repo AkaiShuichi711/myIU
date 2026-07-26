@@ -5,10 +5,11 @@ import { useUserContext } from '@/context/AuthContext';
 import { useLikePost, useSavePost, useDeleteSavedPost, useDeletePost } from '@/lib/react-query/queriesAndMutations';
 import { formatTimeAgo } from '@/lib/utils';
 import UserAvatar from './UserAvatar';
+import type { IPost } from '@/types';
 
 type PostCardProps = {
-  post: any;
-  savedRecords?: any[];
+  post: IPost;
+  savedRecords?: { postId: string; $id: string }[];
 };
 
 const DOC_META: Record<string, { icon: React.ReactNode; label: string; color: string; bg: string }> = {

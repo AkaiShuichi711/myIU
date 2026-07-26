@@ -23,10 +23,11 @@ import {
   useGetStudentGrade,
   useUpsertCourseGrades,
 } from '@/lib/react-query/queriesAndMutations';
-import type { ICourseGrade, IUpsertCourseGrade } from '@/types';
+import type { ICourse, ICourseGroup, ICoursePost, IGroupMember, ICourseGrade, IUpsertCourseGrade } from '@/types';
 import { formatTimeAgo, isLecturerRole, isAdminRole } from '@/lib/utils';
 import { INPUT_CLS } from '@/constants/courses';
 import UserAvatar from '@/components/shared/UserAvatar';
+import { PageLoader } from '@/components/shared';
 
 type Tab = 'feed' | 'materials' | 'assignments' | 'members' | 'grades';
 type PostType = 'announcement' | 'material' | 'assignment';
@@ -61,7 +62,7 @@ const PostCard = ({
   isLecturer,
   onDelete,
 }: {
-  post: any;
+  post: ICoursePost;
   isLecturer: boolean;
   onDelete: (id: string) => void;
 }) => {
@@ -126,12 +127,18 @@ const PostCard = ({
 };
 
 // ── Group Panel ───────────────────────────────────────────────────────────────
-const GroupPanel = ({ group, courseId, isLecturer, onDeleteGroup }: any) => {
+const GroupPanel = ({ group, courseId, isLecturer, onDeleteGroup }: {
+  group: ICourseGroup;
+  courseId: string;
+  isLecturer: boolean;
+  onDeleteGroup: (id: string) => void;
+}) => {
   const [expanded, setExpanded] = useState(false);
   const [showAddMember, setShowAddMember] = useState(false);
   const [memberForm, setMemberForm] = useState({ studentId: '', studentName: '' });
 
-  const { data: members = [], isPending } = useGetGroupMembers(expanded ? group.$id : '');
+  const { data: rawMembers = [], isPending } = useGetGroupMembers(expanded ? group.$id : '');
+  const members = rawMembers as IGroupMember[];
   const { mutate: addMember, isPending: isAdding } = useAddGroupMember();
   const { mutate: removeMember } = useRemoveGroupMember();
 
@@ -199,11 +206,11 @@ const GroupPanel = ({ group, courseId, isLecturer, onDeleteGroup }: any) => {
 
           {isPending ? (
             <div className="flex justify-center py-4"><Loader2 size={16} className="animate-spin text-slate-400" /></div>
-          ) : (members as any[]).length === 0 ? (
+          ) : members.length === 0 ? (
             <p className="text-xs text-slate-400 dark:text-slate-500 py-2 text-center">Chưa có sinh viên trong nhóm này</p>
           ) : (
             <div className="flex flex-col divide-y divide-slate-100 dark:divide-slate-700">
-              {(members as any[]).map((m) => (
+              {members.map((m) => (
                 <div key={m.$id} className="flex items-center justify-between py-2 gap-2">
                   <div className="flex items-center gap-2 min-w-0">
                     <UserAvatar name={m.studentName || '?'} className="w-6 h-6 text-[10px]" variant="muted" />
@@ -275,20 +282,21 @@ const CourseDetail = () => {
   const { data: myLecturerGroups = [] } = useGetLecturerGroupsInCourse(id, user.id);
   const { data: myStudentGroups  = [] } = useGetStudentGroupsInCourse(id, user.id);
 
-  const course   = rawCourse as any;
-  const groups   = rawGroups as any[];
-  const allPosts = rawPosts  as any[];
+  const course   = rawCourse as unknown as ICourse;
+  const groups   = rawGroups as unknown as ICourseGroup[];
+  const allPosts = rawPosts  as unknown as ICoursePost[];
 
   const { mutate: createPost,  isPending: isCreatingPost  } = useCreateCoursePost();
   const { mutate: deletePost  } = useDeleteCoursePost();
   const { mutate: createGroup, isPending: isCreatingGroup } = useCreateCourseGroup();
   const { mutate: deleteGroup } = useDeleteCourseGroup();
 
-  const roles: string[] = (user as any).roles ?? [];
-  const isLecturerByRole = isLecturerRole(roles) || isAdminRole(roles);
-  const isLecturer  = isAdminRole(roles) || ((myLecturerGroups as any[]).length > 0 && isLecturerByRole);
-  const isStudent   = (myStudentGroups  as any[]).length > 0 || !isLecturerByRole;
-  const myStudentId = isStudent ? (myStudentGroups as any[])[0]?.studentId ?? user.id : user.id;
+  const isLecturerByRole = isLecturerRole(user.roles) || isAdminRole(user.roles);
+  const lecturerGroups = myLecturerGroups as unknown as ICourseGroup[];
+  const studentGroups  = myStudentGroups  as unknown as IGroupMember[];
+  const isLecturer  = isAdminRole(user.roles) || (lecturerGroups.length > 0 && isLecturerByRole);
+  const isStudent   = studentGroups.length > 0 || !isLecturerByRole;
+  const myStudentId = isStudent ? (studentGroups[0]?.studentId ?? user.id) : user.id;
 
   // Grades
   const { data: gradesRaw = [], isPending: isLoadingGrades } = useGetCourseGrades(tab === 'grades' && isLecturer ? id : '');
@@ -300,13 +308,13 @@ const CourseDetail = () => {
 
   // Local edit state for the grade table (lecturer only)
   const [editedScores, setEditedScores] = useState<Record<string, Record<string, number>>>({});
-  const myGroupIds  = isStudent ? (myStudentGroups as any[]).map((g: any) => g.groupId) : [];
+  const myGroupIds  = isStudent ? studentGroups.map((g) => g.groupId) : [];
 
-  const visiblePosts    = (allPosts as any[]).filter((p) => isLecturer || !p.groupId || myGroupIds.includes(p.groupId));
+  const visiblePosts    = allPosts.filter((p) => isLecturer || !p.groupId || myGroupIds.includes(p.groupId));
   const materialPosts   = visiblePosts.filter((p) => p.type === 'material');
   const assignmentPosts = visiblePosts.filter((p) => p.type === 'assignment');
 
-  const tabPosts: Record<Tab, any[]> = {
+  const tabPosts: Record<Tab, ICoursePost[]> = {
     feed:        visiblePosts,
     materials:   materialPosts,
     assignments: assignmentPosts,
@@ -351,13 +359,7 @@ const CourseDetail = () => {
     });
   };
 
-  if (isLoadingCourse) {
-    return (
-      <div className="min-h-full bg-[#F8FAFC] dark:bg-[#19191a] flex items-center justify-center">
-        <Loader2 size={24} className="animate-spin text-slate-400" />
-      </div>
-    );
-  }
+  if (isLoadingCourse) return <PageLoader />;
 
   if (!course) {
     return (
@@ -388,7 +390,7 @@ const CourseDetail = () => {
               <ArrowLeft size={12} /> MÔN HỌC
             </Link>
             <span className="text-slate-300 dark:text-slate-700 text-[11px]">/</span>
-            <span className="font-mono text-[11px] font-bold text-slate-600 dark:text-slate-300 uppercase">{(course as any).code}</span>
+            <span className="font-mono text-[11px] font-bold text-slate-600 dark:text-slate-300 uppercase">{course?.code}</span>
           </div>
           {isLecturer && (
             <button
@@ -405,13 +407,13 @@ const CourseDetail = () => {
       <div className="h-28 relative bg-[#0B2275]">
         <div className="absolute inset-0 flex flex-col justify-center px-8 max-w-5xl mx-auto w-full">
           <div className="flex items-center gap-2.5 mb-1">
-            <span className="font-mono text-2xl font-black tracking-widest text-white">{(course as any).code}</span>
+            <span className="font-mono text-2xl font-black tracking-widest text-white">{course?.code}</span>
             {isLecturer && <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-white/20 text-white">GIẢNG VIÊN</span>}
             {isStudent && !isLecturer && <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-white/15 text-white/80">SINH VIÊN</span>}
-            {!(course as any).isActive && <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-black/30 text-white/60 tracking-wider">KẾT THÚC</span>}
+            {!course?.isActive && <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-black/30 text-white/60 tracking-wider">KẾT THÚC</span>}
           </div>
-          <p className="font-semibold text-sm text-white/90">{(course as any).name}</p>
-          <p className="text-white/50 text-[11px] font-mono mt-0.5">{(course as any).semester} · {(groups as any[]).length} nhóm</p>
+          <p className="font-semibold text-sm text-white/90">{course?.name}</p>
+          <p className="text-white/50 text-[11px] font-mono mt-0.5">{course?.semester} · {groups.length} nhóm</p>
         </div>
       </div>
 
@@ -495,7 +497,7 @@ const CourseDetail = () => {
                   className={INPUT_CLS}
                 >
                   <option value="">Tất cả nhóm</option>
-                  {(groups as any[]).map((g) => (
+                  {groups.map((g) => (
                     <option key={g.$id} value={g.$id}>{g.name}</option>
                   ))}
                 </select>
@@ -614,7 +616,7 @@ const CourseDetail = () => {
               </div>
             )}
 
-            {(groups as any[]).length === 0 ? (
+            {groups.length === 0 ? (
               <div className="flex flex-col items-center py-12 gap-2 text-center">
                 <Users size={24} className="text-slate-300 dark:text-slate-600" />
                 <p className="text-sm text-slate-500 dark:text-slate-400">Chưa có nhóm nào</p>
@@ -626,13 +628,13 @@ const CourseDetail = () => {
               </div>
             ) : (
               <div className="flex flex-col gap-3">
-                {(groups as any[]).map((group) => (
+                {groups.map((group) => (
                   <GroupPanel
                     key={group.$id}
                     group={group}
                     courseId={id}
                     isLecturer={isLecturer}
-                    onDeleteGroup={(gid: string) => deleteGroup({ groupId: gid, courseId: id })}
+                    onDeleteGroup={(gid) => deleteGroup({ groupId: gid, courseId: id })}
                   />
                 ))}
               </div>

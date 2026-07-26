@@ -1,6 +1,6 @@
 ﻿import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Bell, Loader2, CheckCheck, FileText, BookOpen, Star, GraduationCap } from 'lucide-react';
+import { Bell, Loader2, CheckCheck } from 'lucide-react';
 import { useUserContext } from '@/context/AuthContext';
 import {
   useGetNotifications,
@@ -8,15 +8,8 @@ import {
   useMarkAllNotificationsRead,
 } from '@/lib/react-query/queriesAndMutations';
 import { formatTimeAgo } from '@/lib/utils';
-
-const TYPE_META: Record<string, { icon: React.ReactNode; color: string }> = {
-  form_approved: { icon: <FileText size={15} className="text-[#00c578]" />,       color: 'bg-[#00c578]/12' },
-  form_rejected: { icon: <FileText size={15} className="text-[#ef4e49]" />,       color: 'bg-[#ef4e49]/12' },
-  form_pending:  { icon: <FileText size={15} className="text-[#f5832f]" />,       color: 'bg-[#f5832f]/12' },
-  grade:         { icon: <Star size={15} className="text-[#0057A8]" />,           color: 'bg-[#0057A8]/10' },
-  course:        { icon: <BookOpen size={15} className="text-[#0057A8]" />,       color: 'bg-[#0057A8]/10' },
-  system:        { icon: <GraduationCap size={15} className="text-[#99a3ad]" />,  color: 'bg-[#33485c]/15' },
-};
+import { NOTIF_TYPE_META, DEFAULT_NOTIF_META } from '@/constants/notifications';
+import type { IAppNotification } from '@/types';
 
 const NotificationBell = () => {
   const { user } = useUserContext();
@@ -27,8 +20,9 @@ const NotificationBell = () => {
   const { mutate: markRead } = useMarkNotificationRead();
   const { mutate: markAll } = useMarkAllNotificationsRead();
 
-  const unreadCount = (notifications as any[]).filter((n) => !n.read).length;
-  const preview = (notifications as any[]).slice(0, 5);
+  const notifs = notifications as IAppNotification[];
+  const unreadCount = notifs.filter((n) => !n.read).length;
+  const preview = notifs.slice(0, 5);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -41,7 +35,7 @@ const NotificationBell = () => {
     return () => document.removeEventListener('mousedown', handler);
   }, [open]);
 
-  const handleClickNotif = (n: any) => {
+  const handleClickNotif = (n: IAppNotification) => {
     if (!n.read) markRead({ notifId: n.$id, userId: user.id });
     setOpen(false);
   };
@@ -89,8 +83,8 @@ const NotificationBell = () => {
                 <p className="text-xs text-slate-400">Chưa có thông báo nào</p>
               </div>
             ) : (
-              preview.map((n: any) => {
-                const meta = TYPE_META[n.type] ?? { icon: <Bell size={15} className="text-slate-400" />, color: 'bg-slate-100' };
+              preview.map((n) => {
+                const meta = NOTIF_TYPE_META[n.type] ?? DEFAULT_NOTIF_META;
                 return (
                   <button
                     key={n.$id}
@@ -116,7 +110,7 @@ const NotificationBell = () => {
           </div>
 
           {/* Footer */}
-          {(notifications as any[]).length > 0 && (
+          {notifs.length > 0 && (
             <div className="px-4 py-2.5 border-t border-slate-50">
               <Link
                 to="/notifications"

@@ -193,20 +193,6 @@ const TenantPage = () => {
             <ChevronRight size={14} color={c.muted} />
             <span style={{ fontSize: "13px", color: c.heading }}>{t('nav.tenant')}</span>
           </div>
-{/* 
-          <div style={{
-            display: "flex", alignItems: "center", gap: "7px",
-            background: "#f0fdf4", border: "1px solid #bbf7d0",
-            borderRadius: "20px", padding: "5px 14px",
-          }}>
-            <span style={{
-              width: "7px", height: "7px", borderRadius: "50%",
-              background: "#22c55e",
-              boxShadow: "0 0 0 3px rgba(34,197,94,0.2)",
-              animation: "pulse 2s infinite",
-            }} />
-            <span style={{ color: "#15803d", fontSize: "12px", fontWeight: 600 }}>Secure Session Active</span>
-          </div> */}
         </div>
 
         {/* PAGE BODY */}
@@ -239,14 +225,6 @@ const TenantPage = () => {
                 </p>
               </div>
             </div>
-            {/* <div style={{
-              background: "#fffbeb", border: "1px solid #fde68a",
-              borderRadius: "10px", padding: "8px 14px",
-              fontSize: "12px", color: "#92400e", fontWeight: 500,
-              maxWidth: "220px", lineHeight: 1.5,
-            }}>
-              ⚠ Restricted: Requires standard tenant organization mapping.
-            </div> */}
           </div>
 
           {/* STATES */}

@@ -2,18 +2,27 @@
 import { LogOut, ChevronDown } from 'lucide-react';
 import Flag from 'react-world-flags';
 import { useUserContext } from '@/context/AuthContext';
-import { useTheme } from '@/context/ThemeContext';
 import NotificationBell from './NotificationBell';
 import { LANGUAGES, getSavedLang, changeLanguage } from '@/lib/googleTranslate';
 
+const c = {
+  bg:             '#163878',
+  border:         'rgba(255,255,255,0.18)',
+  text:           'rgba(255,255,255,0.92)',
+  textMuted:      'rgba(255,255,255,0.68)',
+  divider:        'rgba(255,255,255,0.20)',
+  btnHoverBg:     'rgba(255,255,255,0.10)',
+  dropdownBg:     '#ffffff',
+  dropdownBorder: '#E0E4EB',
+  optionHover:    '#F8FAFC',
+} as const;
+
 const Topbar = () => {
   const { signOut } = useUserContext();
-  const { theme } = useTheme();
   const [isLangOpen, setIsLangOpen] = useState(false);
   const [currentLang, setCurrentLang] = useState(getSavedLang);
   const langRef = useRef<HTMLDivElement>(null);
 
-  const isDark = theme === 'dark';
   const activeLang = LANGUAGES.find((l) => l.code === currentLang) ?? LANGUAGES[0];
 
   const handleLangChange = (code: string) => {
@@ -31,18 +40,6 @@ const Topbar = () => {
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, []);
-
-  const c = {
-    bg:             '#163878',
-    border:         'rgba(255,255,255,0.18)',
-    text:           'rgba(255,255,255,0.92)',
-    textMuted:      'rgba(255,255,255,0.68)',
-    divider:        'rgba(255,255,255,0.20)',
-    btnHoverBg:     'rgba(255,255,255,0.10)',
-    dropdownBg:     isDark ? '#1e2028' : '#ffffff',
-    dropdownBorder: isDark ? '#33485c' : '#E0E4EB',
-    optionHover:    isDark ? '#0d2137' : '#F8FAFC',
-  };
 
   const [logoutHover, setLogoutHover] = useState(false);
 
@@ -122,7 +119,7 @@ const Topbar = () => {
               position: 'absolute', top: 'calc(100% + 6px)', right: 0,
               background: c.dropdownBg, border: `1px solid ${c.dropdownBorder}`,
               borderRadius: '8px',
-              boxShadow: isDark ? '0 8px 24px rgba(0,0,0,0.5)' : '0 8px 24px rgba(0,0,0,0.1)',
+              boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
               minWidth: '160px', maxHeight: '320px', overflowY: 'auto', zIndex: 100,
               padding: '4px',
             }}>
@@ -133,9 +130,7 @@ const Topbar = () => {
                   style={{
                     display: 'flex', alignItems: 'center', gap: '9px',
                     width: '100%', padding: '7px 10px', borderRadius: '6px',
-                    background: opt.code === currentLang
-                      ? (isDark ? 'rgba(241,90,34,0.15)' : 'rgba(241,90,34,0.08)')
-                      : 'transparent',
+                    background: opt.code === currentLang ? 'rgba(241,90,34,0.08)' : 'transparent',
                     border: 'none', cursor: 'pointer', fontSize: '12.5px',
                     color: opt.code === currentLang ? '#0057A8' : c.text,
                     fontWeight: opt.code === currentLang ? 600 : 400,

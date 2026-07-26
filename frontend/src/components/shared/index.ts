@@ -1,4 +1,5 @@
 export { default as Loader } from './Loader';
+export { default as PageLoader } from './PageLoader';
 export { default as LeftSidebar } from './LeftSidebar';
 export { default as Topbar } from './Topbar';
 export { default as PostCard } from './PostCard';

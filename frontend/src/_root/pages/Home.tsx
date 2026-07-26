@@ -10,7 +10,7 @@ import {
 } from '@/lib/react-query/queriesAndMutations';
 import { isLecturerRole, isAdminRole, formatTimeAgo } from '@/lib/utils';
 import { FORM_STATUS } from '@/constants/ui';
-import type { SubmissionStatus } from '@/types';
+import type { SubmissionStatus, ICourse, IFormSubmission, IAppNotification } from '@/types';
 
 const NOTIF_DOT: Record<string, string> = {
   form_approved: 'bg-green-500',
@@ -39,24 +39,23 @@ const Home = () => {
   const { user } = useUserContext();
   const { t } = useTranslation();
 
-  const roles: string[] = (user as any).roles ?? [];
-  const isLecturer = isLecturerRole(roles);
-  const isAdmin    = isAdminRole(roles);
+  const isLecturer = isLecturerRole(user.roles);
+  const isAdmin    = isAdminRole(user.roles);
 
   const { data: studentCourses = [],  isPending: loadingStudentCourses  } = useGetCoursesByStudent(!isLecturer && !isAdmin ? user.id : '');
   const { data: lecturerCourses = [], isPending: loadingLecturerCourses } = useGetCoursesByLecturer(isLecturer || isAdmin ? user.id : '');
   const { data: rawNotifs = [],       isPending: loadingNotifs          } = useGetNotifications(user.id);
   const { data: rawForms = [],        isPending: loadingForms           } = useGetFormSubmissionsByUser(user.id);
 
-  const rawCourses    = isLecturer || isAdmin ? lecturerCourses : studentCourses;
+  const rawCourses     = isLecturer || isAdmin ? lecturerCourses : studentCourses;
   const loadingCourses = isLecturer || isAdmin ? loadingLecturerCourses : loadingStudentCourses;
-  const courses = rawCourses as any[];
-  const notifs  = rawNotifs  as any[];
-  const forms   = rawForms   as any[];
+  const courses = rawCourses as ICourse[];
+  const notifs  = rawNotifs  as IAppNotification[];
+  const forms   = rawForms   as IFormSubmission[];
 
-  const unreadCount   = notifs.filter((n: any) => !n.read).length;
-  const pendingCount  = forms.filter((f: any) => f.status === 'pending').length;
-  const activeCourses = courses.filter((c: any) => c.isActive !== false).length;
+  const unreadCount   = notifs.filter((n) => !n.read).length;
+  const pendingCount  = forms.filter((f) => f.status === 'pending').length;
+  const activeCourses = courses.filter((c) => c.isActive !== false).length;
 
   const nameParts = user.name?.trim().split(/\s+/) ?? [];
   const firstName = nameParts[nameParts.length - 1] ?? user.name;
@@ -128,7 +127,7 @@ const Home = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {courses.slice(0, 4).map((course: any) => (
+              {courses.slice(0, 4).map((course) => (
                 <Link
                   key={course.$id}
                   to={`/courses/${course.$id}`}
@@ -177,7 +176,7 @@ const Home = () => {
               </div>
             ) : (
               <div className="divide-y divide-[#F4F6F8] dark:divide-[#243447]">
-                {notifs.slice(0, 5).map((n: any) => (
+                {notifs.slice(0, 5).map((n) => (
                   <Link
                     key={n.$id}
                     to={n.linkTo || '/notifications'}
@@ -226,7 +225,7 @@ const Home = () => {
             ) : (
               <div className="divide-y divide-[#F4F6F8] dark:divide-[#243447]">
                 {[...forms]
-                  .sort((a: any, b: any) => {
+                  .sort((a, b) => {
                     const priority: Record<string, number> = { pending: 0, approved: 1, rejected: 2 };
                     const pa = priority[a.status] ?? 1;
                     const pb = priority[b.status] ?? 1;
@@ -234,7 +233,7 @@ const Home = () => {
                     return new Date(b.$createdAt).getTime() - new Date(a.$createdAt).getTime();
                   })
                   .slice(0, 4)
-                  .map((f: any) => {
+                  .map((f) => {
                     const st = FORM_STATUS[(f.status as SubmissionStatus)] ?? FORM_STATUS.pending;
                     const StatusIcon = st.Icon;
                     return (

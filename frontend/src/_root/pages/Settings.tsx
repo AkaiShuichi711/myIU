@@ -2,7 +2,6 @@
 import { Loader2, Monitor, Smartphone, Tablet, Palette, MapPin, ShieldOff, Globe, LogOut, ChevronDown, ChevronUp } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import Flag from 'react-world-flags';
-import { useUserContext } from '@/context/AuthContext';
 import { LANGUAGES, getSavedLang, changeLanguage } from '@/lib/googleTranslate';
 
 import { useGetAccountSessions, useRevokeSession, useRevokeOtherSessions } from '@/lib/react-query/queriesAndMutations';
@@ -150,7 +149,6 @@ function SessionCard({ s, onRevoke, revoking }: { s: LoginSession; onRevoke: (id
 }
 
 const Settings = () => {
-  const { user: _user } = useUserContext();
   const { t } = useTranslation();
   const [tab, setTab] = useState<Tab>('appearance');
   const [currentLang, setCurrentLang] = useState(getSavedLang);

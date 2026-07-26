@@ -1,5 +1,5 @@
 ﻿import { useState } from 'react';
-import { Bell, CheckCheck, Loader2, FileText, BookOpen, Star, GraduationCap } from 'lucide-react';
+import { Bell, CheckCheck, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useUserContext } from '@/context/AuthContext';
@@ -9,17 +9,10 @@ import {
   useMarkAllNotificationsRead,
 } from '@/lib/react-query/queriesAndMutations';
 import { formatTimeAgo } from '@/lib/utils';
+import { NOTIF_TYPE_META, DEFAULT_NOTIF_META } from '@/constants/notifications';
+import type { IAppNotification } from '@/types';
 
 type Filter = 'all' | 'unread';
-
-const TYPE_META: Record<string, { icon: React.ReactNode; color: string }> = {
-  form_approved: { icon: <FileText size={15} className="text-[#00c578]" />,  color: 'bg-[#00c578]/12' },
-  form_rejected: { icon: <FileText size={15} className="text-[#ef4e49]" />,  color: 'bg-[#ef4e49]/12' },
-  form_pending:  { icon: <FileText size={15} className="text-[#f5832f]" />,  color: 'bg-[#f5832f]/12' },
-  grade:         { icon: <Star size={15} className="text-[#0057A8]" />,      color: 'bg-[#0057A8]/10' },
-  course:        { icon: <BookOpen size={15} className="text-[#0057A8]" />,  color: 'bg-[#0057A8]/10' },
-  system:        { icon: <GraduationCap size={15} className="text-[#99a3ad]" />, color: 'bg-[#33485c]/15' },
-};
 
 const Notifications = () => {
   const { user } = useUserContext();
@@ -30,12 +23,12 @@ const Notifications = () => {
   const { mutate: markRead } = useMarkNotificationRead();
   const { mutate: markAll, isPending: isMarkingAll } = useMarkAllNotificationsRead();
 
-  const allNotifs = rawNotifs as any[];
+  const allNotifs = rawNotifs as IAppNotification[];
 
   const notifications = allNotifs.filter((n) => filter === 'all' || !n.read);
   const unreadCount = allNotifs.filter((n) => !n.read).length;
 
-  const handleClick = (n: any) => {
+  const handleClick = (n: IAppNotification) => {
     if (!n.read) markRead({ notifId: n.$id, userId: user.id });
   };
 
@@ -108,8 +101,8 @@ const Notifications = () => {
             </div>
           ) : (
             <div className="divide-y divide-slate-50 dark:divide-[#0d2137]">
-              {notifications.map((n: any) => {
-                const meta = TYPE_META[n.type] ?? { icon: <Bell size={15} className="text-[#DCE3E8]" />, color: 'bg-[#33485c]/12' };
+              {notifications.map((n) => {
+                const meta = NOTIF_TYPE_META[n.type] ?? DEFAULT_NOTIF_META;
 
                 const content = (
                   <div

@@ -25,7 +25,5 @@ export const SEMESTERS = [
   'HK1 2025-2026', 'HK2 2025-2026', 'HK3 2025-2026',
 ];
 
-export const CIRCUIT_BG_STYLE: React.CSSProperties = {};
-
 export const INPUT_CLS =
   'w-full px-3 py-2 text-sm rounded-lg bg-slate-50 dark:bg-slate-700/60 border border-slate-200 dark:border-slate-600 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0057A8]/25 focus:border-[#0057A8] transition-all';
