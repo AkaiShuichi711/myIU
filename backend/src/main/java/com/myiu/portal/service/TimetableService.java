@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,21 +28,21 @@ public class TimetableService {
         List<UUID> courseIds;
         if (isLecturerOrAdmin) {
             courseIds = courseRepository.findByCreatorId(userId)
-                    .stream().map(Course::getId).collect(Collectors.toList());
+                    .stream().map(Course::getId).toList();
         } else {
             courseIds = groupMemberRepository.findByStudentId(userId)
-                    .stream().map(GroupMember::getCourseId).distinct().collect(Collectors.toList());
+                    .stream().map(GroupMember::getCourseId).distinct().toList();
         }
 
         if (courseIds.isEmpty()) return List.of();
 
         return scheduleRepository.findByCourseIdIn(courseIds)
-                .stream().map(this::toDTO).collect(Collectors.toList());
+                .stream().map(this::toDTO).toList();
     }
 
     public List<TimetableEntryDTO> getForCourse(UUID courseId) {
         return scheduleRepository.findByCourseIdOrderByStartTimeAsc(courseId)
-                .stream().map(this::toDTO).collect(Collectors.toList());
+                .stream().map(this::toDTO).toList();
     }
 
     @Transactional

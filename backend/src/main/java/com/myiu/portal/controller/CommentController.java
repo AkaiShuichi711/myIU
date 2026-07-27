@@ -1,7 +1,6 @@
 package com.myiu.portal.controller;
 
 import com.myiu.portal.dto.*;
-import com.myiu.portal.repository.UserRepository;
 import com.myiu.portal.service.CommentService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -15,14 +14,10 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/comments")
 @RequiredArgsConstructor
-public class CommentController {
+public class CommentController extends BaseController {
 
     private final CommentService commentService;
-    private final UserRepository userRepository;
 
-    private UUID currentUserId(UserDetails principal) {
-        return userRepository.findByEmail(principal.getUsername()).orElseThrow().getId();
-    }
 
     @PostMapping("/post/{postId}")
     public ResponseEntity<ApiResponse<CommentDTO>> add(

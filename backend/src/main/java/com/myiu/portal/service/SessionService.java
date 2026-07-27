@@ -3,6 +3,7 @@ package com.myiu.portal.service;
 import com.myiu.portal.entity.LoginSession;
 import com.myiu.portal.entity.User;
 import com.myiu.portal.repository.LoginSessionRepository;
+import com.myiu.portal.util.IpUtils;
 import com.myiu.portal.util.UserAgentParser;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +33,7 @@ public class SessionService {
      */
     @Transactional
     public LoginSession createSession(User user, HttpServletRequest request) {
-        String ip = extractIp(request);
+        String ip = IpUtils.extractIp(request);
         String ua = request.getHeader("User-Agent");
 
         LoginSession session = LoginSession.builder()
@@ -84,11 +85,4 @@ public class SessionService {
         }
     }
 
-    private String extractIp(HttpServletRequest request) {
-        String xff = request.getHeader("X-Forwarded-For");
-        if (xff != null && !xff.isBlank()) return xff.split(",")[0].trim();
-        String realIp = request.getHeader("X-Real-IP");
-        if (realIp != null && !realIp.isBlank()) return realIp.trim();
-        return request.getRemoteAddr();
-    }
 }

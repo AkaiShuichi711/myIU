@@ -2,7 +2,8 @@ package com.myiu.portal.controller;
 
 import com.myiu.portal.dto.ApiResponse;
 import com.myiu.portal.entity.*;
-import com.myiu.portal.repository.*;
+import com.myiu.portal.repository.CourseGroupRepository;
+import com.myiu.portal.repository.CourseRepository;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,15 +17,11 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/course-groups")
 @RequiredArgsConstructor
-public class CourseGroupController {
+public class CourseGroupController extends BaseController {
 
     private final CourseGroupRepository courseGroupRepository;
     private final CourseRepository courseRepository;
-    private final UserRepository userRepository;
 
-    private UUID currentUserId(UserDetails principal) {
-        return userRepository.findByEmail(principal.getUsername()).orElseThrow().getId();
-    }
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<CourseGroup>>> get(

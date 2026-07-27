@@ -2,7 +2,8 @@ package com.myiu.portal.controller;
 
 import com.myiu.portal.dto.ApiResponse;
 import com.myiu.portal.entity.*;
-import com.myiu.portal.repository.*;
+import com.myiu.portal.repository.FormSubmissionRepository;
+import com.myiu.portal.repository.FormTemplateRepository;
 import com.myiu.portal.service.EmailService;
 import com.myiu.portal.service.StorageService;
 import lombok.Data;
@@ -18,17 +19,13 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/forms")
 @RequiredArgsConstructor
-public class FormController {
+public class FormController extends BaseController {
 
     private final FormTemplateRepository formTemplateRepository;
     private final FormSubmissionRepository formSubmissionRepository;
-    private final UserRepository userRepository;
     private final StorageService storageService;
     private final EmailService emailService;
 
-    private UUID currentUserId(UserDetails principal) {
-        return userRepository.findByEmail(principal.getUsername()).orElseThrow().getId();
-    }
 
     // ── Templates ──────────────────────────────────────────────────────────────
 

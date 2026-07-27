@@ -7,7 +7,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.*;
 import org.springframework.stereotype.Service;
 
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -22,7 +21,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         var authorities = user.getRoles().stream()
                 .map(r -> new SimpleGrantedAuthority(r.startsWith("ROLE_") ? r : "ROLE_" + r))
-                .collect(Collectors.toList());
+                .toList();
 
         return new org.springframework.security.core.userdetails.User(
                 user.getEmail(),

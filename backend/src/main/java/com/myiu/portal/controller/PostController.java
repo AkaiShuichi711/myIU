@@ -1,7 +1,6 @@
 package com.myiu.portal.controller;
 
 import com.myiu.portal.dto.*;
-import com.myiu.portal.repository.UserRepository;
 import com.myiu.portal.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -16,16 +15,11 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/posts")
 @RequiredArgsConstructor
-public class PostController {
+public class PostController extends BaseController {
 
     private final PostService postService;
     private final StorageService storageService;
-    private final UserRepository userRepository;
 
-    private UUID currentUserId(UserDetails principal) {
-        return userRepository.findByEmail(principal.getUsername())
-                .orElseThrow().getId();
-    }
 
     @PostMapping
     public ResponseEntity<ApiResponse<PostDTO>> create(

@@ -4,6 +4,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.ConsumptionProbe;
+import com.myiu.portal.util.IpUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -99,21 +100,10 @@ public class RateLimitFilter extends OncePerRequestFilter {
     }
 
     private String resolveKey(HttpServletRequest request, String path) {
-        String ip = extractIp(request);
-        // Scope login/search limits to IP; others can be scoped to user if needed
-        return ip + ":" + normalizePath(path);
+        return IpUtils.extractIp(request) + ":" + normalizePath(path);
     }
 
     private String normalizePath(String path) {
-        // Strip UUIDs and IDs for grouping — /api/users/abc123 → /api/users/{id}
         return path.replaceAll("/[0-9a-fA-F-]{8,}", "/{id}");
-    }
-
-    private String extractIp(HttpServletRequest request) {
-        String xff = request.getHeader("X-Forwarded-For");
-        if (xff != null && !xff.isBlank()) return xff.split(",")[0].trim();
-        String realIp = request.getHeader("X-Real-IP");
-        if (realIp != null && !realIp.isBlank()) return realIp.trim();
-        return request.getRemoteAddr();
     }
 }

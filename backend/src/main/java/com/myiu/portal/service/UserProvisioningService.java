@@ -88,16 +88,15 @@ public class UserProvisioningService {
         for (UserRow row : createRows) {
             try {
                 String emailLower = row.email().trim().toLowerCase();
-                if (userRepository.findByEmail(emailLower).isPresent()) {
-                    // Already exists — reactivate if was deactivated
-                    userRepository.findByEmail(emailLower).ifPresent(u -> {
-                        if (!u.isActive()) {
-                            u.setActive(true);
-                            u.setProvisionedBy(adminEmail);
-                            u.setProvisionedAt(Instant.now());
-                            userRepository.save(u);
-                        }
-                    });
+                Optional<User> existingUser = userRepository.findByEmail(emailLower);
+                if (existingUser.isPresent()) {
+                    User u = existingUser.get();
+                    if (!u.isActive()) {
+                        u.setActive(true);
+                        u.setProvisionedBy(adminEmail);
+                        u.setProvisionedAt(Instant.now());
+                        userRepository.save(u);
+                    }
                     createSkipped++;
                     continue;
                 }

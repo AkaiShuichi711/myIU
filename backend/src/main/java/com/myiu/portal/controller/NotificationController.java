@@ -1,7 +1,6 @@
 package com.myiu.portal.controller;
 
 import com.myiu.portal.dto.*;
-import com.myiu.portal.repository.UserRepository;
 import com.myiu.portal.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,14 +13,10 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/notifications")
 @RequiredArgsConstructor
-public class NotificationController {
+public class NotificationController extends BaseController {
 
     private final NotificationService notificationService;
-    private final UserRepository userRepository;
 
-    private UUID currentUserId(UserDetails principal) {
-        return userRepository.findByEmail(principal.getUsername()).orElseThrow().getId();
-    }
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<NotificationDTO>>> get(
@@ -42,14 +37,4 @@ public class NotificationController {
         return ResponseEntity.ok(ApiResponse.ok(null));
     }
 
-    /** DEV ONLY — tạo notification test cho chính mình */
-    @PostMapping("/test")
-    public ResponseEntity<ApiResponse<Void>> createTest(
-            @AuthenticationPrincipal UserDetails principal,
-            @RequestParam(defaultValue = "system") String type,
-            @RequestParam(defaultValue = "Test notification") String message,
-            @RequestParam(defaultValue = "/home") String linkTo) {
-        notificationService.create(currentUserId(principal), type, null, null, null, null, message, linkTo);
-        return ResponseEntity.ok(ApiResponse.ok(null));
-    }
 }

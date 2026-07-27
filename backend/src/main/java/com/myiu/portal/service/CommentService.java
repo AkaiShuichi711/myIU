@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +34,7 @@ public class CommentService {
 
     public List<CommentDTO> getByPost(UUID postId) {
         return commentRepository.findByPostIdOrderByCreatedAtAsc(postId)
-                .stream().map(this::toDTO).collect(Collectors.toList());
+                .stream().map(this::toDTO).toList();
     }
 
     @Transactional

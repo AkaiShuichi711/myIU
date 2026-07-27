@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -38,11 +37,8 @@ public class UserService {
     }
 
     public List<UserDTO> search(String query) {
-        return userRepository.findAll().stream()
-                .filter(u -> u.getName().toLowerCase().contains(query.toLowerCase())
-                          || u.getUsername().toLowerCase().contains(query.toLowerCase()))
-                .map(this::toDTO)
-                .collect(Collectors.toList());
+        return userRepository.searchByNameOrUsername(query)
+                .stream().map(this::toDTO).toList();
     }
 
     public UserDTO toDTO(User user) {

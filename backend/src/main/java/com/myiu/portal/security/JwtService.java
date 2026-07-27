@@ -24,25 +24,6 @@ public class JwtService {
         return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String generateToken(String subject) {
-        return Jwts.builder()
-                .subject(subject)
-                .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + expirationMs))
-                .signWith(key())
-                .compact();
-    }
-
-    public String generateToken(UserDetails userDetails, Map<String, Object> extraClaims) {
-        return Jwts.builder()
-                .claims(extraClaims)
-                .subject(userDetails.getUsername())
-                .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + expirationMs))
-                .signWith(key())
-                .compact();
-    }
-
     public String generateToken(String subject, Map<String, Object> extraClaims) {
         return Jwts.builder()
                 .claims(extraClaims)

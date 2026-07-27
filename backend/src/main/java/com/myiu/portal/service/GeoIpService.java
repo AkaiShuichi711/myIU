@@ -84,9 +84,17 @@ public class GeoIpService {
     }
 
     private boolean isPrivate(String ip) {
-        return ip.startsWith("127.") || ip.startsWith("10.")
-                || ip.startsWith("192.168.") || ip.startsWith("172.")
-                || ip.equals("0:0:0:0:0:0:0:1") || ip.equals("::1")
-                || ip.equals("0.0.0.0");
+        if (ip.startsWith("127.") || ip.startsWith("10.") || ip.startsWith("192.168.")
+                || ip.equals("0:0:0:0:0:0:0:1") || ip.equals("::1") || ip.equals("0.0.0.0")) {
+            return true;
+        }
+        if (ip.startsWith("172.")) {
+            String[] parts = ip.split("\\.");
+            try {
+                int second = Integer.parseInt(parts[1]);
+                return second >= 16 && second <= 31;
+            } catch (Exception ignored) {}
+        }
+        return false;
     }
 }

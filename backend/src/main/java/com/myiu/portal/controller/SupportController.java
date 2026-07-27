@@ -4,7 +4,6 @@ import com.myiu.portal.dto.ApiResponse;
 import com.myiu.portal.entity.SupportTicket;
 import com.myiu.portal.entity.User;
 import com.myiu.portal.repository.SupportTicketRepository;
-import com.myiu.portal.repository.UserRepository;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,14 +16,10 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/support")
 @RequiredArgsConstructor
-public class SupportController {
+public class SupportController extends BaseController {
 
     private final SupportTicketRepository ticketRepository;
-    private final UserRepository userRepository;
 
-    private User currentUser(UserDetails principal) {
-        return userRepository.findByEmail(principal.getUsername()).orElseThrow();
-    }
 
     @PostMapping
     public ResponseEntity<ApiResponse<SupportTicket>> create(

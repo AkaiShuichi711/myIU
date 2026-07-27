@@ -14,7 +14,7 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
-public class UserController {
+public class UserController extends BaseController {
 
     private final UserService userService;
     private final StorageService storageService;
@@ -34,6 +34,9 @@ public class UserController {
             @PathVariable UUID id,
             @RequestBody UpdateUserRequest req,
             @AuthenticationPrincipal UserDetails principal) {
+        if (!id.equals(currentUserId(principal))) {
+            return ResponseEntity.status(403).body(ApiResponse.error("Forbidden"));
+        }
         return ResponseEntity.ok(ApiResponse.ok(userService.update(id, req)));
     }
 
@@ -45,7 +48,11 @@ public class UserController {
     @PostMapping("/{id}/avatar")
     public ResponseEntity<ApiResponse<String>> uploadAvatar(
             @PathVariable UUID id,
-            @RequestParam("file") MultipartFile file) throws Exception {
+            @RequestParam("file") MultipartFile file,
+            @AuthenticationPrincipal UserDetails principal) throws Exception {
+        if (!id.equals(currentUserId(principal))) {
+            return ResponseEntity.status(403).body(ApiResponse.error("Forbidden"));
+        }
         var stored = storageService.store(file, id);
         String url = storageService.getUrl(stored.getId());
         UpdateUserRequest req = new UpdateUserRequest();

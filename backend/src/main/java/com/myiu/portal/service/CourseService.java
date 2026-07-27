@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -19,7 +18,7 @@ public class CourseService {
 
     public List<CourseDTO> getAll() {
         return courseRepository.findByIsActiveTrueOrderByCreatedAtDesc()
-                .stream().map(this::toDTO).collect(Collectors.toList());
+                .stream().map(this::toDTO).toList();
     }
 
     public CourseDTO getById(UUID id) {

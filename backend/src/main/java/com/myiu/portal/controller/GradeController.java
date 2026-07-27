@@ -2,7 +2,7 @@ package com.myiu.portal.controller;
 
 import com.myiu.portal.dto.ApiResponse;
 import com.myiu.portal.entity.CourseGrade;
-import com.myiu.portal.repository.*;
+import com.myiu.portal.repository.CourseGradeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,14 +16,10 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/grades")
 @RequiredArgsConstructor
-public class GradeController {
+public class GradeController extends BaseController {
 
     private final CourseGradeRepository gradeRepository;
-    private final UserRepository userRepository;
 
-    private UUID currentUserId(UserDetails principal) {
-        return userRepository.findByEmail(principal.getUsername()).orElseThrow().getId();
-    }
 
     @GetMapping
     public ResponseEntity<ApiResponse<Object>> get(

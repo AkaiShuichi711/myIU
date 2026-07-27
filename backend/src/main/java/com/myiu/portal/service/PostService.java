@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -118,7 +117,7 @@ public class PostService {
     public List<PostDTO> getSavedPosts(UUID userId) {
         return saveRepository.findByUserIdOrderByCreatedAtDesc(userId).stream()
                 .map(s -> toDTO(s.getPost()))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public PostDTO toDTO(Post post) {
@@ -136,7 +135,7 @@ public class PostService {
                 .media(post.getMedia().stream().map(m -> PostDTO.MediaDTO.builder()
                         .id(m.getId()).url(m.getUrl())
                         .mediaType(m.getMediaType()).sortOrder(m.getSortOrder())
-                        .build()).collect(Collectors.toList()))
+                        .build()).toList())
                 .createdAt(post.getCreatedAt())
                 .updatedAt(post.getUpdatedAt())
                 .build();

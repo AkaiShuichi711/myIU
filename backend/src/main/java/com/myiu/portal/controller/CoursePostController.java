@@ -2,7 +2,9 @@ package com.myiu.portal.controller;
 
 import com.myiu.portal.dto.ApiResponse;
 import com.myiu.portal.entity.*;
-import com.myiu.portal.repository.*;
+import com.myiu.portal.repository.CourseGroupRepository;
+import com.myiu.portal.repository.CoursePostRepository;
+import com.myiu.portal.repository.CourseRepository;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,16 +19,12 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/course-posts")
 @RequiredArgsConstructor
-public class CoursePostController {
+public class CoursePostController extends BaseController {
 
     private final CoursePostRepository coursePostRepository;
     private final CourseRepository courseRepository;
     private final CourseGroupRepository courseGroupRepository;
-    private final UserRepository userRepository;
 
-    private UUID currentUserId(UserDetails principal) {
-        return userRepository.findByEmail(principal.getUsername()).orElseThrow().getId();
-    }
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<CoursePost>>> get(
@@ -42,8 +40,8 @@ public class CoursePostController {
     public ResponseEntity<ApiResponse<CoursePost>> create(
             @RequestBody CoursePostRequest req,
             @AuthenticationPrincipal UserDetails principal) {
-        UUID userId = currentUserId(principal);
-        var user = userRepository.findById(userId).orElseThrow();
+        User user = currentUser(principal);
+        UUID userId = user.getId();
         Course course = courseRepository.getReferenceById(req.getCourseId());
         CoursePost.CoursePostBuilder builder = CoursePost.builder()
                 .course(course)

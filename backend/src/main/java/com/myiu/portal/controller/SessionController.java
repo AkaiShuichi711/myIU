@@ -3,7 +3,6 @@ package com.myiu.portal.controller;
 import com.myiu.portal.dto.ApiResponse;
 import com.myiu.portal.entity.LoginSession;
 import com.myiu.portal.entity.User;
-import com.myiu.portal.repository.UserRepository;
 import com.myiu.portal.service.SessionService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -18,18 +17,16 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/sessions")
 @RequiredArgsConstructor
-public class SessionController {
+public class SessionController extends BaseController {
 
     private final SessionService sessionService;
-    private final UserRepository userRepository;
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<SessionDTO>>> getSessions(
             @AuthenticationPrincipal UserDetails userDetails,
             HttpServletRequest request) {
 
-        User user = userRepository.findByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = currentUser(userDetails);
 
         String sessionIdStr = (String) request.getAttribute("sessionId");
         UUID currentSessionId = null;
@@ -56,8 +53,7 @@ public class SessionController {
             @PathVariable UUID id,
             @AuthenticationPrincipal UserDetails userDetails) {
 
-        User user = userRepository.findByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = currentUser(userDetails);
 
         sessionService.revokeSession(id, user.getId());
         return ResponseEntity.ok(ApiResponse.ok("Session revoked", null));
@@ -68,8 +64,7 @@ public class SessionController {
             @AuthenticationPrincipal UserDetails userDetails,
             HttpServletRequest request) {
 
-        User user = userRepository.findByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = currentUser(userDetails);
 
         String sessionIdStr = (String) request.getAttribute("sessionId");
         if (sessionIdStr != null) {

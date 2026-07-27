@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -21,7 +20,7 @@ public class NotificationService {
 
     public List<NotificationDTO> getForUser(UUID userId) {
         return notificationRepository.findByUserIdOrderByCreatedAtDesc(userId)
-                .stream().map(this::toDTO).collect(Collectors.toList());
+                .stream().map(this::toDTO).toList();
     }
 
     public long getUnreadCount(UUID userId) {

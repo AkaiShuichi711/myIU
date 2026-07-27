@@ -1,7 +1,6 @@
 package com.myiu.portal.controller;
 
 import com.myiu.portal.dto.*;
-import com.myiu.portal.repository.UserRepository;
 import com.myiu.portal.service.CourseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,14 +13,10 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/courses")
 @RequiredArgsConstructor
-public class CourseController {
+public class CourseController extends BaseController {
 
     private final CourseService courseService;
-    private final UserRepository userRepository;
 
-    private UUID currentUserId(UserDetails principal) {
-        return userRepository.findByEmail(principal.getUsername()).orElseThrow().getId();
-    }
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<CourseDTO>>> getAll() {
