@@ -10,15 +10,15 @@ Role-based access enforced at API and UI level.
 
 ```
 myIU/ (this repo)                myIU-admin/ (separate repo)
-├── backend-java  :8080  ──────── shared PostgreSQL ──── backend  :8081
-└── frontend      :5173                                   frontend :3000
+├── backend  :8080  ──────────── shared PostgreSQL ──── backend  :8081
+└── frontend :5173                                       frontend :3000
 ```
 
 | Role | Application | Auth method |
 |---|---|---|
 | `student` | myIU portal (5173 / 8080) | Microsoft SSO → JWT |
 | `lecturer` | myIU portal (5173 / 8080) | Microsoft SSO → JWT |
-| `admin` | myIU-admin (3000 / 8081) | Email + password → JWT |
+| `admin` | myIU admin panel (built-in `/admin`) | Email + password → JWT |
 
 ---
 
@@ -45,14 +45,40 @@ On local dev this is set automatically by the `.env` file (loaded by `spring-dot
 | Backend | Java 21 (Eclipse Temurin LTS), Spring Boot 3.4.1 |
 | Auth | Azure AD OAuth2 + JWT (jjwt 0.12.5) — `sessionId` embedded in JWT claim |
 | Session security | JWT revocation via per-request DB check (`existsByIdAndRevokedFalse`) |
-| Database | PostgreSQL 16, Flyway V1–V5 migrations |
+| Database | PostgreSQL 16, Flyway V1–V8 migrations |
+| Real-time | WebSocket / STOMP over SockJS — notifications push |
+| Email | Gmail SMTP (JavaMailSender) — async HTML email on form approve/reject |
 | Rate limiting | Bucket4j token-bucket — 5/min login, 60/min search, 10/hr upload |
-| Caching | Caffeine W-TinyLFU — rate limit buckets + L1 cache (admin) |
+| Caching | Caffeine W-TinyLFU — rate limit buckets + L1 cache |
 | Observability | Spring Actuator → Prometheus → Grafana |
 | API docs | SpringDoc OpenAPI — `/swagger-ui.html` (disabled on prod) |
-| Frontend | React 18, TypeScript, Vite 5, TailwindCSS, React Query |
+| Frontend | React 18, TypeScript, Vite 5, TailwindCSS, React Query v5 |
+| i18n | i18next (VI/EN) + Google Translate widget |
 | Container | Docker (multi-stage, Eclipse Temurin JRE) + Nginx (frontend) |
 | CI/CD | GitHub Actions — ci.yml → deploy-dev.yml → deploy-prod.yml |
+
+---
+
+## LMS Features
+
+| Feature | Status | Notes |
+|---|---|---|
+| Microsoft SSO login | ✅ Done | Azure AD OAuth2 + JWT |
+| Course management | ✅ Done | CRUD, enrollments, groups |
+| Course posts (feed/materials/assignments) | ✅ Done | Post types with attachments |
+| Assignment submission | ✅ Done | Student submit/resubmit, lecturer grade, LATE detection |
+| Attendance tracking | ✅ Done | Lecturer mark P/L/A/E per session, student history view |
+| Grades | ✅ Done | Per-course grade sheet, student self-view |
+| Timetable | ✅ Done | Weekly schedule, room info |
+| Forms & approval workflow | ✅ Done | Template-based, email notifications on approve/reject |
+| Real-time notifications | ✅ Done | WebSocket STOMP push |
+| Support tickets | ✅ Done | Submit, track, admin respond |
+| Admin panel | ✅ Done | User management, provisioning, support ticket management |
+| Session management | ✅ Done | Meta-style active sessions + remote revoke |
+| Course self-enrollment | 🔲 Planned | Medium priority |
+| Email broadcast on announcement | 🔲 Planned | Medium priority |
+| Course progress tracking | 🔲 Planned | Nice to have |
+| Discussion forum | 🔲 Planned | Nice to have |
 
 ---
 
@@ -60,67 +86,112 @@ On local dev this is set automatically by the `.env` file (loaded by `spring-dot
 
 ```
 myIU/
-├── backend-java/
+├── backend/
 │   ├── src/main/java/com/myiu/portal/
 │   │   ├── config/
-│   │   │   ├── AsyncConfig.java          # geoIpExecutor thread pool (GeoIP async enrichment)
-│   │   │   ├── CacheConfig.java          # Caffeine W-TinyLFU cache for rate limit buckets
+│   │   │   ├── AsyncConfig.java          # geoIpExecutor (GeoIP), emailExecutor (email sending)
+│   │   │   ├── CacheConfig.java          # Caffeine W-TinyLFU
 │   │   │   ├── RateLimitFilter.java      # Token-bucket O(1) rate limiting (Bucket4j)
-│   │   │   ├── SecurityConfig.java       # CORS, filter chain, OAuth2, JWT, 401 entry point
+│   │   │   ├── SecurityConfig.java       # CORS, filter chain, OAuth2, JWT, WebSocket
+│   │   │   ├── WebSocketConfig.java      # STOMP broker + SockJS endpoint
 │   │   │   ├── StorageConfig.java
 │   │   │   └── GlobalExceptionHandler.java
-│   │   ├── controller/                   # 14 REST controllers
+│   │   ├── controller/                   # 19 REST controllers
+│   │   │   ├── AuthController.java
+│   │   │   ├── UserController.java
+│   │   │   ├── CourseController.java
+│   │   │   ├── CourseGroupController.java
+│   │   │   ├── CoursePostController.java
+│   │   │   ├── GradeController.java
+│   │   │   ├── AssignmentSubmissionController.java  # Submit, grade assignments
+│   │   │   ├── AttendanceController.java             # Mark & view attendance
+│   │   │   ├── AdminController.java                  # Admin: stats, users, tickets, provision
+│   │   │   ├── FormController.java       # Templates CRUD + submission approval + email trigger
+│   │   │   ├── TimetableController.java  # Course schedule management
+│   │   │   ├── NotificationController.java
+│   │   │   ├── PostController.java
+│   │   │   ├── CommentController.java
+│   │   │   ├── BlockController.java
+│   │   │   ├── GroupMemberController.java
+│   │   │   ├── StorageController.java
+│   │   │   ├── SupportController.java
+│   │   │   └── SessionController.java
 │   │   ├── dto/
-│   │   │   └── CursorPage.java           # Cursor-based pagination (O(log N) vs OFFSET O(N))
-│   │   ├── entity/                       # 19 JPA entities
-│   │   ├── repository/                   # 14 Spring Data repositories
+│   │   │   ├── CursorPage.java           # Cursor-based pagination (O(log N))
+│   │   │   ├── ApiResponse.java          # Uniform response wrapper { data, message, error }
+│   │   │   ├── CourseScheduleRequest.java
+│   │   │   └── TimetableEntryDTO.java
+│   │   ├── entity/                       # 22 JPA entities
+│   │   │   ├── AssignmentSubmission.java # coursePostId+studentId unique; status SUBMITTED/LATE/GRADED
+│   │   │   └── Attendance.java           # courseId+studentId+date unique; status PRESENT/ABSENT/LATE/EXCUSED
+│   │   ├── repository/
 │   │   ├── security/
-│   │   │   ├── JwtAuthenticationFilter.java  # Session revocation check + sets sessionId attribute
-│   │   │   ├── JwtService.java               # HS384, generateToken(subject, claims)
-│   │   │   ├── OAuth2SuccessHandler.java     # Login → createSession → embed sessionId in JWT
-│   │   │   └── ...
+│   │   │   ├── JwtAuthenticationFilter.java
+│   │   │   ├── JwtService.java
+│   │   │   ├── OAuth2SuccessHandler.java
+│   │   │   └── WebSocketAuthInterceptor.java  # JWT auth for STOMP connections
 │   │   ├── service/
-│   │   │   ├── GeoIpService.java         # @Async lookupAndEnrich() — doesn't block login
-│   │   │   ├── SessionService.java       # createSession: save fast, enrich geo async
-│   │   │   └── ...
+│   │   │   ├── EmailService.java         # @Async HTML email — approved/rejected notifications
+│   │   │   ├── TimetableService.java     # Course schedule logic
+│   │   │   ├── GeoIpService.java         # @Async GeoIP enrichment
+│   │   │   ├── NotificationService.java
+│   │   │   ├── SessionService.java
+│   │   │   └── UserProvisioningService.java  # Excel-driven bulk user create/deactivate
 │   │   └── util/
-│   │       └── UserAgentParser.java      # Parses browser/OS/device from User-Agent
+│   │       └── UserAgentParser.java
 │   ├── src/main/resources/
-│   │   ├── application.yml               # Base config (Jackson, multipart, OAuth2 structure)
-│   │   ├── application-local.yml         # Local: myiu_local, debug logging, Swagger enabled
-│   │   ├── application-dev.yml           # Dev: myiu_dev, INFO logging, Swagger enabled
-│   │   ├── application-prod.yml          # Prod: myiu_prod, WARN logging, Swagger disabled
-│   │   ├── application-test.yml          # Test: Testcontainers, no hardcoded secrets
-│   │   └── db/migration/                 # V1–V5 Flyway migrations
-│   ├── src/test/java/com/myiu/portal/
-│   │   ├── SessionServiceTest.java       # Unit tests (Mockito, no DB)
-│   │   └── GeoIpServiceTest.java
-│   ├── Dockerfile                        # Multi-stage: JDK builder → JRE runtime
-│   └── .dockerignore
+│   │   ├── application.yml               # Base config
+│   │   ├── application-local.yml
+│   │   ├── application-dev.yml
+│   │   ├── application-prod.yml
+│   │   ├── application-test.yml
+│   │   └── db/migration/
+│   │       ├── V1__initial_schema.sql    # users, posts, courses, forms, notifications, grades
+│   │       ├── V2__admin_users.sql
+│   │       ├── V3__user_provisioning.sql
+│   │       ├── V4__support_tickets.sql
+│   │       ├── V5__login_sessions.sql
+│   │       ├── V6__course_schedules.sql
+│   │       ├── V7__assignment_submissions.sql  # assignment_submissions table
+│   │       └── V8__attendance_records.sql      # attendance_records table
+│   └── Dockerfile
 │
 ├── frontend/
 │   ├── src/
-│   │   ├── _auth/                        # Sign-in, OAuth2 callback
-│   │   ├── _root/pages/Settings.tsx      # Meta-style login sessions tab
-│   │   ├── lib/api/client.ts             # fetch wrapper — 401 → auto-logout
-│   │   └── lib/react-query/              # React Query hooks
-│   ├── Dockerfile                        # Node builder → Nginx runtime
-│   ├── nginx.conf                        # SPA routing + gzip + immutable cache headers
-│   ├── .env.development                  # VITE_API_URL=http://localhost:8080
-│   └── .env.production                   # VITE_API_URL=https://api.myiu.edu.vn
+│   │   ├── _auth/                        # Sign-in, OAuth2 callback, ForgotPassword
+│   │   ├── _admin/                       # Admin panel (auth-protected /admin/* routes)
+│   │   │   ├── AdminLoginPage.tsx
+│   │   │   ├── AdminLayout.tsx
+│   │   │   ├── AdminDashboard.tsx        # Live stats (users/courses/tickets)
+│   │   │   ├── AdminUsersPage.tsx        # User list, search, activate/deactivate
+│   │   │   ├── AdminProvisionPage.tsx    # Excel upload for bulk user provisioning
+│   │   │   └── AdminSupportPage.tsx      # Support ticket list + respond
+│   │   ├── _root/pages/                  # Student/lecturer pages
+│   │   │   ├── CourseDetail.tsx          # Tabs: Feed · Materials · Assignments · Attendance · Grades · Members
+│   │   │   └── ... (20+ other pages)
+│   │   ├── components/shared/            # Topbar, LeftSidebar, NotificationBell
+│   │   ├── constants/                    # FORM_STATUS, FILE_TYPE_META, FORM_CATEGORIES
+│   │   ├── hooks/
+│   │   │   └── useNotificationSocket.ts  # WebSocket STOMP hook
+│   │   ├── lib/react-query/              # All queries & mutations
+│   │   ├── locales/                      # vi.json, en.json (i18next)
+│   │   └── types/index.ts
+│   ├── public/assets/images/
+│   │   └── logo_aftersignin.svg          # IU seal + institution text (app header)
+│   ├── index.html                        # Google Translate widget (vi/en only)
+│   ├── vite.config.ts                    # define: { global: 'globalThis' } for SockJS
+│   └── Dockerfile
 │
 ├── .github/workflows/
-│   ├── ci.yml                            # PR gate: lint → test → build-check
-│   ├── deploy-dev.yml                    # Push to develop → deploy to dev server
-│   └── deploy-prod.yml                   # Push tag v* → deploy to production
+│   ├── ci.yml
+│   ├── deploy-dev.yml
+│   └── deploy-prod.yml
 │
-├── docker-compose.local.yml              # PostgreSQL only (backends run on host)
-├── docker-compose.dev.yml                # Full stack — dev server
-├── docker-compose.prod.yml               # Full stack — production
-├── Makefile                              # Cross-platform convenience commands
-├── .env.local.example                    # Template for local .env
-├── .env.dev.example                      # Template for dev server
-└── .env.prod.example                     # Template for production
+├── docker-compose.local.yml
+├── docker-compose.dev.yml
+├── docker-compose.prod.yml
+├── Makefile
+└── backend/.env.example
 ```
 
 ---
@@ -132,7 +203,7 @@ myIU/
 - **Java 21** — Eclipse Temurin LTS
 - **Node.js 22+**
 - **Docker Desktop** (Windows/macOS) or Docker Engine (Linux)
-- **Git Bash** (Windows — needed for Makefile and shell scripts)
+- **Git Bash** (Windows — needed for Makefile)
 
 > **Windows: set JAVA_HOME before running Maven**
 > ```powershell
@@ -143,23 +214,16 @@ myIU/
 ### 1. Start local PostgreSQL
 
 ```bash
-# Creates myiu_local database in Docker
 make start
-# or without make:
-docker compose -f docker-compose.local.yml up -d
+# or: docker compose -f docker-compose.local.yml up -d
 ```
 
 ### 2. Configure environment
 
 ```bash
-# Portal backend
-cp .env.local.example backend-java/.env
-# Edit backend-java/.env: fill in AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_TENANT_ID
-# DB settings already point to myiu_local — no change needed
-
-# Admin backend
-cp .env.local.example myIU-admin/backend/.env
-# Edit myIU-admin/backend/.env: same Azure values, PORT=8081
+cp backend/.env.example backend/.env
+# Fill in: AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_TENANT_ID
+# Optional: SMTP_USER, SMTP_PASS (Gmail App Password) for email notifications
 ```
 
 ### 3. Start portal backend
@@ -167,32 +231,33 @@ cp .env.local.example myIU-admin/backend/.env
 ```bash
 # Git Bash / macOS / Linux
 make portal
-# or:
-cd backend-java && SPRING_PROFILES_ACTIVE=local ./mvnw spring-boot:run
+# or: cd backend && SPRING_PROFILES_ACTIVE=local ./mvnw spring-boot:run
 
-# Windows PowerShell (no Makefile)
-cd backend-java
+# Windows PowerShell
+cd backend
 $env:SPRING_PROFILES_ACTIVE = "local"
 .\mvnw.cmd spring-boot:run
 ```
 
-Flyway runs migrations automatically. Database `myiu_local` is created on first run.
+Flyway runs V1–V8 migrations automatically on first start.
 
 ### 4. Start portal frontend
 
 ```bash
 make fe-portal
-# or:
-cd frontend && npm install && npm run dev
+# or: cd frontend && npm install && npm run dev
 # → http://localhost:5173
 ```
 
-### 5. Start admin backend + frontend (optional)
+### Admin panel
 
-```bash
-make admin          # admin backend on :8081
-make fe-admin       # admin frontend on :3000
+The admin panel is embedded in the portal frontend at `/admin`. Create the first admin via:
+
 ```
+POST /api/admin/auth/setup  { "email": "...", "name": "...", "password": "..." }
+```
+
+Then log in at `http://localhost:5173/admin`.
 
 ### All commands at a glance
 
@@ -214,7 +279,7 @@ make db-reset       # wipe and recreate local DB
 
 ## Environment variables
 
-Copy `.env.local.example` → `backend-java/.env` and fill in your values.
+Copy `backend/.env.example` → `backend/.env` and fill in your values.
 
 | Variable | Required | Default (local only) | Description |
 |---|---|---|---|
@@ -225,13 +290,17 @@ Copy `.env.local.example` → `backend-java/.env` and fill in your values.
 | `DB_URL` | — | `jdbc:postgresql://localhost:5432/myiu_local` | PostgreSQL JDBC URL |
 | `DB_USERNAME` | — | `postgres` | DB username |
 | `DB_PASSWORD` | — | `postgres` | DB password |
-| `JWT_SECRET` | ✓ prod | hardcoded local only | Min 256-bit random string. **Never use local default on any server.** |
-| `FRONTEND_URL` | — | `http://localhost:5173` | Allowed CORS origin |
+| `JWT_SECRET` | ✓ prod | hardcoded local only | Min 256-bit. **Never use local default on any server.** |
+| `FRONTEND_URL` | — | `http://localhost:5173` | Allowed CORS origin + email CTA base URL |
 | `APP_BASE_URL` | — | `http://localhost:8080` | Backend public base URL |
 | `UPLOAD_DIR` | — | `./uploads` | File upload directory |
+| `SMTP_USER` | — | empty | Gmail address for email notifications |
+| `SMTP_PASS` | — | empty | Gmail App Password (16-char, not account password) |
 | `PROVISION_MAX_CREATE` | — | `200` | Max users per provisioning run |
 | `PROVISION_MAX_DELETE` | — | `100` | Max deactivations per provisioning run |
-| `SMTP_USER` / `SMTP_PASS` | — | empty | SMTP credentials for notifications |
+
+> **SMTP setup:** Enable 2FA on Gmail → Google Account → Security → App Passwords → generate.
+> App refuses to send emails (but won't crash) if `SMTP_USER` is empty.
 
 > **Dev/prod:** `JWT_SECRET` has **no fallback** — app refuses to start if missing.
 > Generate: `openssl rand -hex 64`
@@ -243,7 +312,7 @@ Copy `.env.local.example` → `backend-java/.env` and fill in your values.
 ```
 1. Browser → GET /oauth2/authorization/microsoft
 2. Spring Security saves OAuth2 state to cookie (3 min TTL, stateless)
-3. Redirect to Azure AD login page (with prompt=select_account)
+3. Redirect to Azure AD login page
 4. User authenticates with Microsoft
 5. Azure → GET /login/oauth2/code/microsoft?code=...&state=...
 6. OAuth2SuccessHandler:
@@ -262,25 +331,51 @@ Copy `.env.local.example` → `backend-java/.env` and fill in your values.
 
 ---
 
-## Login session tracking (Meta-style)
+## Email notifications
 
-When a user logs in, the backend records:
+Khi admin duyệt hoặc từ chối đơn, `FormController` gọi `EmailService` (async):
+
+```
+FormController.updateSubmission()
+  └── emailService.sendFormApproved() / sendFormRejected()
+        └── @Async("emailExecutor") — chạy trên thread pool riêng (1-2 threads)
+              └── JavaMailSender → Gmail SMTP:587 (STARTTLS)
+                    → HTML email với badge trạng thái + CTA button → FRONTEND_URL/forms
+```
+
+Email chỉ được gửi nếu `SMTP_USER` được cấu hình. Nếu không có SMTP, backend log warning và tiếp tục bình thường.
+
+---
+
+## Real-time notifications (WebSocket)
+
+```
+Frontend useNotificationSocket hook
+  └── SockJS → /ws (HTTP upgrade)
+        └── WebSocketAuthInterceptor — validate JWT from STOMP CONNECT header
+              └── STOMP broker → /topic/notifications/{userId}
+                    └── NotificationService.push() → sends to topic
+```
+
+---
+
+## Login session tracking (Meta-style)
 
 | Field | Source |
 |---|---|
 | IP address | `X-Forwarded-For` → `X-Real-IP` → `getRemoteAddr()` |
 | Country / City | ip-api.com — async, doesn't block login |
-| Browser / Version | User-Agent header (UserAgentParser utility) |
+| Browser / Version | User-Agent header |
 | OS | User-Agent header |
 | Device type | User-Agent header (desktop / mobile / tablet) |
 
-Users can see all active sessions in Settings and revoke individual sessions or all other sessions. Revocation takes effect on the next request from that session (no delay — per-request DB check).
+Users can see all active sessions in Settings → revoke individual sessions or all other sessions.
 
 ---
 
 ## Rate limiting
 
-Token-bucket algorithm (Bucket4j) — O(1) per request, no lock contention.
+Token-bucket algorithm (Bucket4j) — O(1) per request.
 
 | Endpoint pattern | Limit | Scope |
 |---|---|---|
@@ -296,34 +391,35 @@ Returns `429 Too Many Requests` with `Retry-After` header.
 ## API documentation
 
 - **Local/Dev:** `http://localhost:8080/swagger-ui.html`
-- **Prod:** Swagger disabled (security policy)
-- Raw schema: `/api-docs` (OpenAPI JSON)
+- **Prod:** Swagger disabled
+- Raw schema: `/api-docs`
 
 ---
 
 ## User provisioning (admin)
 
-Admin uploads Excel via myIU-admin portal:
+Admin uploads Excel via `/admin/provision`:
 
 **Sheet "Create"** — creates/updates users:
 | email | name | role |
 |---|---|---|
 | student@iu.edu.vn | Nguyen Van A | student |
-| lecturer@iu.edu.vn | Tran Thi B | lecturer |
 
-**Sheet "Delete"** — sets `is_active = false` (soft delete, data preserved):
+**Sheet "Delete"** — sets `is_active = false` (soft delete):
 | email |
 |---|
 | old.user@iu.edu.vn |
+
+Endpoint: `POST /api/admin/provision` (file field: `file`).
 
 ---
 
 ## Notes
 
-- Portal backend owns the schema — Flyway migrations run on startup.
+- Portal backend owns the schema — Flyway V1–V8 migrations run on startup.
 - Admin backend uses `ddl-auto: none` — reads from portal's schema, never writes DDL.
-- Both backends share the same PostgreSQL instance, different by environment (local/dev/prod).
 - OAuth2 state is stored in a short-lived **cookie** (not HTTP session) — backend is fully stateless.
 - Swagger UI is available on local/dev but **disabled on production**.
-- For deployment documentation see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+- For deployment see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 - For architecture details see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+- For API reference see [docs/API_ROUTES.md](docs/API_ROUTES.md).

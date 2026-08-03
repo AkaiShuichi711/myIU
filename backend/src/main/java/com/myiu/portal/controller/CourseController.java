@@ -2,6 +2,7 @@ package com.myiu.portal.controller;
 
 import com.myiu.portal.dto.*;
 import com.myiu.portal.service.CourseService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -30,7 +31,7 @@ public class CourseController extends BaseController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<CourseDTO>> create(
-            @RequestBody CourseDTO req,
+            @Valid @RequestBody CourseDTO req,
             @AuthenticationPrincipal UserDetails principal) {
         return ResponseEntity.ok(ApiResponse.ok(courseService.create(currentUserId(principal), req)));
     }

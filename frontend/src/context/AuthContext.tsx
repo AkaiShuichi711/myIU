@@ -90,7 +90,8 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const TENANT = import.meta.env.VITE_AD_TENANT_ID || 'a7380202-eb54-415a-9b66-4d9806cfab42';
+  // VITE_AD_TENANT_ID must be set in .env.local — 'common' is the generic fallback endpoint
+  const TENANT = import.meta.env.VITE_AD_TENANT_ID || 'common';
   const MS_LOGOUT = `https://login.microsoftonline.com/${TENANT}/oauth2/v2.0/logout`
     + `?post_logout_redirect_uri=${encodeURIComponent(`${import.meta.env.VITE_APP_URL || window.location.origin}/sign-in`)}`;
 

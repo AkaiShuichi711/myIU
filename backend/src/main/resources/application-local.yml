@@ -20,13 +20,16 @@ spring:
     hibernate:
       ddl-auto: validate          # validate schema against Flyway migrations
 
-# JWT: safe hardcoded default for local dev — never deploy this to any server
+  flyway:
+    locations: classpath:db/migration,classpath:db/seed
+
+# JWT: defaults to a safe local dev secret — override JWT_SECRET env var for any real testing
 app:
   jwt:
-    secret: "local-dev-secret-key-min-256-bits-ONLY-for-localhost-never-production-use"
-    expiration-ms: 86400000
+    secret: ${JWT_SECRET:local-dev-secret-key-min-256-bits-ONLY-for-localhost-never-production-use}
+    expiration-ms: ${JWT_EXPIRATION_MS:86400000}
   cors:
-    allowed-origins: "http://localhost:5173,http://localhost:3000"
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:3000}
 
 logging:
   level:

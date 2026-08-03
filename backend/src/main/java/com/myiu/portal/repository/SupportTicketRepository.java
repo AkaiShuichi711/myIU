@@ -8,4 +8,6 @@ import java.util.UUID;
 
 public interface SupportTicketRepository extends JpaRepository<SupportTicket, UUID> {
     List<SupportTicket> findBySubmitterIdOrderByCreatedAtDesc(UUID submitterId);
+    List<SupportTicket> findAllByOrderByCreatedAtDesc();
+    List<SupportTicket> findByStatusOrderByCreatedAtDesc(String status);
 }

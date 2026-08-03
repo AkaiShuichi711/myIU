@@ -5,11 +5,6 @@ import AuthCallback from './_auth/AuthCallback';
 import RootLayout from './_root/RootLayout';
 import SignInForm from './_auth/forms/SignInForm';
 import ForgotPassword from './_auth/forms/ForgotPassword';
-import AdminLoginPage from './_admin/AdminLoginPage';
-import AdminLayout from './_admin/AdminLayout';
-import AdminDashboard from './_admin/AdminDashboard';
-import AdminUsersPage from './_admin/AdminUsersPage';
-import AdminProvisionPage from './_admin/AdminProvisionPage';
 import { Toaster } from './components/ui/toaster';
 import {
   Home,
@@ -26,21 +21,18 @@ import {
   TimetablePage,
 } from './_root/pages';
 import TenantPage from './_root/pages/Tenant';
+import NotFoundPage from './_root/pages/NotFoundPage';
 
 const App = () => {
   return (
-    // ĐÃ SỬA: Xóa bỏ "flex", dùng w-full h-screen overflow-hidden để layout con bên trong tự quyết định trục tọa độ
     <main className="w-full h-screen overflow-hidden bg-white flex flex-col">
       <Routes>
         {/* Public Routes */}
         <Route element={<AuthLayout />}>
           <Route path="/sign-in" element={<SignInForm />} />
-          {/* /sign-up is not supported — app uses Microsoft SSO only */}
           <Route path="/sign-up" element={<Navigate to="/sign-in" replace />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
-          {/* OAuth2 callback — nhận token từ Spring Boot sau Microsoft SSO */}
           <Route path="/auth/callback" element={<AuthCallback />} />
-          {/* Redirect other /auth/* paths */}
           <Route path="/auth/*" element={<Navigate to="/sign-in" replace />} />
         </Route>
 
@@ -48,7 +40,6 @@ const App = () => {
         <Route element={<RootLayout />}>
           <Route index element={<Navigate to="/home" replace />} />
           <Route path="/home" element={<Home />} />
-          {/* Legacy social feed routes - redirected */}
           <Route path="/explore" element={<Navigate to="/courses" replace />} />
           <Route path="/saved" element={<Navigate to="/courses" replace />} />
           <Route path="/all-users" element={<Navigate to="/courses" replace />} />
@@ -70,16 +61,7 @@ const App = () => {
           <Route path="/support" element={<SupportPage />} />
         </Route>
 
-        {/* Admin Routes */}
-        <Route path="/admin/login" element={<AdminLoginPage />} />
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<AdminDashboard />} />
-          <Route path="users" element={<AdminUsersPage />} />
-          <Route path="provision" element={<AdminProvisionPage />} />
-        </Route>
-
-        {/* Catch-all: redirect unknown paths */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
       <Toaster />
     </main>

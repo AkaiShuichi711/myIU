@@ -5,6 +5,9 @@ import com.myiu.portal.entity.*;
 import com.myiu.portal.repository.CourseGroupRepository;
 import com.myiu.portal.repository.CoursePostRepository;
 import com.myiu.portal.repository.CourseRepository;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +41,7 @@ public class CoursePostController extends BaseController {
     @PostMapping
     @PreAuthorize("hasRole('lecturer')")
     public ResponseEntity<ApiResponse<CoursePost>> create(
-            @RequestBody CoursePostRequest req,
+            @Valid @RequestBody CoursePostRequest req,
             @AuthenticationPrincipal UserDetails principal) {
         User user = currentUser(principal);
         UUID userId = user.getId();
@@ -70,8 +73,10 @@ public class CoursePostController extends BaseController {
 
     @Data
     public static class CoursePostRequest {
+        @NotNull
         private UUID courseId;
         private UUID groupId;
+        @NotBlank
         private String title;
         private String body;
         private String type;

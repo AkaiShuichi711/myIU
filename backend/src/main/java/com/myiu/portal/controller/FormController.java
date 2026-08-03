@@ -6,6 +6,8 @@ import com.myiu.portal.repository.FormSubmissionRepository;
 import com.myiu.portal.repository.FormTemplateRepository;
 import com.myiu.portal.service.EmailService;
 import com.myiu.portal.service.StorageService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -113,7 +115,7 @@ public class FormController extends BaseController {
     @PutMapping("/submissions/{id}")
     public ResponseEntity<ApiResponse<FormSubmission>> updateSubmission(
             @PathVariable UUID id,
-            @RequestBody StatusRequest req) {
+            @Valid @RequestBody StatusRequest req) {
         FormSubmission s = formSubmissionRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Submission not found"));
         s.setStatus(req.getStatus());
@@ -149,6 +151,7 @@ public class FormController extends BaseController {
 
     @Data
     public static class StatusRequest {
+        @NotBlank
         private String status;
         private String rejectionReason;
     }

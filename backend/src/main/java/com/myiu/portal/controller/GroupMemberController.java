@@ -3,6 +3,8 @@ package com.myiu.portal.controller;
 import com.myiu.portal.dto.ApiResponse;
 import com.myiu.portal.entity.*;
 import com.myiu.portal.repository.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -41,7 +43,7 @@ public class GroupMemberController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<GroupMember>> add(@RequestBody MemberRequest req) {
+    public ResponseEntity<ApiResponse<GroupMember>> add(@Valid @RequestBody MemberRequest req) {
         CourseGroup group = courseGroupRepository.getReferenceById(req.getGroupId());
         GroupMember member = GroupMember.builder()
                 .group(group)
@@ -67,8 +69,11 @@ public class GroupMemberController {
 
     @Data
     public static class MemberRequest {
+        @NotNull
         private UUID groupId;
+        @NotNull
         private UUID courseId;
+        @NotNull
         private UUID studentId;
         private String studentName;
     }

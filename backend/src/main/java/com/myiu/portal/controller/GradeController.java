@@ -3,6 +3,10 @@ package com.myiu.portal.controller;
 import com.myiu.portal.dto.ApiResponse;
 import com.myiu.portal.entity.CourseGrade;
 import com.myiu.portal.repository.CourseGradeRepository;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -41,7 +45,7 @@ public class GradeController extends BaseController {
     @PostMapping
     @PreAuthorize("hasRole('lecturer')")
     public ResponseEntity<ApiResponse<CourseGrade>> upsert(
-            @RequestBody GradeRequest req,
+            @Valid @RequestBody GradeRequest req,
             @AuthenticationPrincipal UserDetails principal) {
         Optional<CourseGrade> existing = gradeRepository.findByCourseIdAndStudentId(req.getCourseId(), req.getStudentId());
         CourseGrade grade = existing.orElse(CourseGrade.builder()
@@ -61,14 +65,22 @@ public class GradeController extends BaseController {
 
     @lombok.Data
     public static class GradeRequest {
+        @NotNull
         private UUID courseId;
+        @NotNull
         private UUID studentId;
         private String studentName;
+        @DecimalMin("0.0") @DecimalMax("100.0")
         private Double quiz;
+        @DecimalMin("0.0") @DecimalMax("100.0")
         private Double exercise;
+        @DecimalMin("0.0") @DecimalMax("100.0")
         private Double lab;
+        @DecimalMin("0.0") @DecimalMax("100.0")
         private Double midterm;
+        @DecimalMin("0.0") @DecimalMax("100.0")
         private Double project;
+        @DecimalMin("0.0") @DecimalMax("100.0")
         private Double finalScore;
     }
 }

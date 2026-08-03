@@ -4,6 +4,7 @@ import {
   ArrowLeft, Megaphone, FileText, ClipboardList, Users,
   Plus, Trash2, Loader2, Calendar, Paperclip,
   BookOpen, UserPlus, X, ChevronDown, ChevronUp, BarChart3,
+  Upload, CheckCircle2, Clock, AlertCircle, UserCheck, Link2,
 } from 'lucide-react';
 import { useUserContext } from '@/context/AuthContext';
 import {
@@ -22,6 +23,14 @@ import {
   useGetCourseGrades,
   useGetStudentGrade,
   useUpsertCourseGrades,
+  useGetMySubmission,
+  useSubmitAssignment,
+  useGetAssignmentSubmissions,
+  useGradeSubmission,
+  useGetAttendance,
+  useGetMyAttendance,
+  useBulkUpsertAttendance,
+  useGetAllCourseMembers,
 } from '@/lib/react-query/queriesAndMutations';
 import type { ICourse, ICourseGroup, ICoursePost, IGroupMember, ICourseGrade, IUpsertCourseGrade } from '@/types';
 import { formatTimeAgo, isLecturerRole, isAdminRole } from '@/lib/utils';
@@ -29,7 +38,7 @@ import { INPUT_CLS } from '@/constants/courses';
 import UserAvatar from '@/components/shared/UserAvatar';
 import { PageLoader } from '@/components/shared';
 
-type Tab = 'feed' | 'materials' | 'assignments' | 'members' | 'grades';
+type Tab = 'feed' | 'materials' | 'assignments' | 'members' | 'grades' | 'attendance';
 type PostType = 'announcement' | 'material' | 'assignment';
 
 const TYPE_META: Record<PostType, { label: string; color: string; border: string; bg: string; icon: typeof Megaphone }> = {
@@ -121,6 +130,192 @@ const PostCard = ({
           <UserAvatar name={post.authorName || 'U'} className="w-5 h-5 text-[9px]" />
           {post.authorName}
         </div>
+      </div>
+    </div>
+  );
+};
+
+// ── Assignment Card (with submission panel) ───────────────────────────────────
+const ATTEND_STATUS = ['PRESENT', 'LATE', 'ABSENT', 'EXCUSED'] as const;
+type AttendStatus = (typeof ATTEND_STATUS)[number];
+const ATTEND_LABEL: Record<AttendStatus, { short: string; color: string; bg: string }> = {
+  PRESENT:  { short: 'P', color: 'text-emerald-600', bg: 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-300' },
+  LATE:     { short: 'L', color: 'text-amber-600',   bg: 'bg-amber-50 dark:bg-amber-900/20 border-amber-300' },
+  ABSENT:   { short: 'A', color: 'text-red-500',     bg: 'bg-red-50 dark:bg-red-900/20 border-red-300' },
+  EXCUSED:  { short: 'E', color: 'text-slate-500',   bg: 'bg-slate-50 dark:bg-slate-700/40 border-slate-300' },
+};
+
+const AssignmentCard = ({
+  post, isLecturer, userId, courseId, onDelete,
+}: {
+  post: ICoursePost; isLecturer: boolean; userId: string; courseId: string;
+  onDelete: (id: string) => void;
+}) => {
+  const [showSubmit, setShowSubmit]     = useState(false);
+  const [showSubs, setShowSubs]         = useState(false);
+  const [submitUrl, setSubmitUrl]       = useState('');
+  const [submitText, setSubmitText]     = useState('');
+  const [gradingId, setGradingId]       = useState<string | null>(null);
+  const [gradeForm, setGradeForm]       = useState({ score: '', feedback: '' });
+
+  const { data: mySubmission }       = useGetMySubmission(!isLecturer ? post.$id : '');
+  const { data: submissions = [] }   = useGetAssignmentSubmissions(isLecturer && showSubs ? post.$id : '');
+  const { mutate: submit, isPending: isSubmitting } = useSubmitAssignment();
+  const { mutate: gradeIt, isPending: isGrading }   = useGradeSubmission();
+
+  const sub = mySubmission as any;
+  const subs = submissions as any[];
+
+  const statusBadge = sub ? (
+    sub.status === 'GRADED'    ? <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 px-2 py-0.5 rounded-full border border-emerald-200"><CheckCircle2 size={10}/> Đã chấm: {sub.score}/10</span>
+    : sub.status === 'LATE'    ? <span className="flex items-center gap-1 text-[10px] font-bold text-amber-600 bg-amber-50 dark:bg-amber-900/20 px-2 py-0.5 rounded-full border border-amber-200"><Clock size={10}/> Nộp trễ</span>
+    : <span className="flex items-center gap-1 text-[10px] font-bold text-[#0057A8] bg-[#0057A8]/10 px-2 py-0.5 rounded-full border border-[#0057A8]/20"><CheckCircle2 size={10}/> Đã nộp</span>
+  ) : (
+    <span className="flex items-center gap-1 text-[10px] font-bold text-slate-400 bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded-full border border-slate-200 dark:border-slate-600"><AlertCircle size={10}/> Chưa nộp</span>
+  );
+
+  const meta = TYPE_META.assignment;
+  return (
+    <div className="bg-white dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700/60 border-l-[3px] border-l-slate-500 overflow-hidden">
+      <div className="px-4 py-3 bg-slate-100 dark:bg-slate-700/60 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <ClipboardList size={13} className={meta.color} />
+          <span className={`text-[10px] font-bold tracking-widest uppercase ${meta.color}`}>BÀI TẬP</span>
+          {!isLecturer && <div className="ml-2">{statusBadge}</div>}
+          {isLecturer && subs.length > 0 && (
+            <span className="ml-2 text-[10px] font-bold text-[#0057A8] bg-[#0057A8]/10 px-2 py-0.5 rounded-full">{subs.length} bài nộp</span>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] text-slate-400 font-mono">{post.$createdAt ? new Date(post.$createdAt).toLocaleDateString('vi-VN') : ''}</span>
+          {isLecturer && (
+            <button onClick={() => onDelete(post.$id)} className="text-slate-300 dark:text-slate-600 hover:text-red-400 transition-colors">
+              <Trash2 size={12}/>
+            </button>
+          )}
+        </div>
+      </div>
+
+      <div className="px-4 py-3.5">
+        <h3 className="font-semibold text-slate-800 dark:text-slate-100 text-sm mb-1">{post.title}</h3>
+        {post.body && <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-wrap">{post.body}</p>}
+        {post.dueDate && (
+          <div className="mt-2.5 flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 font-semibold">
+            <Calendar size={12}/> Hạn nộp: {new Date(post.dueDate).toLocaleDateString('vi-VN')}
+          </div>
+        )}
+        {post.attachmentNames?.length > 0 && (
+          <div className="mt-3 flex flex-col gap-1.5">
+            {post.attachmentNames.map((name: string, i: number) => (
+              <a key={i} href={post.attachmentUrls?.[i] || '#'} target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 text-xs text-slate-600 dark:text-slate-300 hover:bg-slate-100 transition-colors">
+                <Paperclip size={12} className="text-slate-400"/> {name}
+              </a>
+            ))}
+          </div>
+        )}
+
+        {/* Student: submit area */}
+        {!isLecturer && (
+          <div className="mt-3 border-t border-slate-100 dark:border-slate-700 pt-3">
+            {sub?.feedback && (
+              <div className="mb-3 p-3 rounded-lg bg-slate-50 dark:bg-slate-700/40 border border-slate-200 dark:border-slate-600">
+                <p className="text-[10px] font-bold text-slate-400 uppercase mb-1">Nhận xét giảng viên</p>
+                <p className="text-xs text-slate-600 dark:text-slate-300">{sub.feedback}</p>
+              </div>
+            )}
+            {sub && !showSubmit ? (
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  {sub.fileName && <span className="flex items-center gap-1.5 text-xs text-slate-500"><Paperclip size={11}/>{sub.fileName}</span>}
+                  {sub.fileUrl && <a href={sub.fileUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-[#0057A8] hover:underline flex items-center gap-1"><Link2 size={11}/> Xem bài nộp</a>}
+                </div>
+                <button onClick={() => setShowSubmit(true)} className="text-xs text-slate-400 hover:text-[#0057A8] transition-colors">Nộp lại</button>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {!showSubmit && (
+                  <button onClick={() => setShowSubmit(true)}
+                    className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold text-white bg-[#0057A8] hover:bg-[#0087b3] transition-colors w-full">
+                    <Upload size={12}/> Nộp bài
+                  </button>
+                )}
+                {showSubmit && (
+                  <>
+                    <input value={submitUrl} onChange={e => setSubmitUrl(e.target.value)}
+                      placeholder="Link bài nộp (Drive, OneDrive…)"
+                      className="w-full px-3 py-2 rounded-lg text-xs border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700/60 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-[#0057A8]/40" />
+                    <textarea value={submitText} onChange={e => setSubmitText(e.target.value)}
+                      placeholder="Ghi chú (tùy chọn)" rows={2}
+                      className="w-full px-3 py-2 rounded-lg text-xs border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700/60 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-[#0057A8]/40 resize-none" />
+                    <div className="flex gap-2 justify-end">
+                      <button onClick={() => setShowSubmit(false)} className="px-3 py-1.5 rounded-lg text-xs text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">Hủy</button>
+                      <button
+                        disabled={isSubmitting || (!submitUrl.trim() && !submitText.trim())}
+                        onClick={() => submit({ coursePostId: post.$id, fileUrl: submitUrl || undefined, textContent: submitText || undefined },
+                          { onSuccess: () => { setShowSubmit(false); setSubmitUrl(''); setSubmitText(''); } })}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-[#0057A8] hover:bg-[#0087b3] transition-colors disabled:opacity-60">
+                        {isSubmitting ? <Loader2 size={11} className="animate-spin"/> : <Upload size={11}/>} Nộp
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Lecturer: submissions list */}
+        {isLecturer && (
+          <div className="mt-3 border-t border-slate-100 dark:border-slate-700 pt-3">
+            <button onClick={() => setShowSubs(v => !v)}
+              className="flex items-center gap-1.5 text-xs font-semibold text-[#0057A8] hover:text-[#0087b3] transition-colors">
+              <UserCheck size={12}/> {showSubs ? 'Ẩn' : 'Xem'} bài nộp
+              {showSubs && <ChevronUp size={12}/>}{!showSubs && <ChevronDown size={12}/>}
+            </button>
+            {showSubs && (
+              <div className="mt-2 flex flex-col gap-1.5">
+                {subs.length === 0 ? (
+                  <p className="text-xs text-slate-400 py-2 text-center">Chưa có sinh viên nộp bài</p>
+                ) : subs.map((s: any) => (
+                  <div key={s.id} className="flex items-start gap-3 px-3 py-2.5 rounded-lg bg-slate-50 dark:bg-slate-700/40 border border-slate-100 dark:border-slate-600">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="text-xs font-semibold text-slate-700 dark:text-slate-200">{s.studentName}</p>
+                        {s.status === 'GRADED' && <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-full">{s.score}/10</span>}
+                        {s.status === 'LATE'   && <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded-full">Trễ</span>}
+                      </div>
+                      {s.fileUrl && <a href={s.fileUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-[#0057A8] hover:underline flex items-center gap-1 mt-1"><Link2 size={10}/> Xem bài</a>}
+                      {s.textContent && <p className="text-xs text-slate-500 mt-1 truncate">{s.textContent}</p>}
+                      {gradingId === s.id && (
+                        <div className="mt-2 flex flex-col gap-1.5">
+                          <input type="number" min={0} max={10} step={0.5} value={gradeForm.score}
+                            onChange={e => setGradeForm(f => ({ ...f, score: e.target.value }))}
+                            placeholder="Điểm (0–10)" className="w-28 px-2 py-1 rounded-md text-xs border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-[#0057A8]/40"/>
+                          <input value={gradeForm.feedback} onChange={e => setGradeForm(f => ({ ...f, feedback: e.target.value }))}
+                            placeholder="Nhận xét" className="px-2 py-1 rounded-md text-xs border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-[#0057A8]/40"/>
+                          <div className="flex gap-1.5">
+                            <button onClick={() => setGradingId(null)} className="px-2 py-1 rounded text-[11px] text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors">Hủy</button>
+                            <button disabled={isGrading || !gradeForm.score}
+                              onClick={() => gradeIt({ id: s.id, data: { score: parseFloat(gradeForm.score), feedback: gradeForm.feedback } },
+                                { onSuccess: () => { setGradingId(null); setGradeForm({ score: '', feedback: '' }); } })}
+                              className="flex items-center gap-1 px-2 py-1 rounded text-[11px] font-semibold text-white bg-[#0057A8] hover:bg-[#0087b3] transition-colors disabled:opacity-60">
+                              {isGrading ? <Loader2 size={10} className="animate-spin"/> : null} Lưu
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    {gradingId !== s.id && (
+                      <button onClick={() => { setGradingId(s.id); setGradeForm({ score: s.score?.toString() ?? '', feedback: s.feedback ?? '' }); }}
+                        className="text-[11px] font-semibold text-slate-400 hover:text-[#0057A8] transition-colors shrink-0">Chấm</button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -262,6 +457,127 @@ function gradeLabel(g: number) {
 // ── END MOCK GRADES ────────────────────────────────────────────────────────────
 
 
+// ── Attendance Tab ────────────────────────────────────────────────────────────
+const AttendanceTab = ({ courseId, isLecturer }: {
+  courseId: string; isLecturer: boolean;
+}) => {
+  const today = new Date().toISOString().split('T')[0];
+  const [date, setDate] = useState(today);
+  const [draft, setDraft] = useState<Record<string, AttendStatus>>({});
+
+  const { data: rawAttendance = [], isPending: isLoadingAtt } = useGetAttendance(isLecturer ? courseId : '', date);
+  const { data: myAtt = [], isPending: isLoadingMyAtt } = useGetMyAttendance(!isLecturer ? courseId : '');
+  const { data: membersRaw = [] } = useGetAllCourseMembers(isLecturer ? courseId : '');
+  const { mutate: bulkSave, isPending: isSaving } = useBulkUpsertAttendance();
+
+  const members = membersRaw as any[];
+  const attendance = rawAttendance as any[];
+  const myAttList = myAtt as any[];
+
+  const statusOf = (studentId: string): AttendStatus =>
+    draft[studentId] ?? attendance.find((a: any) => a.studentId === studentId)?.status ?? 'PRESENT';
+
+  const handleSave = () => {
+    const records = members.map((m) => ({
+      studentId: m.studentId,
+      studentName: m.studentName,
+      status: statusOf(m.studentId),
+    }));
+    bulkSave({ courseId, date, records }, { onSuccess: () => setDraft({}) });
+  };
+
+  if (!isLecturer) {
+    return (
+      <div className="bg-white dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700/60 overflow-hidden">
+        <div className="px-4 py-3 bg-slate-50 dark:bg-slate-800/60 border-b border-slate-100 dark:border-slate-700">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+            <UserCheck size={12}/> Điểm danh của bạn
+          </p>
+        </div>
+        {isLoadingMyAtt ? (
+          <div className="flex justify-center py-12"><Loader2 size={18} className="animate-spin text-slate-400"/></div>
+        ) : myAttList.length === 0 ? (
+          <div className="flex flex-col items-center py-12 gap-2 text-center">
+            <UserCheck size={24} className="text-slate-200 dark:text-slate-700"/>
+            <p className="text-sm text-slate-400">Chưa có dữ liệu điểm danh</p>
+          </div>
+        ) : (
+          <div className="divide-y divide-slate-50 dark:divide-slate-700/40">
+            {myAttList.map((a: any) => {
+              const s = ATTEND_LABEL[a.status as AttendStatus] ?? ATTEND_LABEL.PRESENT;
+              return (
+                <div key={a.id} className="flex items-center justify-between px-4 py-2.5">
+                  <span className="text-xs text-slate-600 dark:text-slate-300">{a.date}</span>
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${s.bg} ${s.color}`}>{a.status}</span>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="bg-white dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700/60 p-4">
+        <div className="flex items-center gap-3 flex-wrap">
+          <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Ngày</label>
+          <input type="date" value={date} onChange={e => setDate(e.target.value)}
+            className="px-3 py-1.5 rounded-lg text-xs border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700/60 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-[#0057A8]/40"/>
+          <span className="text-[11px] text-slate-400">{members.length} sinh viên</span>
+        </div>
+      </div>
+
+      {isLoadingAtt ? (
+        <div className="flex justify-center py-12"><Loader2 size={20} className="animate-spin text-slate-400"/></div>
+      ) : members.length === 0 ? (
+        <div className="flex flex-col items-center py-12 gap-2 text-center">
+          <Users size={24} className="text-slate-200 dark:text-slate-700"/>
+          <p className="text-sm text-slate-400">Chưa có sinh viên nào trong môn học</p>
+        </div>
+      ) : (
+        <div className="bg-white dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700/60 overflow-hidden">
+          <div className="divide-y divide-slate-50 dark:divide-slate-700/40">
+            {members.map((m: any) => {
+              const current = statusOf(m.studentId);
+              return (
+                <div key={m.studentId} className="flex items-center gap-3 px-4 py-2.5">
+                  <UserAvatar name={m.studentName || '?'} className="w-7 h-7 text-[10px] shrink-0" variant="muted"/>
+                  <p className="text-xs font-medium text-slate-700 dark:text-slate-200 flex-1 truncate">{m.studentName}</p>
+                  <div className="flex gap-1">
+                    {ATTEND_STATUS.map((s) => {
+                      const meta = ATTEND_LABEL[s];
+                      const active = current === s;
+                      return (
+                        <button key={s} onClick={() => setDraft(d => ({ ...d, [m.studentId]: s }))}
+                          className={`w-7 h-7 rounded-lg text-[11px] font-bold border transition-colors ${
+                            active ? `${meta.bg} ${meta.color}` : 'border-slate-200 dark:border-slate-600 text-slate-400 hover:border-slate-300'
+                          }`}>
+                          {meta.short}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <div className="px-4 py-3 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between">
+            <p className="text-[11px] text-slate-400">
+              {Object.keys(draft).length > 0 ? `${Object.keys(draft).length} thay đổi chưa lưu` : 'P = Có mặt · L = Trễ · A = Vắng · E = Phép'}
+            </p>
+            <button onClick={handleSave} disabled={isSaving}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold text-white bg-[#0057A8] hover:bg-[#0087b3] transition-colors disabled:opacity-50">
+              {isSaving ? <Loader2 size={11} className="animate-spin"/> : null} Lưu điểm danh
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 // ── Main Component ────────────────────────────────────────────────────────────
 const CourseDetail = () => {
   const { id = '' } = useParams<{ id: string }>();
@@ -320,6 +636,7 @@ const CourseDetail = () => {
     assignments: assignmentPosts,
     members:     [],
     grades:      [],
+    attendance:  [],
   };
 
   const handleCreatePost = () => {
@@ -378,6 +695,7 @@ const CourseDetail = () => {
     { id: 'assignments', label: 'Bài tập',   count: assignmentPosts.length },
     { id: 'members',     label: 'Thành viên' },
     { id: 'grades',      label: 'Bảng điểm' },
+    { id: 'attendance',  label: 'Điểm danh' },
   ];
 
   return (
@@ -541,8 +859,8 @@ const CourseDetail = () => {
           </div>
         )}
 
-        {/* Posts feed tabs */}
-        {tab !== 'members' && tab !== 'grades' && (
+        {/* Posts feed tabs (feed + materials only) */}
+        {(tab === 'feed' || tab === 'materials') && (
           <>
             {isLoadingPosts ? (
               <div className="flex justify-center py-16"><Loader2 size={24} className="animate-spin text-slate-400" /></div>
@@ -565,6 +883,36 @@ const CourseDetail = () => {
                     key={post.$id}
                     post={post}
                     isLecturer={isLecturer}
+                    onDelete={(pid) => deletePost({ postId: pid, courseId: id })}
+                  />
+                ))}
+              </div>
+            )}
+          </>
+        )}
+
+        {/* Assignments tab — uses AssignmentCard with submission panel */}
+        {tab === 'assignments' && (
+          <>
+            {isLoadingPosts ? (
+              <div className="flex justify-center py-16"><Loader2 size={24} className="animate-spin text-slate-400" /></div>
+            ) : assignmentPosts.length === 0 ? (
+              <div className="flex flex-col items-center py-16 gap-2 text-center">
+                <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                  <ClipboardList size={20} className="text-slate-300 dark:text-slate-600" />
+                </div>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Chưa có bài tập nào</p>
+                {isLecturer && <button onClick={() => setShowCreatePost(true)} className="text-xs text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 mt-1 transition-colors">+ Tạo bài tập đầu tiên</button>}
+              </div>
+            ) : (
+              <div className="flex flex-col gap-3">
+                {assignmentPosts.map((post) => (
+                  <AssignmentCard
+                    key={post.$id}
+                    post={post}
+                    isLecturer={isLecturer}
+                    userId={user.id}
+                    courseId={id}
                     onDelete={(pid) => deletePost({ postId: pid, courseId: id })}
                   />
                 ))}
@@ -866,6 +1214,11 @@ const CourseDetail = () => {
               </div>
             )}
           </div>
+        )}
+
+        {/* Attendance tab */}
+        {tab === 'attendance' && (
+          <AttendanceTab courseId={id} isLecturer={isLecturer} />
         )}
       </div>
     </div>

@@ -75,7 +75,7 @@ const LanguageSwitcher = ({ variant = 'light' }: LanguageSwitcherProps) => {
         onClick={() => setOpen((v) => !v)}
         style={{
           display: 'flex', alignItems: 'center', gap: '7px',
-          padding: '6px 10px', borderRadius: '8px',
+          padding: '6px 10px', borderRadius: '6px',
           background: open ? btnBgHover : btnBg,
           border: isDark ? 'none' : `1px solid #E2E8F0`,
           cursor: 'pointer', transition: 'background 0.15s',
@@ -106,7 +106,7 @@ const LanguageSwitcher = ({ variant = 'light' }: LanguageSwitcherProps) => {
         <div style={{
           position: 'absolute', top: 'calc(100% + 6px)', right: 0,
           background: dropdownBg, border: `1px solid ${dropdownBorder}`,
-          borderRadius: '10px', boxShadow: dropdownShadow,
+          borderRadius: '6px', boxShadow: dropdownShadow,
           minWidth: '160px', overflow: 'hidden', zIndex: 9999,
         }}>
           {LANGUAGE_OPTIONS.map((opt) => {

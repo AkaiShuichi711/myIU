@@ -70,7 +70,7 @@ const SignInForm = () => {
           type="button"
           onClick={handleMicrosoftSignIn}
           disabled={isLoading}
-          className="w-full bg-gradient-to-r from-[#0068ff] to-[#0057A8] text-white h-12 flex items-center justify-center gap-3 text-[14px] font-semibold rounded-xl transition-all duration-200 hover:-translate-y-0.5"         >
+          className="w-full bg-gradient-to-r from-[#0068ff] to-[#0057A8] text-white h-12 flex items-center justify-center gap-3 text-[14px] font-semibold rounded-[6px] transition-all duration-200">
           {isLoading ? (
             <div className="flex items-center gap-2">
               <Loader />

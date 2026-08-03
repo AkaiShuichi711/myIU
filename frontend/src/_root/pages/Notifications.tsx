@@ -69,7 +69,7 @@ const Notifications = () => {
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-colors ${
+              className={`px-4 py-1.5 rounded-[6px] text-xs font-semibold transition-colors ${
                 filter === f
                   ? 'bg-[#0057A8] text-white'
                   : 'bg-white dark:bg-[#19191a] border border-slate-200 dark:border-[#33485c]/50 text-slate-500 dark:text-[#DCE3E8] hover:bg-slate-50 dark:hover:bg-[#0d2137]'

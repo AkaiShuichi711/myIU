@@ -4,6 +4,9 @@ import com.myiu.portal.dto.ApiResponse;
 import com.myiu.portal.entity.*;
 import com.myiu.portal.repository.CourseGroupRepository;
 import com.myiu.portal.repository.CourseRepository;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -44,7 +47,7 @@ public class CourseGroupController extends BaseController {
 
     @PostMapping
     @PreAuthorize("hasRole('lecturer')")
-    public ResponseEntity<ApiResponse<CourseGroup>> create(@RequestBody GroupRequest req) {
+    public ResponseEntity<ApiResponse<CourseGroup>> create(@Valid @RequestBody GroupRequest req) {
         Course course = courseRepository.getReferenceById(req.getCourseId());
         CourseGroup group = CourseGroup.builder()
                 .course(course)
@@ -72,9 +75,12 @@ public class CourseGroupController extends BaseController {
 
     @Data
     public static class GroupRequest {
+        @NotNull
         private UUID courseId;
+        @NotNull
         private UUID lecturerId;
         private String lecturerName;
+        @NotBlank
         private String name;
         private String description;
     }

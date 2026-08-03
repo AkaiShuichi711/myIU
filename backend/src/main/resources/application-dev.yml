@@ -17,7 +17,10 @@ spring:
       client:
         registration:
           microsoft:
-            redirect-uri: "https://myiu.onrender.com/login/oauth2/code/microsoft"
+            redirect-uri: "${APP_BASE_URL}/login/oauth2/code/microsoft"
+
+  flyway:
+    locations: classpath:db/migration,classpath:db/seed
 
   datasource:
     url: ${DB_URL}                # REQUIRED — no fallback
@@ -39,9 +42,9 @@ spring:
 app:
   jwt:
     secret: ${JWT_SECRET}         # REQUIRED — fail-fast if missing
-    expiration-ms: 86400000
+    expiration-ms: ${JWT_EXPIRATION_MS:86400000}
   cors:
-    allowed-origins: ${FRONTEND_URL}
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:${FRONTEND_URL}}
 
 logging:
   level:

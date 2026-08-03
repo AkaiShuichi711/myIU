@@ -12,6 +12,14 @@ dist
 dist-ssr
 *.local
 
+# Environment files with real secrets — never commit
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+# Safe to commit: .env.example, .env.local.example, .env.development, .env.production
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

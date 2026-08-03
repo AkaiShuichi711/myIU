@@ -90,7 +90,7 @@ function SessionCard({ s, onRevoke, revoking }: { s: LoginSession; onRevoke: (id
           <div className="flex items-center gap-3 mt-1.5 flex-wrap">
             <span className="flex items-center gap-1 text-xs text-slate-400 dark:text-slate-500">
               {s.countryCode && !isLocal ? (
-                <Flag code={s.countryCode} className="h-3 w-4.5 object-cover rounded-[2px] shrink-0" />
+                <Flag code={s.countryCode} className="h-3 w-4.5 object-cover rounded-[6px] shrink-0" />
               ) : (
                 <Globe size={11} className="shrink-0" />
               )}
@@ -241,7 +241,7 @@ const Settings = () => {
                         : 'border-slate-100 dark:border-slate-600 hover:border-slate-200 dark:hover:border-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700'
                     }`}
                   >
-                    <Flag code={opt.flagCode} className="h-5 w-7 object-cover rounded-[3px] shadow-sm shrink-0" />
+                    <Flag code={opt.flagCode} className="h-5 w-7 object-cover rounded-[6px] shadow-sm shrink-0" />
                     <span className={`text-xs font-semibold truncate ${currentLang === opt.code ? 'text-[#0057A8]' : 'text-slate-700 dark:text-slate-200'}`}>
                       {opt.label}
                     </span>

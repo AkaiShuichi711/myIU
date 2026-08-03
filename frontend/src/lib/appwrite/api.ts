@@ -49,6 +49,10 @@ export async function signOutAccount() {
   return { status: 'ok' };
 }
 
+export async function logout(): Promise<void> {
+  await api.post('/api/auth/logout');
+}
+
 /** Microsoft SSO — handled server-side; not needed in local mode */
 export async function signInWithMicrosoft(_accessToken: string, _msalUser: any, _roles?: string[], _groups?: any[]) {
   throw new Error('Microsoft SSO is not available in local mode');
@@ -616,3 +620,70 @@ export async function createCourseSchedule(courseId: string, data: {
 export async function deleteCourseSchedule(scheduleId: string) {
   return api.delete(`/api/course-schedules/${scheduleId}`);
 }
+
+// ─── ASSIGNMENT SUBMISSIONS ───────────────────────────────────────────────────
+
+export async function submitAssignment(data: {
+  coursePostId: string; fileUrl?: string; fileId?: string;
+  fileName?: string; textContent?: string;
+}) {
+  return norm(await api.post<any>('/api/submissions', data));
+}
+
+export async function getAssignmentSubmissions(coursePostId: string) {
+  try {
+    return normList(await api.get<any[]>(`/api/submissions?coursePostId=${coursePostId}`));
+  } catch { return []; }
+}
+
+export async function getMySubmission(coursePostId: string) {
+  try {
+    return norm(await api.get<any>(`/api/submissions/mine?coursePostId=${coursePostId}`));
+  } catch { return null; }
+}
+
+export async function gradeSubmission(id: string, data: { score?: number; feedback?: string }) {
+  return norm(await api.put<any>(`/api/submissions/${id}/grade`, data));
+}
+
+// ─── ATTENDANCE ───────────────────────────────────────────────────────────────
+
+export async function getAttendance(courseId: string, date?: string, studentId?: string) {
+  const params = new URLSearchParams({ courseId });
+  if (date) params.set('date', date);
+  if (studentId) params.set('studentId', studentId);
+  try {
+    return normList(await api.get<any[]>(`/api/attendance?${params}`));
+  } catch { return []; }
+}
+
+export async function getMyAttendance(courseId: string) {
+  try {
+    return normList(await api.get<any[]>(`/api/attendance/mine?courseId=${courseId}`));
+  } catch { return []; }
+}
+
+export async function upsertAttendance(data: {
+  courseId: string; studentId: string; studentName: string;
+  date: string; status: string; note?: string;
+}) {
+  return norm(await api.post<any>('/api/attendance', data));
+}
+
+export async function bulkUpsertAttendance(data: {
+  courseId: string; date: string;
+  records: { studentId: string; studentName: string; status: string; note?: string }[];
+}) {
+  return normList(await api.post<any>('/api/attendance/bulk', data));
+}
+
+export async function deleteAttendanceRecord(id: string) {
+  return api.delete(`/api/attendance/${id}`);
+}
+
+export async function getAllCourseMembers(courseId: string) {
+  try {
+    return normList(await api.get<any[]>(`/api/group-members?courseId=${courseId}`));
+  } catch { return []; }
+}
+

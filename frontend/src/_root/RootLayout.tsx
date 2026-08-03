@@ -1,21 +1,12 @@
-﻿import { Outlet } from "react-router-dom";
+﻿import { Outlet, Navigate } from "react-router-dom";
 import { useUserContext } from "@/context/AuthContext";
 import { LeftSidebar, Topbar } from "@/components/shared";
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { useNotificationSocket } from "@/hooks/useNotificationSocket";
 
 const RootLayout = () => {
   const { isAuthenticated, isLoading, user } = useUserContext();
-  const navigate = useNavigate();
   useNotificationSocket(user?.id ?? '');
-
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      navigate("/sign-in");
-    }
-  }, [isAuthenticated, isLoading, navigate]);
 
   if (isLoading) {
     return (
@@ -24,6 +15,8 @@ const RootLayout = () => {
       </div>
     );
   }
+
+  if (!isAuthenticated) return <Navigate to="/sign-in" replace />;
 
   return (
     <div className="w-full h-screen flex flex-col overflow-hidden bg-[#F8FAFC] dark:bg-[#19191a] transition-colors duration-200">

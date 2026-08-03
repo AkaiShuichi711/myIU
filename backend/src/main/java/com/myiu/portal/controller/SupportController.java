@@ -4,6 +4,8 @@ import com.myiu.portal.dto.ApiResponse;
 import com.myiu.portal.entity.SupportTicket;
 import com.myiu.portal.entity.User;
 import com.myiu.portal.repository.SupportTicketRepository;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +25,7 @@ public class SupportController extends BaseController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<SupportTicket>> create(
-            @RequestBody CreateTicketRequest req,
+            @Valid @RequestBody CreateTicketRequest req,
             @AuthenticationPrincipal UserDetails principal) {
         User user = currentUser(principal);
         SupportTicket ticket = SupportTicket.builder()
@@ -48,8 +50,11 @@ public class SupportController extends BaseController {
 
     @Data
     public static class CreateTicketRequest {
+        @NotBlank
         private String service;
+        @NotBlank
         private String need;
+        @NotBlank
         private String description;
         private String attachmentUrl;
     }

@@ -76,20 +76,20 @@ const FormSubmitModal = ({ template, onClose, onSuccess }: Props) => {
 
   const buildApproverEmail = (reviewUrl: string) => `
     <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f8fafc;padding:20px">
-      <div style="background:white;border-radius:12px;padding:28px;border:1px solid #e2e8f0">
-        <div style="background:#0057A8;padding:16px 20px;border-radius:8px;margin-bottom:24px">
+      <div style="background:white;border-radius:6px;padding:28px;border:1px solid #e2e8f0">
+        <div style="background:#0057A8;padding:16px 20px;border-radius:6px;margin-bottom:24px">
           <h1 style="color:white;margin:0;font-size:17px;font-weight:700">myIU Portal</h1>
           <p style="color:rgba(255,255,255,0.8);margin:3px 0 0;font-size:12px">Hệ thống biểu mẫu điện tử</p>
         </div>
         <h2 style="color:#19191a;font-size:15px;margin:0 0 6px">Yêu cầu duyệt biểu mẫu</h2>
         <p style="color:#475569;font-size:13px;margin:0 0 20px">Bạn nhận được yêu cầu duyệt từ <strong>${user.name}</strong> (${user.email})</p>
         <table style="width:100%;border-collapse:collapse;margin-bottom:20px;font-size:13px">
-          <tr><td style="padding:8px 12px;background:#f1f5f9;border-radius:4px 0 0 4px;color:#64748b;width:130px">Biểu mẫu</td>
+          <tr><td style="padding:8px 12px;background:#f1f5f9;border-radius:6px 0 0 4px;color:#64748b;width:130px">Biểu mẫu</td>
               <td style="padding:8px 12px;background:#f8fafc;color:#19191a;font-weight:600">${template.title}</td></tr>
           <tr><td style="padding:8px 12px;color:#64748b">Người nộp</td>
               <td style="padding:8px 12px;color:#19191a">${user.name} — ${user.email}</td></tr>
         </table>
-        <a href="${reviewUrl}" style="display:inline-block;background:#0057A8;color:white;text-decoration:none;padding:10px 24px;border-radius:8px;font-size:13px;font-weight:600">
+        <a href="${reviewUrl}" style="display:inline-block;background:#0057A8;color:white;text-decoration:none;padding:10px 24px;border-radius:6px;font-size:13px;font-weight:600">
           Xem &amp; Duyệt biểu mẫu →
         </a>
         <p style="color:#94a3b8;font-size:11px;margin-top:20px">Nếu bạn không phải người duyệt phù hợp, hãy đăng nhập và từ chối với lý do để người nộp tìm đúng người phụ trách.</p>

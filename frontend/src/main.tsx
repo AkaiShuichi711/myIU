@@ -5,20 +5,19 @@ import { MsalProvider } from "@azure/msal-react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import App from "./App";
 import AuthProvider from "./context/AuthContext";
-import { AdminAuthProvider } from "./context/AdminAuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import { msalConfig } from "./lib/msal/config";
-// import "./i18n";
-
-const msalInstance = new PublicClientApplication(msalConfig);
+import ErrorBoundary from "./components/shared/ErrorBoundary";
 
 import "./i18n";
+
+const msalInstance = new PublicClientApplication(msalConfig);
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime:          1000 * 60 * 5,  // 5 min — don't refetch fresh data
-      gcTime:             1000 * 60 * 10, // 10 min — keep unused cache
+      staleTime:          1000 * 60 * 5,
+      gcTime:             1000 * 60 * 10,
       retry:              1,
       refetchOnWindowFocus: false,
     },
@@ -26,17 +25,17 @@ const queryClient = new QueryClient({
 });
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <ThemeProvider>
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <MsalProvider instance={msalInstance}>
-          <AuthProvider>
-            <AdminAuthProvider>
+  <ErrorBoundary>
+    <ThemeProvider>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <MsalProvider instance={msalInstance}>
+            <AuthProvider>
               <App />
-            </AdminAuthProvider>
-          </AuthProvider>
-        </MsalProvider>
-      </BrowserRouter>
-    </QueryClientProvider>
-  </ThemeProvider>,
+            </AuthProvider>
+          </MsalProvider>
+        </BrowserRouter>
+      </QueryClientProvider>
+    </ThemeProvider>
+  </ErrorBoundary>,
 );

@@ -2,6 +2,7 @@ package com.myiu.portal.controller;
 
 import com.myiu.portal.dto.*;
 import com.myiu.portal.service.*;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ public class PostController extends BaseController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<PostDTO>> create(
-            @RequestBody CreatePostRequest req,
+            @Valid @RequestBody CreatePostRequest req,
             @AuthenticationPrincipal UserDetails principal) {
         return ResponseEntity.ok(ApiResponse.ok(postService.create(currentUserId(principal), req)));
     }
@@ -51,7 +52,7 @@ public class PostController extends BaseController {
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<PostDTO>> update(
             @PathVariable UUID id,
-            @RequestBody CreatePostRequest req,
+            @Valid @RequestBody CreatePostRequest req,
             @AuthenticationPrincipal UserDetails principal) {
         return ResponseEntity.ok(ApiResponse.ok(postService.update(id, currentUserId(principal), req)));
     }

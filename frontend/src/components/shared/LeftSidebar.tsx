@@ -100,30 +100,25 @@ const LeftSidebar = () => {
                 padding: collapsed ? '7px 0' : '7px 10px',
                 justifyContent: collapsed ? 'center' : 'flex-start',
                 gap: collapsed ? 0 : '9px',
-                background: isActive ? 'rgba(241,90,34,0.07)' : 'transparent',
+                background: 'transparent',
                 margin: '1px 4px',
                 borderRadius: '6px',
+                borderBottom: isActive ? '2px solid #0057A8' : '2px solid transparent',
               };
               const sharedProps = {
                 title: collapsed ? t(link.labelKey as string) : undefined,
                 className: 'relative flex items-center transition-all duration-100',
                 style: sharedStyle,
                 onMouseEnter: (e: React.MouseEvent<HTMLElement>) => {
-                  if (!isActive) (e.currentTarget as HTMLElement).style.background = 'rgba(241,90,34,0.05)';
+                  if (!isActive) (e.currentTarget as HTMLElement).style.background = 'rgba(0,87,168,0.06)';
                 },
                 onMouseLeave: (e: React.MouseEvent<HTMLElement>) => {
-                  (e.currentTarget as HTMLElement).style.background = isActive ? 'rgba(241,90,34,0.07)' : 'transparent';
+                  (e.currentTarget as HTMLElement).style.background = 'transparent';
                 },
               };
 
               const inner = (
                 <>
-                  {isActive && (
-                    <span
-                      className="absolute left-0 top-1/2 -translate-y-1/2"
-                      style={{ width: '3px', height: '16px', background: '#0057A8', borderRadius: '0 3px 3px 0' }}
-                    />
-                  )}
                   <div className="relative shrink-0">
                     <Icon size={15} style={{ color: isActive ? '#0057A8' : '#272e35' }} />
                     {badge && collapsed && (

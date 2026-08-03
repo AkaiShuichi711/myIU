@@ -25,6 +25,8 @@ backend-java/.mvn-dist/
 backend/target/
 backend/.mvn-dist/
 uploads/
+backend/uploads/*
+!backend/uploads/.gitkeep
 
 # Logs
 npm-debug.log*

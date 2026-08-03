@@ -13,7 +13,8 @@ export function useNotificationSocket(userId: string) {
     if (!token || !userId) return;
 
     const client = new Client({
-      webSocketFactory: () => new SockJS(`${import.meta.env.VITE_API_URL || 'http://localhost:8080'}/ws`),
+      // VITE_WS_URL is for the WebSocket/SockJS base — defaults to VITE_API_URL (SockJS uses HTTP transport)
+      webSocketFactory: () => new SockJS(`${import.meta.env.VITE_WS_URL || import.meta.env.VITE_API_URL || 'http://localhost:8080'}/ws`),
       connectHeaders: { Authorization: `Bearer ${token}` },
       reconnectDelay: 5000,
       onConnect: () => {

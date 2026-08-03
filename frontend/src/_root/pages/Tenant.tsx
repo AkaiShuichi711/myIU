@@ -92,7 +92,7 @@ const TenantPage = () => {
     icon: React.ReactNode; title: string; accent: string; children: React.ReactNode;
   }) => (
     <div style={{
-      background: c.cardBg, borderRadius: "16px", border: `1px solid ${c.border}`,
+      background: c.cardBg, borderRadius: "6px", border: `1px solid ${c.border}`,
       overflow: "hidden", boxShadow: isDark ? '0 1px 4px rgba(0,0,0,0.3)' : '0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04)',
     }}>
       <div style={{
@@ -100,7 +100,7 @@ const TenantPage = () => {
         borderBottom: `1px solid ${c.rowBorder}`, background: c.sectionHdr,
       }}>
         <div style={{
-          width: "30px", height: "30px", borderRadius: "8px",
+          width: "30px", height: "30px", borderRadius: "6px",
           display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
         }}>{icon}</div>
         <span style={{ fontSize: "11px", fontWeight: 700, color: c.sectionTxt, letterSpacing: "0.07em", textTransform: "uppercase" }}>
@@ -114,12 +114,12 @@ const TenantPage = () => {
   const unauthContent = (
     <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
       <div style={{
-        background: c.cardBg, borderRadius: "20px", padding: "48px 40px",
+        background: c.cardBg, borderRadius: "6px", padding: "48px 40px",
         boxShadow: isDark ? "0 20px 60px rgba(0,0,0,0.5)" : "0 20px 60px rgba(0,0,0,0.12)",
         maxWidth: "400px", width: "100%", textAlign: "center",
       }}>
         <div style={{
-          width: "56px", height: "56px", borderRadius: "14px",
+          width: "56px", height: "56px", borderRadius: "6px",
           background: isDark ? "#3B1C1C" : "#fff0f0", border: `1px solid ${isDark ? "#7F1D1D" : "#fecaca"}`,
           display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px",
         }}>
@@ -134,7 +134,7 @@ const TenantPage = () => {
         <button onClick={() => (window.location.href = "/sign-in")} style={{
           width: "100%", padding: "12px",
           background: "#0057A8",
-          border: "none", borderRadius: "12px",
+          border: "none", borderRadius: "6px",
           color: "#fff", fontWeight: 600, fontSize: "14px", cursor: "pointer",
         }}>
           {t('tenant.signInMicrosoft')}
@@ -183,7 +183,7 @@ const TenantPage = () => {
             <button onClick={() => (window.location.href = "/home")} style={{
               display: "flex", alignItems: "center", gap: "6px",
               background: "none", border: `1px solid ${c.btnBorder}`,
-              borderRadius: "8px", padding: "6px 14px",
+              borderRadius: "6px", padding: "6px 14px",
               color: c.btnColor, fontSize: "13px", fontWeight: 500, cursor: "pointer",
               transition: "background 0.15s",
             }}>
@@ -201,7 +201,7 @@ const TenantPage = () => {
           {/* PAGE HEADER */}
           <div style={{
             background: c.cardBg,
-            borderRadius: "20px",
+            borderRadius: "6px",
             border: `1px solid ${c.border}`,
             padding: "24px 28px",
             marginBottom: "20px",
@@ -211,7 +211,7 @@ const TenantPage = () => {
           }}>
             <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
               <div style={{
-                width: "48px", height: "48px", borderRadius: "14px",
+                width: "48px", height: "48px", borderRadius: "6px",
                 display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
               }}>
                 <GraduationCap size={22} color="#0057A8" />
@@ -229,7 +229,7 @@ const TenantPage = () => {
 
           {/* STATES */}
           {loading ? (
-            <div style={{ background: c.cardBg, borderRadius: "16px", border: `1px solid ${c.border}`, padding: "60px", textAlign: "center" }}>
+            <div style={{ background: c.cardBg, borderRadius: "6px", border: `1px solid ${c.border}`, padding: "60px", textAlign: "center" }}>
               <div style={{
                 width: "40px", height: "40px", margin: "0 auto 16px",
                 border: `3px solid ${isDark ? "#1E3A5F" : "#e0f2fe"}`, borderTop: "3px solid #0057A8",
@@ -239,14 +239,14 @@ const TenantPage = () => {
             </div>
           ) : error ? (
             <div style={{
-              background: c.cardBg, borderRadius: "16px", border: `1px solid ${isDark ? "#7F1D1D" : "#fecaca"}`,
+              background: c.cardBg, borderRadius: "6px", border: `1px solid ${isDark ? "#7F1D1D" : "#fecaca"}`,
               padding: "24px", boxShadow: c.shadow,
             }}>
               <p style={{ color: "#dc2626", fontSize: "14px", margin: "0 0 16px" }}>{error}</p>
               <button onClick={loadTenant} style={{
                 padding: "8px 18px", background: isDark ? "#3B1C1C" : "#fef2f2",
                 border: `1px solid ${isDark ? "#7F1D1D" : "#fecaca"}`,
-                borderRadius: "8px", color: "#dc2626", fontSize: "13px", fontWeight: 600, cursor: "pointer",
+                borderRadius: "6px", color: "#dc2626", fontSize: "13px", fontWeight: 600, cursor: "pointer",
               }}>{t('tenant.retry')}</button>
             </div>
           ) : tenant ? (
@@ -274,7 +274,7 @@ const TenantPage = () => {
                 }}>
                   <span style={{ color: c.label, fontSize: "13px", fontWeight: 500 }}>{t('tenant.idTokenClaims')}</span>
                   <span style={{
-                    fontSize: "12px", padding: "3px 12px", borderRadius: "20px", fontWeight: 600,
+                    fontSize: "12px", padding: "3px 12px", borderRadius: "6px", fontWeight: 600,
                     ...(tenant.idTokenClaims
                       ? { color: "#22C55E" }
                       : { color: "red" }
@@ -300,7 +300,7 @@ const TenantPage = () => {
               {tenant.armTenant && (
                 <Section title={t('tenant.armResponse')} accent="#0057A8"
                   icon={<Network size={15} color="#0057A8" />}>
-                  <div style={{ marginTop: "10px", borderRadius: "12px", overflow: "hidden", border: `1px solid ${c.border}` }}>
+                  <div style={{ marginTop: "10px", borderRadius: "6px", overflow: "hidden", border: `1px solid ${c.border}` }}>
                     <div style={{
                       background: "#1e293b",
                       display: "flex", alignItems: "center", gap: "6px",
@@ -315,7 +315,7 @@ const TenantPage = () => {
                       <span style={{
                         marginLeft: "auto", fontSize: "10px", fontFamily: "monospace",
                         background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)",
-                        borderRadius: "4px", padding: "2px 7px", color: "#94A3B8", letterSpacing: "0.05em",
+                        borderRadius: "6px", padding: "2px 7px", color: "#94A3B8", letterSpacing: "0.05em",
                       }}>READ_ONLY</span>
                     </div>
                     <pre style={{
@@ -333,7 +333,7 @@ const TenantPage = () => {
             </div>
           ) : (
             <div style={{
-              background: c.cardBg, borderRadius: "16px", border: `1px solid ${c.border}`,
+              background: c.cardBg, borderRadius: "6px", border: `1px solid ${c.border}`,
               padding: "60px", textAlign: "center", color: c.label, fontSize: "13px",
             }}>
               {t('tenant.noTenant')}

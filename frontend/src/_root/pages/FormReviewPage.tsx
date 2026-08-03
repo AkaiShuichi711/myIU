@@ -12,8 +12,8 @@ import type { IFormSubmission } from '@/types';
 
 const buildResultEmail = (submitterName: string, formTitle: string, status: 'approved' | 'rejected', approverName: string, rejectionReason?: string) => `
   <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f8fafc;padding:20px">
-    <div style="background:white;border-radius:12px;padding:28px;border:1px solid #e2e8f0">
-      <div style="background:#0057A8;padding:16px 20px;border-radius:8px;margin-bottom:24px">
+    <div style="background:white;border-radius:6px;padding:28px;border:1px solid #e2e8f0">
+      <div style="background:#0057A8;padding:16px 20px;border-radius:6px;margin-bottom:24px">
         <h1 style="color:white;margin:0;font-size:17px;font-weight:700">myIU Portal</h1>
         <p style="color:rgba(255,255,255,0.8);margin:3px 0 0;font-size:12px">Hệ thống biểu mẫu điện tử</p>
       </div>
@@ -35,7 +35,7 @@ const buildResultEmail = (submitterName: string, formTitle: string, status: 'app
             <td style="padding:8px 12px;color:#ef4444">${rejectionReason}</td></tr>` : ''}
       </table>
       ${status === 'rejected' ? '<p style="color:#475569;font-size:13px">Vui lòng xem lại thông tin và nộp lại biểu mẫu với người duyệt phù hợp.</p>' : ''}
-      <a href="${window.location.origin}/forms" style="display:inline-block;background:#0057A8;color:white;text-decoration:none;padding:10px 24px;border-radius:8px;font-size:13px;font-weight:600">
+      <a href="${window.location.origin}/forms" style="display:inline-block;background:#0057A8;color:white;text-decoration:none;padding:10px 24px;border-radius:6px;font-size:13px;font-weight:600">
         Xem danh sách biểu mẫu →
       </a>
     </div>

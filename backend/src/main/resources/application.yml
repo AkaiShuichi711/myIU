@@ -70,10 +70,10 @@ spring:
             user-name-attribute: email
 
   mail:
-    host: smtp.gmail.com
-    port: 587
-    username: ${SMTP_USER:}
-    password: ${SMTP_PASS:}
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
     properties:
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true

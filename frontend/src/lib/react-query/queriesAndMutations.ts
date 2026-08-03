@@ -6,6 +6,9 @@ import {
   keepPreviousData,
 } from '@tanstack/react-query';
 import {
+  submitAssignment, getAssignmentSubmissions, getMySubmission, gradeSubmission,
+  getAttendance, getMyAttendance, upsertAttendance, bulkUpsertAttendance, deleteAttendanceRecord,
+  getAllCourseMembers,
   createUserAccount,
   signInAccount,
   getAllUsers,
@@ -759,3 +762,98 @@ export const useDeleteCourseSchedule = () => {
     },
   });
 };
+
+// ─── ASSIGNMENT SUBMISSIONS ───────────────────────────────────────────────────
+
+export const useSubmitAssignment = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { coursePostId: string; fileUrl?: string; fileId?: string; fileName?: string; textContent?: string }) =>
+      submitAssignment(data),
+    onSuccess: (_d, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['mySubmission', vars.coursePostId] });
+    },
+  });
+};
+
+export const useGetAssignmentSubmissions = (coursePostId: string) =>
+  useQuery({
+    queryKey: ['submissions', coursePostId],
+    queryFn: () => getAssignmentSubmissions(coursePostId),
+    enabled: !!coursePostId,
+  });
+
+export const useGetMySubmission = (coursePostId: string) =>
+  useQuery({
+    queryKey: ['mySubmission', coursePostId],
+    queryFn: () => getMySubmission(coursePostId),
+    enabled: !!coursePostId,
+  });
+
+export const useGradeSubmission = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: { score?: number; feedback?: string } }) =>
+      gradeSubmission(id, data),
+    onSuccess: (_d, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['submissions'] });
+    },
+  });
+};
+
+// ─── ATTENDANCE ───────────────────────────────────────────────────────────────
+
+export const useGetAttendance = (courseId: string, date?: string, studentId?: string) =>
+  useQuery({
+    queryKey: ['attendance', courseId, date, studentId],
+    queryFn: () => getAttendance(courseId, date, studentId),
+    enabled: !!courseId,
+  });
+
+export const useGetMyAttendance = (courseId: string) =>
+  useQuery({
+    queryKey: ['myAttendance', courseId],
+    queryFn: () => getMyAttendance(courseId),
+    enabled: !!courseId,
+  });
+
+export const useUpsertAttendance = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { courseId: string; studentId: string; studentName: string; date: string; status: string; note?: string }) =>
+      upsertAttendance(data),
+    onSuccess: (_d, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['attendance', vars.courseId] });
+    },
+  });
+};
+
+export const useBulkUpsertAttendance = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: { courseId: string; date: string; records: { studentId: string; studentName: string; status: string; note?: string }[] }) =>
+      bulkUpsertAttendance(data),
+    onSuccess: (_d, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['attendance', vars.courseId] });
+    },
+  });
+};
+
+export const useDeleteAttendanceRecord = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, courseId }: { id: string; courseId: string }) =>
+      deleteAttendanceRecord(id),
+    onSuccess: (_d, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['attendance', vars.courseId] });
+    },
+  });
+};
+
+
+export const useGetAllCourseMembers = (courseId: string) =>
+  useQuery({
+    queryKey: ['allCourseMembers', courseId],
+    queryFn: () => getAllCourseMembers(courseId),
+    enabled: !!courseId,
+  });

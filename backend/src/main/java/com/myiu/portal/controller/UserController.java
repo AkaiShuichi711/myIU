@@ -2,6 +2,7 @@ package com.myiu.portal.controller;
 
 import com.myiu.portal.dto.*;
 import com.myiu.portal.service.*;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -32,7 +33,7 @@ public class UserController extends BaseController {
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<UserDTO>> update(
             @PathVariable UUID id,
-            @RequestBody UpdateUserRequest req,
+            @Valid @RequestBody UpdateUserRequest req,
             @AuthenticationPrincipal UserDetails principal) {
         if (!id.equals(currentUserId(principal))) {
             return ResponseEntity.status(403).body(ApiResponse.error("Forbidden"));

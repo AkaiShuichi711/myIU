@@ -2,6 +2,7 @@ package com.myiu.portal.controller;
 
 import com.myiu.portal.dto.*;
 import com.myiu.portal.service.TimetableService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -34,7 +35,7 @@ public class TimetableController extends BaseController {
     @PostMapping("/api/courses/{courseId}/schedules")
     public ResponseEntity<ApiResponse<TimetableEntryDTO>> addSchedule(
             @PathVariable UUID courseId,
-            @RequestBody CourseScheduleRequest req) {
+            @Valid @RequestBody CourseScheduleRequest req) {
         return ResponseEntity.ok(ApiResponse.ok(timetableService.addSchedule(courseId, req)));
     }
 

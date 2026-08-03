@@ -4,6 +4,7 @@ import Flag from 'react-world-flags';
 import { useUserContext } from '@/context/AuthContext';
 import NotificationBell from './NotificationBell';
 import { LANGUAGES, getSavedLang, changeLanguage } from '@/lib/googleTranslate';
+import { logout } from '@/lib/appwrite/api';
 
 const c = {
   bg:             '#163878',
@@ -69,7 +70,7 @@ const Topbar = () => {
             fontFamily: "Arial, 'Helvetica Neue', sans-serif",
             whiteSpace: 'nowrap',
           }}>
-            VIET NAM NATIONAL UNIVERSITY HO CHI MINH CITY
+            VIETNAM NATIONAL UNIVERSITY HO CHI MINH CITY
           </span>
           <span style={{
             fontSize: '14px', fontWeight: 700,
@@ -106,7 +107,7 @@ const Topbar = () => {
             onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = c.btnHoverBg}
             onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'transparent'}
           >
-            <Flag code={activeLang.flagCode} style={{ height: '14px', width: '20px', objectFit: 'cover', borderRadius: '2px' }} />
+            <Flag code={activeLang.flagCode} style={{ height: '14px', width: '20px', objectFit: 'cover', borderRadius: '6px' }} />
             <ChevronDown size={10} style={{
               color: c.textMuted,
               transform: isLangOpen ? 'rotate(180deg)' : 'none',
@@ -118,7 +119,7 @@ const Topbar = () => {
             <div style={{
               position: 'absolute', top: 'calc(100% + 6px)', right: 0,
               background: c.dropdownBg, border: `1px solid ${c.dropdownBorder}`,
-              borderRadius: '8px',
+              borderRadius: '6px',
               boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
               minWidth: '160px', maxHeight: '320px', overflowY: 'auto', zIndex: 100,
               padding: '4px',
@@ -130,9 +131,9 @@ const Topbar = () => {
                   style={{
                     display: 'flex', alignItems: 'center', gap: '9px',
                     width: '100%', padding: '7px 10px', borderRadius: '6px',
-                    background: opt.code === currentLang ? 'rgba(241,90,34,0.08)' : 'transparent',
+                    background: opt.code === currentLang ? 'rgba(22,56,120,0.08)' : 'transparent',
                     border: 'none', cursor: 'pointer', fontSize: '12.5px',
-                    color: opt.code === currentLang ? '#0057A8' : c.text,
+                    color: opt.code === currentLang ? '#163878' : c.text,
                     fontWeight: opt.code === currentLang ? 600 : 400,
                     textAlign: 'left', transition: 'background 0.1s',
                   }}
@@ -145,7 +146,7 @@ const Topbar = () => {
                       (e.currentTarget as HTMLElement).style.background = 'transparent';
                   }}
                 >
-                  <Flag code={opt.flagCode} style={{ height: '13px', width: '19px', objectFit: 'cover', borderRadius: '2px', flexShrink: 0 }} />
+                  <Flag code={opt.flagCode} style={{ height: '13px', width: '19px', objectFit: 'cover', borderRadius: '6px', flexShrink: 0 }} />
                   {opt.label}
                 </button>
               ))}
@@ -157,14 +158,17 @@ const Topbar = () => {
 
         {/* Sign out */}
         <button
-          onClick={() => signOut()}
+          onClick={async () => {
+            try { await logout(); } catch { /* server may be unreachable — proceed anyway */ }
+            signOut();
+          }}
           title="Sign out"
           style={{
             display: 'flex', alignItems: 'center', gap: '6px',
-            background: logoutHover ? 'rgba(239,68,68,0.20)' : 'transparent',
-            border: `1px solid ${logoutHover ? 'rgba(239,68,68,0.5)' : c.border}`,
+            background: logoutHover ? 'rgba(255,255,255,0.12)' : 'transparent',
+            border: `1px solid ${c.border}`,
             borderRadius: '6px', padding: '5px 10px',
-            color: logoutHover ? '#fca5a5' : c.textMuted,
+            color: logoutHover ? c.text : c.textMuted,
             fontSize: '12px', fontWeight: 500, cursor: 'pointer',
             transition: 'all 0.15s',
           }}

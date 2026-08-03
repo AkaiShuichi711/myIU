@@ -1,11 +1,9 @@
-﻿// === IMPORTS ===
-import { Outlet, Navigate } from "react-router-dom";
+﻿import { Outlet, Navigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useTheme } from "@/context/ThemeContext";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Pagination, Autoplay } from "swiper/modules";
+import { Autoplay } from "swiper/modules";
 import "swiper/css";
-import "swiper/css/pagination";
 import { useTranslation } from "react-i18next";
 import { useUserContext } from "@/context/AuthContext";
 import Flag from "react-world-flags";
@@ -18,6 +16,7 @@ const carouselImages = [
   "/assets/images/side-img5.jpg",
 ] as const;
 
+
 const footerLinks = [
   "iuHomepage",
   "officesAndCenters",
@@ -28,12 +27,6 @@ const footerLinks = [
 
 const socialIcons = ["facebook", "instagram", "outlook", "linkedin"] as const;
 
-
-const swiperStyle = {
-  "--swiper-pagination-color": "linear-gradient(to right, #0057A8, #0057A8)",
-  "--swiper-pagination-progressbar-bg-color": "rgba(255, 255, 255, 0.3)",
-  "--swiper-pagination-bottom": "0px",
-} as Record<string, string>;
 
 // === COMPONENT DEFINITION ===
 const AuthLayout = () => {
@@ -63,37 +56,29 @@ const AuthLayout = () => {
   ) : (
     // === MAIN LAYOUT CONTAINER ===
     <div className="min-h-screen w-full bg-white flex flex-col">
-      {/* === MAIN CONTENT SECTION === */}
       <main className="flex flex-1 w-full min-h-0">
-        {/* === LEFT SIDE: AUTH FORM === */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center px-6 bg-gradient-to-br from-[#0f0d3d] via-[#1e1b6e] to-[#0057A8] overflow-auto">
+        <div
+          className="w-full lg:w-1/2 flex items-center justify-center px-6 bg-gradient-to-br from-[#0f0d3d] via-[#1e1b6e] to-[#0057A8] overflow-y-auto [&::-webkit-scrollbar]:hidden"
+          style={{ scrollbarWidth: 'none' }}
+        >
           <div className="w-full max-w-md py-8">
             <Outlet />
           </div>
         </div>
 
-        {/* === RIGHT SIDE: CAROUSEL COMPONENT === */}
-        {/* THÊM MỚI: Phần carousel chỉ hiện trên desktop (lg:) */}
         {carouselImages.length > 0 && (
-          <div className="hidden lg:flex lg:w-1/2 relative overflow-visible bg-gradient-to-br from-[#0057A8]/10 to-[#0057A8]/20 h-full z-10">
-            {/* THÊM h-full + z-10 để dots không bị che */}
+          <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden h-full">
             <Swiper
-              modules={[Pagination, Autoplay]}
+              modules={[Autoplay]}
               spaceBetween={0}
               slidesPerView={1}
-              pagination={{ type: "progressbar" }}
               autoplay={{ delay: 3500, disableOnInteraction: false }}
               loop={carouselImages.length > 1}
-              className="w-full h-full [&_.swiper-pagination-progressbar]:bottom-0"
-              style={swiperStyle}
+              className="w-full h-full"
             >
               {carouselImages.map((src, index) => (
                 <SwiperSlide key={src}>
-                  <img
-                    src={src}
-                    alt={`Auth visual slide ${index + 1}`}
-                    className="h-full w-full object-cover"
-                  />
+                  <img src={src} alt={`Auth visual slide ${index + 1}`} className="h-full w-full object-cover" />
                 </SwiperSlide>
               ))}
             </Swiper>
@@ -174,7 +159,7 @@ const AuthLayout = () => {
         >
           <Flag
             code={activeLanguage.flagCode}
-            className="h-6 w-8 object-cover rounded-[3px] shadow-sm"
+            className="h-6 w-8 object-cover rounded-[6px] shadow-sm"
           />
           <svg
             className={`w-3.5 h-3.5 text-[#94A3B8] transition-transform duration-200 ${
@@ -215,7 +200,7 @@ const AuthLayout = () => {
                   <div className="flex items-center gap-3">
                     <Flag
                       code={option.flagCode}
-                      className="h-4 w-6 object-cover rounded-[2px]"
+                      className="h-4 w-6 object-cover rounded-[6px]"
                     />
                     <span>{option.label}</span>
                   </div>

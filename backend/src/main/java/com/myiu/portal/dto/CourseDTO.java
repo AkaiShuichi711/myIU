@@ -1,5 +1,6 @@
 package com.myiu.portal.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,7 +12,9 @@ import java.util.UUID;
 @Data @Builder @NoArgsConstructor @AllArgsConstructor
 public class CourseDTO {
     private UUID id;
+    @NotBlank
     private String name;
+    @NotBlank
     private String code;
     private String semester;
     private String description;
