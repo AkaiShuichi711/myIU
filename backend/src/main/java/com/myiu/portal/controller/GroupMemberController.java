@@ -35,6 +35,8 @@ public class GroupMemberController {
         } else if (courseId != null && studentId != null) {
             result = groupMemberRepository.findByStudentId(studentId).stream()
                     .filter(m -> m.getCourseId().equals(courseId)).toList();
+        } else if (courseId != null) {
+            result = groupMemberRepository.findByCourseId(courseId);
         } else if (studentId != null) {
             result = groupMemberRepository.findByStudentId(studentId);
         } else {

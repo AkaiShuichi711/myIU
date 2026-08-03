@@ -9,6 +9,7 @@ import java.util.UUID;
 
 public interface GroupMemberRepository extends JpaRepository<GroupMember, UUID> {
     List<GroupMember> findByGroupId(UUID groupId);
+    List<GroupMember> findByCourseId(UUID courseId);
     List<GroupMember> findByStudentId(UUID studentId);
     Optional<GroupMember> findByGroupIdAndStudentId(UUID groupId, UUID studentId);
 }

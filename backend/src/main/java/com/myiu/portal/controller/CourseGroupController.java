@@ -11,8 +11,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -66,6 +65,7 @@ public class CourseGroupController extends BaseController {
         return ResponseEntity.ok(ApiResponse.ok(null));
     }
 
+    @Transactional(readOnly = true)
     @GetMapping("/lecturer/{lecturerId}/courses")
     public ResponseEntity<ApiResponse<List<Course>>> getLecturerCourses(@PathVariable UUID lecturerId) {
         List<UUID> courseIds = courseGroupRepository.findByLecturerId(lecturerId).stream()
