@@ -21,6 +21,7 @@ public class TimetableService {
     private final CourseRepository courseRepository;
     private final GroupMemberRepository groupMemberRepository;
 
+    @Transactional(readOnly = true)
     public List<TimetableEntryDTO> getForUser(UUID userId, Collection<String> roles) {
         boolean isLecturerOrAdmin = roles.stream()
                 .anyMatch(r -> r.equals("ROLE_LECTURER") || r.equals("ROLE_ADMIN"));
@@ -40,6 +41,7 @@ public class TimetableService {
                 .stream().map(this::toDTO).toList();
     }
 
+    @Transactional(readOnly = true)
     public List<TimetableEntryDTO> getForCourse(UUID courseId) {
         return scheduleRepository.findByCourseIdOrderByStartTimeAsc(courseId)
                 .stream().map(this::toDTO).toList();
