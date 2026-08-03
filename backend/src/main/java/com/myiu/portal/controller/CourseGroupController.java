@@ -67,10 +67,10 @@ public class CourseGroupController extends BaseController {
     }
 
     @GetMapping("/lecturer/{lecturerId}/courses")
-    public ResponseEntity<ApiResponse<List<UUID>>> getLecturerCourses(@PathVariable UUID lecturerId) {
+    public ResponseEntity<ApiResponse<List<Course>>> getLecturerCourses(@PathVariable UUID lecturerId) {
         List<UUID> courseIds = courseGroupRepository.findByLecturerId(lecturerId).stream()
                 .map(g -> g.getCourse().getId()).distinct().toList();
-        return ResponseEntity.ok(ApiResponse.ok(courseIds));
+        return ResponseEntity.ok(ApiResponse.ok(courseRepository.findAllById(courseIds)));
     }
 
     @Data

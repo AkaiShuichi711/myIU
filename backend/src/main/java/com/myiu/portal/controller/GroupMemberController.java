@@ -19,6 +19,7 @@ public class GroupMemberController {
 
     private final GroupMemberRepository groupMemberRepository;
     private final CourseGroupRepository courseGroupRepository;
+    private final CourseRepository courseRepository;
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<GroupMember>>> get(
@@ -61,10 +62,10 @@ public class GroupMemberController {
     }
 
     @GetMapping("/student/{studentId}/courses")
-    public ResponseEntity<ApiResponse<List<UUID>>> getStudentCourses(@PathVariable UUID studentId) {
+    public ResponseEntity<ApiResponse<List<Course>>> getStudentCourses(@PathVariable UUID studentId) {
         List<UUID> courseIds = groupMemberRepository.findByStudentId(studentId).stream()
                 .map(GroupMember::getCourseId).distinct().toList();
-        return ResponseEntity.ok(ApiResponse.ok(courseIds));
+        return ResponseEntity.ok(ApiResponse.ok(courseRepository.findAllById(courseIds)));
     }
 
     @Data
