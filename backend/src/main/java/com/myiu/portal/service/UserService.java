@@ -41,6 +41,11 @@ public class UserService {
                 .stream().map(this::toDTO).toList();
     }
 
+    public List<UserDTO> searchByRole(String query, String role) {
+        return userRepository.searchByNameOrEmailAndRole(query, role)
+                .stream().map(this::toDTO).toList();
+    }
+
     public UserDTO toDTO(User user) {
         return UserDTO.builder()
                 .id(user.getId())

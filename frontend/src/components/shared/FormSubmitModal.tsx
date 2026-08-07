@@ -50,7 +50,7 @@ const FormSubmitModal = ({ template, onClose, onSuccess }: Props) => {
     searchRef.current = setTimeout(async () => {
       setIsSearching(true);
       try {
-        const data = await api.get<Suggestion[]>(`/api/users/search?q=${encodeURIComponent(q)}`);
+        const data = await api.get<Suggestion[]>(`/api/users/search?q=${encodeURIComponent(q)}&role=lecturer`);
         setSuggestions(data ?? []);
         setShowSuggestions((data?.length ?? 0) > 0);
       } catch {

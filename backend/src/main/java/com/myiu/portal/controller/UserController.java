@@ -42,8 +42,13 @@ public class UserController extends BaseController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<ApiResponse<List<UserDTO>>> search(@RequestParam String q) {
-        return ResponseEntity.ok(ApiResponse.ok(userService.search(q)));
+    public ResponseEntity<ApiResponse<List<UserDTO>>> search(
+            @RequestParam String q,
+            @RequestParam(required = false) String role) {
+        List<UserDTO> result = (role != null && !role.isBlank())
+                ? userService.searchByRole(q, role.toLowerCase())
+                : userService.search(q);
+        return ResponseEntity.ok(ApiResponse.ok(result));
     }
 
     @PostMapping("/{id}/avatar")
