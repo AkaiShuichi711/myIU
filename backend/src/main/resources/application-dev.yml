@@ -21,6 +21,7 @@ spring:
 
   flyway:
     locations: classpath:db/migration,classpath:db/seed
+    out-of-order: true          # allow re-seeding after manual flyway_schema_history edits
 
   datasource:
     url: ${DB_URL}                # REQUIRED — no fallback
