@@ -16,11 +16,13 @@ public class CourseService {
     private final CourseRepository courseRepository;
     private final UserRepository userRepository;
 
+    @Transactional(readOnly = true)
     public List<CourseDTO> getAll() {
         return courseRepository.findByIsActiveTrueOrderByCreatedAtDesc()
                 .stream().map(this::toDTO).toList();
     }
 
+    @Transactional(readOnly = true)
     public CourseDTO getById(UUID id) {
         return toDTO(courseRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Course not found")));
