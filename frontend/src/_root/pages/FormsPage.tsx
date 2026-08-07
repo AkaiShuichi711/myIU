@@ -335,10 +335,10 @@ const Empty = ({ icon: Icon, label, action }: { icon: typeof Inbox; label: strin
 );
 
 // ── Table wrapper ──────────────────────────────────────────────────────────────
-const TableWrap = ({ children, fixed }: { children: React.ReactNode; fixed?: boolean }) => (
+const TableWrap = ({ children }: { children: React.ReactNode }) => (
   <div className="bg-white dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700/60 overflow-hidden">
     <div className="overflow-x-auto">
-      <table className={`w-full min-w-[580px] ${fixed ? 'table-fixed' : ''}`}>{children}</table>
+      <table className="w-full min-w-[580px]">{children}</table>
     </div>
   </div>
 );
@@ -576,7 +576,14 @@ const FormsPage = () => {
             ) : (
               <div className="flex flex-col gap-4">
                 {FORM_CATEGORIES.filter(c => groupedForms[c.id]).map(({ id, label, icon: Icon }) => (
-                  <TableWrap key={id} fixed>
+                  <TableWrap key={id}>
+                    {/* colgroup fixes column widths consistently across separate section tables */}
+                    <colgroup>
+                      <col />
+                      <col style={{ width: '80px' }} />
+                      <col style={{ width: '148px' }} />
+                      <col style={{ width: '200px' }} />
+                    </colgroup>
                     <thead className="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-100 dark:border-slate-700">
                       <tr>
                         <td colSpan={4} className="px-4 py-2.5">
@@ -589,9 +596,9 @@ const FormsPage = () => {
                       </tr>
                       <tr className="border-t border-slate-100 dark:border-slate-700">
                         <TH>Tên biểu mẫu</TH>
-                        <TH className="w-[80px]">Loại</TH>
-                        <TH className="w-[148px]">Danh mục</TH>
-                        <TH className="w-[200px] text-right">Thao tác</TH>
+                        <TH>Loại</TH>
+                        <TH>Danh mục</TH>
+                        <TH className="text-right">Thao tác</TH>
                       </tr>
                     </thead>
                     <tbody>
