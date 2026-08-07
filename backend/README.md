@@ -96,6 +96,8 @@ Seed data được kích hoạt bằng profile `local` hoặc `dev`:
 SPRING_PROFILES_ACTIVE=local mvn spring-boot:run
 ```
 
+> **`out-of-order: true` trong dev profile** — `application-dev.yml` bật `spring.flyway.out-of-order: true` để cho phép re-apply seed migrations (V7, V10) sau khi xóa thủ công `flyway_schema_history`. **Không bật flag này trên prod.**
+
 ---
 
 ## API Reference
@@ -116,7 +118,7 @@ SPRING_PROFILES_ACTIVE=local mvn spring-boot:run
 | GET | `/api/users/{id}` | Bearer |
 | PUT | `/api/users/{id}` | Bearer |
 | GET | `/api/users/by-username/{username}` | Bearer |
-| GET | `/api/users/search?q=` | Bearer |
+| GET | `/api/users/search?q=&role=` | Bearer — `role` optional; `role=lecturer` restricts results to lecturers |
 | POST | `/api/users/{id}/avatar` | Bearer |
 | POST | `/api/users/provision` | Bearer (Admin) |
 
@@ -144,13 +146,13 @@ SPRING_PROFILES_ACTIVE=local mvn spring-boot:run
 | GET/POST | `/api/course-posts` | Bài đăng trong khóa học |
 | GET/POST | `/api/grades` | Bảng điểm |
 
-### Timetable
-| Method | Path |
-|--------|------|
-| GET | `/api/timetable` |
-| GET | `/api/timetable/course/{courseId}` |
-| POST | `/api/timetable/{courseId}/schedules` |
-| DELETE | `/api/timetable/schedules/{id}` |
+### Timetable / Course Schedules
+| Method | Path | Mô tả |
+|--------|------|-------|
+| GET | `/api/timetable` | Lịch học cá nhân (student/lecturer) |
+| GET | `/api/courses/{courseId}/schedules` | Lịch học của một course |
+| POST | `/api/courses/{courseId}/schedules` | Thêm buổi học (lecturer only) |
+| DELETE | `/api/course-schedules/{scheduleId}` | Xóa buổi học (lecturer only) |
 
 ### Attendance & Submissions
 | Method | Path |
@@ -187,6 +189,7 @@ SPRING_PROFILES_ACTIVE=local mvn spring-boot:run
 - **Token**: JWT (HMAC-SHA256), 24h expiry, blacklist in-memory khi logout
 - **Session revocation**: Bảng `login_sessions` với cột `is_revoked`
 - **OAuth2**: Microsoft Azure AD (Authorization Code Flow), cookie-based state
+- **Email normalization**: Microsoft có thể trả về email dạng HOA (`ITITIU21354@...`). `OAuth2SuccessHandler` và `UserDetailsServiceImpl` đều gọi `.toLowerCase()` trước khi lookup. **Không xóa bước này.**
 - **CORS**: Configured via `app.cors.allowed-origins`
 
 ---
@@ -194,3 +197,26 @@ SPRING_PROFILES_ACTIVE=local mvn spring-boot:run
 ## Swagger UI
 
 Sau khi chạy: `http://localhost:8080/swagger-ui.html`
+
+---
+
+## Lưu ý quan trọng cho developer
+
+### `open-in-view: false` + `@Transactional`
+`spring.jpa.open-in-view: false` được bật toàn cục. Hibernate session **đóng ngay sau khi repository call kết thúc**. Bất kỳ service method nào truy cập LAZY relation (ví dụ `user.getRoles()`) ngoài phạm vi repository call đều sẽ ném `LazyInitializationException`.
+
+**Luôn thêm `@Transactional(readOnly = true)` vào service method** mà truy xuất entity có quan hệ LAZY.
+
+### `user_roles` table — JPQL JOIN
+Roles được lưu qua `@ElementCollection` trong bảng `user_roles`. JPQL thông thường không thể filter trực tiếp — phải dùng JOIN:
+
+```java
+// Đúng
+@Query("SELECT u FROM User u JOIN u.roles r WHERE r = :role AND ...")
+List<User> searchByRole(@Param("q") String q, @Param("role") String role);
+```
+
+Roles lưu **không có prefix** `ROLE_` (ví dụ: `student`, `lecturer`). `UserDetailsServiceImpl` tự thêm prefix khi tạo `GrantedAuthority`.
+
+### File storage
+Tất cả file (form template, submission) được serve từ **portal backend** tại `/api/storage/files/{filename}`. Admin backend cũng tạo URL theo format này để portal user có thể download. Không tạo file-serving endpoint riêng ở admin.

@@ -69,7 +69,7 @@ On local dev this is set automatically by the `.env` file (loaded by `spring-dot
 | Assignment submission | ✅ Done | Student submit/resubmit, lecturer grade, LATE detection |
 | Attendance tracking | ✅ Done | Lecturer mark P/L/A/E per session, student history view |
 | Grades | ✅ Done | Per-course grade sheet, student self-view |
-| Timetable | ✅ Done | Weekly schedule, room info |
+| Timetable | ✅ Done | Weekly calendar view (student/lecturer). Lecturer manages schedules from **CourseDetail → Lịch học tab** |
 | Forms & approval workflow | ✅ Done | Template-based, email notifications on approve/reject |
 | Real-time notifications | ✅ Done | WebSocket STOMP push |
 | Support tickets | ✅ Done | Submit, track, admin respond |
@@ -167,7 +167,7 @@ myIU/
 │   │   │   ├── AdminProvisionPage.tsx    # Excel upload for bulk user provisioning
 │   │   │   └── AdminSupportPage.tsx      # Support ticket list + respond
 │   │   ├── _root/pages/                  # Student/lecturer pages
-│   │   │   ├── CourseDetail.tsx          # Tabs: Feed · Materials · Assignments · Attendance · Grades · Members
+│   │   │   ├── CourseDetail.tsx          # Tabs: Feed · Materials · Assignments · Attendance · Grades · Members · Lịch học
 │   │   │   └── ... (20+ other pages)
 │   │   ├── components/shared/            # Topbar, LeftSidebar, NotificationBell
 │   │   ├── constants/                    # FORM_STATUS, FILE_TYPE_META, FORM_CATEGORIES
@@ -401,3 +401,81 @@ Endpoint: `POST /api/admin/provision` (file field: `file`).
 - For deployment see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 - For architecture details see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 - For API reference see [docs/API_ROUTES.md](docs/API_ROUTES.md).
+
+---
+
+## Developer Gotchas
+
+Critical notes accumulated during development — read this before touching the codebase.
+
+### 1. Microsoft OAuth2 email case normalization
+Microsoft Azure AD returns the user's email in **ANY case** (e.g. `ITITIU21354@student.hcmiu.edu.vn`). PostgreSQL `findByEmail` is case-sensitive, so the lookup fails and the user hits the `not_provisioned` error page even though their account exists.
+
+**Fix already applied** in two places — do not remove:
+- `OAuth2SuccessHandler.java` — `email = email.toLowerCase()` before `findByEmail()`
+- `UserDetailsServiceImpl.java` — `normalizedEmail = email.toLowerCase()` before loading JWT principal
+
+If you add other code that looks up users by email, always call `.toLowerCase()` first.
+
+### 2. JPA lazy loading + `open-in-view: false`
+`spring.jpa.open-in-view: false` is set globally. This means the Hibernate session **closes after each repository call**, not after the HTTP response is sent. Any service method that traverses a LAZY relation (e.g. `user.getRoles()`, `course.getGroups()`) outside of the repository call **will throw `LazyInitializationException`** unless the method is annotated with `@Transactional(readOnly = true)`.
+
+This has already bitten us with `CourseService.getAll()` and `CourseService.getById()`. Always add `@Transactional(readOnly = true)` to service methods that read entity relations.
+
+### 3. `user_roles` table — `@ElementCollection` JPA gotcha
+Roles are stored in a separate `user_roles` table via `@ElementCollection`. You **cannot** filter on them with a plain `WHERE u.role = :role` JPQL. Use a JOIN:
+
+```java
+// Correct — JOIN on the element collection
+@Query("SELECT u FROM User u JOIN u.roles r WHERE r = :role AND ...")
+List<User> searchByNameOrEmailAndRole(@Param("q") String q, @Param("role") String role);
+```
+
+Roles are stored **without** the `ROLE_` prefix (`student`, `lecturer`). `UserDetailsServiceImpl` adds the prefix when constructing `GrantedAuthority` for Spring Security. The `?role=` query param on `GET /api/users/search` accepts the raw value without prefix (e.g. `?role=lecturer`).
+
+### 4. Flyway `out-of-order: true` in dev profile
+`application-dev.yml` sets `spring.flyway.out-of-order: true`. This is intentional — the seed migrations (`V7__seed_base.sql`, `V10__seed_extended.sql`) sometimes need to be re-run after a manual `DELETE FROM flyway_schema_history` on the dev DB. Without this flag Flyway refuses to apply migrations whose version numbers are lower than the latest applied version.
+
+Do not set this flag on prod.
+
+### 5. Admin backend must be started separately
+The admin panel (`myIU-admin`, port 8081) is a **completely separate Spring Boot application**. It is NOT started by `make portal`. If the admin frontend throws a network error when creating users, the admin backend is probably not running.
+
+```powershell
+# Start admin backend
+cd ..\myIU-admin\backend
+.\mvnw.cmd spring-boot:run
+# → http://localhost:8081
+```
+
+### 6. React 18 + browser auto-translate — DOM crash
+Chrome/Edge's Google Translate wraps Vietnamese text nodes in `<font>` tags between React renders. When a dynamic list (e.g. a `<tr>` in FormsPage) re-renders, React's `insertBefore` tries to insert a node relative to the original text node — which has since been moved inside the `<font>` wrapper — causing an `insertBefore` / `NotFoundError` crash.
+
+**Always add `translate="no"` to:**
+- Dynamic table rows (`<tr translate="no">`)
+- Modals that contain form fields or lists
+
+Additionally, use `startTransition` when changing tabs/pages immediately after closing a modal to prevent React 18 batching the modal unmount with the parent re-render:
+
+```tsx
+const [, startTransition] = useTransition();
+// ...
+onSuccess={() => {
+  setSubmitTarget(null);            // unmount modal — synchronous
+  startTransition(() => setPageTab('my-requests'));  // low-priority tab switch
+}}
+```
+
+### 7. Schedule management (CourseDetail → Lịch học tab)
+The `ScheduleTab` component lives inside `CourseDetail.tsx`. React Query hooks are defined in `lib/react-query/queriesAndMutations.ts`:
+- `useGetCourseSchedules(courseId)` — `GET /api/courses/{id}/schedules`
+- `useCreateCourseSchedule()` — `POST /api/courses/{id}/schedules`
+- `useDeleteCourseSchedule()` — `DELETE /api/course-schedules/{scheduleId}`
+
+Lecturers see an add-form + delete buttons; students see read-only grouped by day.
+
+### 8. File storage — portal backend only
+All uploaded files (form templates, form submissions) are served from the **portal backend** at `/api/storage/files/{filename}`. The admin backend also generates URLs in this format when creating or updating form templates so that portal users can download them. Do not add a separate file-serving endpoint in the admin backend.
+
+### 9. `FormSubmitModal.tsx` — state order matters
+`setIsSubmitting(false)` must be called **before** `onSuccess()`. If called after (or in a `finally` block), React 18 batches the `false` state update together with the parent's unmount-triggered re-render, causing a fiber inconsistency crash. See the comment in `handleSubmit()` in `FormSubmitModal.tsx`.
