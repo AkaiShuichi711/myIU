@@ -129,12 +129,13 @@ const FormSubmitModal = ({ template, onClose, onSuccess }: Props) => {
       const subject   = `[Yêu cầu duyệt] ${template.title} — ${emailId}@${user.email.split('@')[1]}`;
       await sendEmail(approverEmail, subject, buildApproverEmail(reviewUrl));
 
-      setSubmitStep('done');
+      // Clear submitting state BEFORE calling onSuccess so the modal
+      // has no pending state updates when the parent unmounts it.
+      setIsSubmitting(false);
       onSuccess();
     } catch (e: any) {
       setError(e.message || 'Đã có lỗi xảy ra');
       setSubmitStep('idle');
-    } finally {
       setIsSubmitting(false);
     }
   };
@@ -144,7 +145,7 @@ const FormSubmitModal = ({ template, onClose, onSuccess }: Props) => {
                   : 'Nộp biểu mẫu';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+    <div translate="no" className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
       <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 w-full max-w-md">
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-700">

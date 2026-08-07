@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useTransition } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import {
@@ -74,7 +74,9 @@ const SubmissionRow = ({ sub, mode = 'mine' }: { sub: IFormSubmission; mode?: 'm
   const meta = FORM_STATUS[sub.status] ?? FORM_STATUS.pending;
   const StatusIcon = meta.Icon;
   return (
-    <tr className="group border-b border-slate-50 dark:border-slate-700/40 hover:bg-slate-50/80 dark:hover:bg-slate-700/20 transition-colors">
+    // translate="no" prevents browser auto-translate from wrapping text nodes
+    // in <font> tags, which breaks React's insertBefore during DOM reconciliation
+    <tr translate="no" className="group border-b border-slate-50 dark:border-slate-700/40 hover:bg-slate-50/80 dark:hover:bg-slate-700/20 transition-colors">
       {/* Form name */}
       <td className="px-4 py-3">
         <div className="flex items-center gap-2.5 min-w-0">
@@ -370,6 +372,7 @@ const FormsPage = () => {
   const { user } = useUserContext();
   const navigate = useNavigate();
   const isAdmin = isAdminRole(user.roles);
+  const [, startTransition] = useTransition();
 
   const [pageTab, setPageTab]           = useState<PageTab>('forms');
   const [filter, setFilter]             = useState<FormCategory | 'all'>('all');
@@ -681,7 +684,13 @@ const FormsPage = () => {
         <FormSubmitModal
           template={submitTarget}
           onClose={() => setSubmitTarget(null)}
-          onSuccess={() => { setSubmitTarget(null); setPageTab('my-requests'); }}
+          onSuccess={() => {
+            // Close modal first, then switch tab as a low-priority transition.
+            // Separating the two prevents React 18 from batching an unmount
+            // with a parent re-render, which causes insertBefore DOM errors.
+            setSubmitTarget(null);
+            startTransition(() => setPageTab('my-requests'));
+          }}
         />
       )}
     </div>
