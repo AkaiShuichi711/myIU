@@ -4,7 +4,7 @@ import {
   ArrowLeft, Megaphone, FileText, ClipboardList, Users,
   Plus, Trash2, Loader2, Calendar, Paperclip,
   BookOpen, UserPlus, X, ChevronDown, ChevronUp, BarChart3,
-  Upload, CheckCircle2, Clock, AlertCircle, UserCheck, Link2,
+  Upload, CheckCircle2, Clock, AlertCircle, UserCheck, Link2, MapPin,
 } from 'lucide-react';
 import { useUserContext } from '@/context/AuthContext';
 import {
@@ -31,6 +31,9 @@ import {
   useGetMyAttendance,
   useBulkUpsertAttendance,
   useGetAllCourseMembers,
+  useGetCourseSchedules,
+  useCreateCourseSchedule,
+  useDeleteCourseSchedule,
 } from '@/lib/react-query/queriesAndMutations';
 import type { ICourse, ICourseGroup, ICoursePost, IGroupMember, ICourseGrade, IUpsertCourseGrade } from '@/types';
 import { formatTimeAgo, isLecturerRole, isAdminRole } from '@/lib/utils';
@@ -38,7 +41,7 @@ import { INPUT_CLS } from '@/constants/courses';
 import UserAvatar from '@/components/shared/UserAvatar';
 import { PageLoader } from '@/components/shared';
 
-type Tab = 'feed' | 'materials' | 'assignments' | 'members' | 'grades' | 'attendance';
+type Tab = 'feed' | 'materials' | 'assignments' | 'members' | 'grades' | 'attendance' | 'schedule';
 type PostType = 'announcement' | 'material' | 'assignment';
 
 const TYPE_META: Record<PostType, { label: string; color: string; border: string; bg: string; icon: typeof Megaphone }> = {
@@ -578,6 +581,203 @@ const AttendanceTab = ({ courseId, isLecturer }: {
   );
 };
 
+// ── Schedule Tab ──────────────────────────────────────────────────────────────
+const SCHEDULE_DAYS = [
+  { key: 'MON', label: 'Thứ 2' },
+  { key: 'TUE', label: 'Thứ 3' },
+  { key: 'WED', label: 'Thứ 4' },
+  { key: 'THU', label: 'Thứ 5' },
+  { key: 'FRI', label: 'Thứ 6' },
+  { key: 'SAT', label: 'Thứ 7' },
+] as const;
+
+type ScheduleEntry = {
+  scheduleId: string;
+  dayOfWeek: string;
+  startTime: string;
+  endTime: string;
+  room?: string;
+};
+
+const ScheduleTab = ({ courseId, isLecturer }: { courseId: string; isLecturer: boolean }) => {
+  const { data: rawSchedules = [], isPending } = useGetCourseSchedules(courseId);
+  const { mutate: addSchedule, isPending: isAdding } = useCreateCourseSchedule();
+  const { mutate: removeSchedule } = useDeleteCourseSchedule();
+
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState({ dayOfWeek: 'MON', startTime: '07:30', endTime: '09:30', room: '' });
+  const [formError, setFormError] = useState('');
+
+  const schedules = rawSchedules as unknown as ScheduleEntry[];
+
+  const grouped = SCHEDULE_DAYS.map(d => ({
+    ...d,
+    entries: schedules
+      .filter(s => s.dayOfWeek === d.key)
+      .sort((a, b) => a.startTime.localeCompare(b.startTime)),
+  })).filter(d => d.entries.length > 0);
+
+  const handleAdd = () => {
+    if (!form.startTime || !form.endTime) { setFormError('Vui lòng nhập đủ giờ bắt đầu và kết thúc.'); return; }
+    if (form.startTime >= form.endTime) { setFormError('Giờ kết thúc phải sau giờ bắt đầu.'); return; }
+    setFormError('');
+    addSchedule({ courseId, data: { dayOfWeek: form.dayOfWeek, startTime: form.startTime, endTime: form.endTime, room: form.room || undefined } }, {
+      onSuccess: () => { setShowForm(false); setForm({ dayOfWeek: 'MON', startTime: '07:30', endTime: '09:30', room: '' }); },
+    });
+  };
+
+  return (
+    <div className="flex flex-col gap-4">
+
+      {/* Header row */}
+      {isLecturer && (
+        <div className="flex items-center justify-between">
+          <p className="text-xs text-slate-400 dark:text-slate-500">
+            {schedules.length} lịch học — sinh viên nhìn thấy trong Thời khóa biểu
+          </p>
+          <button
+            onClick={() => { setShowForm(v => !v); setFormError(''); }}
+            className="flex items-center gap-1.5 text-xs font-semibold text-[#0057A8] hover:text-[#004080] transition-colors"
+          >
+            <Plus size={13} />
+            {showForm ? 'Hủy' : 'Thêm lịch học'}
+          </button>
+        </div>
+      )}
+
+      {/* Add form */}
+      {showForm && isLecturer && (
+        <div className="bg-white dark:bg-[#1e2028] border border-[#E0E4EB] dark:border-[#33485c] rounded-xl p-4 flex flex-col gap-3">
+          <p className="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wide">Lịch học mới</p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {/* Day */}
+            <div className="flex flex-col gap-1">
+              <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">Thứ</label>
+              <select
+                value={form.dayOfWeek}
+                onChange={e => setForm(f => ({ ...f, dayOfWeek: e.target.value }))}
+                className={INPUT_CLS + ' text-xs'}
+              >
+                {SCHEDULE_DAYS.map(d => (
+                  <option key={d.key} value={d.key}>{d.label}</option>
+                ))}
+              </select>
+            </div>
+            {/* Start */}
+            <div className="flex flex-col gap-1">
+              <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">Bắt đầu</label>
+              <input
+                type="time"
+                value={form.startTime}
+                onChange={e => setForm(f => ({ ...f, startTime: e.target.value }))}
+                className={INPUT_CLS + ' text-xs'}
+              />
+            </div>
+            {/* End */}
+            <div className="flex flex-col gap-1">
+              <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">Kết thúc</label>
+              <input
+                type="time"
+                value={form.endTime}
+                onChange={e => setForm(f => ({ ...f, endTime: e.target.value }))}
+                className={INPUT_CLS + ' text-xs'}
+              />
+            </div>
+            {/* Room */}
+            <div className="flex flex-col gap-1">
+              <label className="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">Phòng (tùy chọn)</label>
+              <input
+                type="text"
+                placeholder="VD: A1.101"
+                value={form.room}
+                onChange={e => setForm(f => ({ ...f, room: e.target.value }))}
+                className={INPUT_CLS + ' text-xs'}
+              />
+            </div>
+          </div>
+          {formError && <p className="text-[11px] text-red-500">{formError}</p>}
+          <div className="flex justify-end">
+            <button
+              onClick={handleAdd}
+              disabled={isAdding}
+              className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-[#0057A8] hover:bg-[#004080] text-white text-xs font-semibold transition-colors disabled:opacity-60"
+            >
+              {isAdding ? <Loader2 size={11} className="animate-spin" /> : <Plus size={11} />}
+              Thêm
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Loading */}
+      {isPending && (
+        <div className="flex justify-center py-12">
+          <Loader2 size={22} className="animate-spin text-slate-300 dark:text-slate-600" />
+        </div>
+      )}
+
+      {/* Empty */}
+      {!isPending && schedules.length === 0 && (
+        <div className="flex flex-col items-center py-14 gap-2 text-center">
+          <Calendar size={36} className="text-slate-200 dark:text-slate-700" />
+          <p className="text-sm font-medium text-slate-400 dark:text-slate-500">Chưa có lịch học nào</p>
+          {isLecturer && (
+            <p className="text-xs text-slate-300 dark:text-slate-600 max-w-xs">
+              Nhấn <strong>Thêm lịch học</strong> để tạo ca học đầu tiên cho môn này.
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* Schedule list grouped by day */}
+      {!isPending && grouped.length > 0 && (
+        <div className="flex flex-col gap-3">
+          {grouped.map(day => (
+            <div key={day.key} className="bg-white dark:bg-[#1e2028] border border-[#E0E4EB] dark:border-[#33485c] rounded-xl overflow-hidden">
+              {/* Day header */}
+              <div className="px-4 py-2.5 border-b border-[#E0E4EB] dark:border-[#33485c] bg-slate-50 dark:bg-[#243447]">
+                <span className="text-[11.5px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wide">
+                  {day.label}
+                </span>
+              </div>
+              {/* Entries */}
+              <div className="divide-y divide-slate-100 dark:divide-[#243447]">
+                {day.entries.map(entry => (
+                  <div key={entry.scheduleId} className="flex items-center gap-3 px-4 py-3">
+                    <div className="flex items-center gap-1.5 text-[#0057A8] shrink-0">
+                      <Clock size={13} />
+                      <span className="text-xs font-semibold font-mono">
+                        {entry.startTime} – {entry.endTime}
+                      </span>
+                    </div>
+                    {entry.room ? (
+                      <div className="flex items-center gap-1 text-slate-400 dark:text-slate-500 text-xs">
+                        <MapPin size={11} />
+                        <span>{entry.room}</span>
+                      </div>
+                    ) : (
+                      <span className="text-xs text-slate-300 dark:text-slate-600 italic">Chưa có phòng</span>
+                    )}
+                    {isLecturer && (
+                      <button
+                        onClick={() => removeSchedule({ scheduleId: entry.scheduleId, courseId })}
+                        className="ml-auto text-slate-300 hover:text-red-500 dark:text-slate-600 dark:hover:text-red-400 transition-colors"
+                        title="Xóa lịch này"
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 // ── Main Component ────────────────────────────────────────────────────────────
 const CourseDetail = () => {
   const { id = '' } = useParams<{ id: string }>();
@@ -637,6 +837,7 @@ const CourseDetail = () => {
     members:     [],
     grades:      [],
     attendance:  [],
+    schedule:    [],
   };
 
   const handleCreatePost = () => {
@@ -696,6 +897,7 @@ const CourseDetail = () => {
     { id: 'members',     label: 'Thành viên' },
     { id: 'grades',      label: 'Bảng điểm' },
     { id: 'attendance',  label: 'Điểm danh' },
+    { id: 'schedule',    label: 'Lịch học' },
   ];
 
   return (
@@ -1219,6 +1421,11 @@ const CourseDetail = () => {
         {/* Attendance tab */}
         {tab === 'attendance' && (
           <AttendanceTab courseId={id} isLecturer={isLecturer} />
+        )}
+
+        {/* Schedule tab */}
+        {tab === 'schedule' && (
+          <ScheduleTab courseId={id} isLecturer={isLecturer} />
         )}
       </div>
     </div>
