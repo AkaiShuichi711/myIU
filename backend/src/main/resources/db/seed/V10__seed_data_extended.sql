@@ -138,11 +138,12 @@ ON CONFLICT (course_id, student_id, date) DO NOTHING;
 -- ── Form Submissions ──────────────────────────────────────────
 -- Prefix fc = form submission
 
-INSERT INTO form_submissions (id, submitter_id, submitter_name, submitter_email, form_title, status, created_at, updated_at)
+INSERT INTO form_submissions (id, submitter_id, submitter_name, submitter_email, form_template_id, form_title, status, created_at, updated_at)
 VALUES
   ('fc000001-0000-0000-0000-000000000001',
    '22220001-0000-0000-0000-000000000003',
    'Lê Hoàng Cường', 'le.hoang.c@student.iu.edu.vn',
+   'ff000001-0000-0000-0000-000000000002',
    'Đơn phúc khảo điểm – MATH101',
    'pending',
    NOW() - INTERVAL '2 days', NOW() - INTERVAL '2 days'),
@@ -150,9 +151,26 @@ VALUES
   ('fc000001-0000-0000-0000-000000000002',
    '22220001-0000-0000-0000-000000000008',
    'Bùi Thị Lan', 'bui.thi.l@student.iu.edu.vn',
+   'ff000001-0000-0000-0000-000000000001',
    'Đơn xin học bổng học kỳ 2024-2025',
    'approved',
-   NOW() - INTERVAL '10 days', NOW() - INTERVAL '5 days')
+   NOW() - INTERVAL '10 days', NOW() - INTERVAL '5 days'),
+
+  ('fc000001-0000-0000-0000-000000000003',
+   '22220001-0000-0000-0000-000000000001',
+   'Nguyễn Văn An', 'nguyen.van.a@student.iu.edu.vn',
+   'ff000001-0000-0000-0000-000000000003',
+   'Đơn xin nghỉ học – CS101',
+   'rejected',
+   NOW() - INTERVAL '5 days', NOW() - INTERVAL '3 days'),
+
+  ('fc000001-0000-0000-0000-000000000004',
+   '22220001-0000-0000-0000-000000000005',
+   'Hoàng Minh Đức', 'hoang.minh.d@student.iu.edu.vn',
+   'ff000001-0000-0000-0000-000000000005',
+   'Đơn xin miễn giảm học phí HK2 2024-2025',
+   'pending',
+   NOW() - INTERVAL '1 day', NOW() - INTERVAL '1 day')
 ON CONFLICT (id) DO NOTHING;
 
 -- ── Additional Course Grades (CS301, MATH201) ─────────────────

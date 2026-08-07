@@ -353,22 +353,58 @@ VALUES
 
 ON CONFLICT (id) DO NOTHING;
 
--- ── Form Templates (2 templates) ──────────────────────────────
+-- ── Form Templates ────────────────────────────────────────────
+-- Fixed UUIDs (prefix ff) so V10 can reference them if needed.
+-- file_url: public-domain sample PDFs — work immediately without portal upload.
+-- created_by: Trần Đức Thịnh (lecturer 1)
 
-INSERT INTO form_templates (id, title, description, file_type, category, sort_order, is_active, created_at, updated_at)
+INSERT INTO form_templates (id, title, description, file_url, file_name, file_type, category, sort_order, is_active, created_by, created_at, updated_at)
 VALUES
-  (gen_random_uuid(),
+  ('ff000001-0000-0000-0000-000000000001',
    'Đơn xin học bổng',
    'Mẫu đơn đăng ký học bổng dành cho sinh viên có thành tích học tập xuất sắc và hoàn cảnh khó khăn. '
    || 'Điền đầy đủ thông tin và nộp kèm bảng điểm xác nhận.',
+   'https://www.africau.edu/images/default/sample.pdf',
+   'don_xin_hoc_bong.pdf',
    'pdf', 'academic', 1, TRUE,
+   '11110001-0000-0000-0000-000000000001',
    NOW() - INTERVAL '30 days', NOW() - INTERVAL '30 days'),
 
-  (gen_random_uuid(),
+  ('ff000001-0000-0000-0000-000000000002',
    'Đơn phúc khảo điểm',
    'Mẫu đơn yêu cầu phúc khảo bài thi / kiểm tra. '
    || 'Sinh viên cần nộp đơn trong vòng 10 ngày kể từ khi có kết quả chính thức.',
+   'https://www.africau.edu/images/default/sample.pdf',
+   'don_phuc_khao_diem.pdf',
    'pdf', 'academic', 2, TRUE,
-   NOW() - INTERVAL '30 days', NOW() - INTERVAL '30 days')
+   '11110001-0000-0000-0000-000000000001',
+   NOW() - INTERVAL '30 days', NOW() - INTERVAL '30 days'),
+
+  ('ff000001-0000-0000-0000-000000000003',
+   'Đơn xin nghỉ học',
+   'Mẫu đơn xin phép nghỉ học có lý do. Sinh viên điền thông tin và nộp cho giảng viên phụ trách ít nhất 1 ngày trước buổi học.',
+   'https://www.africau.edu/images/default/sample.pdf',
+   'don_xin_nghi_hoc.pdf',
+   'pdf', 'academic', 3, TRUE,
+   '11110001-0000-0000-0000-000000000001',
+   NOW() - INTERVAL '25 days', NOW() - INTERVAL '25 days'),
+
+  ('ff000001-0000-0000-0000-000000000004',
+   'Đơn xin bảo lưu kết quả học tập',
+   'Mẫu đơn xin bảo lưu kết quả học tập trong trường hợp có hoàn cảnh đặc biệt. Gửi kèm giấy tờ minh chứng.',
+   'https://www.africau.edu/images/default/sample.pdf',
+   'don_xin_bao_luu.pdf',
+   'pdf', 'administrative', 4, TRUE,
+   '11110001-0000-0000-0000-000000000001',
+   NOW() - INTERVAL '20 days', NOW() - INTERVAL '20 days'),
+
+  ('ff000001-0000-0000-0000-000000000005',
+   'Đơn xin miễn giảm học phí',
+   'Mẫu đơn xin xét miễn giảm học phí theo diện chính sách hoặc hoàn cảnh khó khăn. Nộp đầu mỗi học kỳ.',
+   'https://www.africau.edu/images/default/sample.pdf',
+   'don_xin_mien_giam_hoc_phi.pdf',
+   'pdf', 'finance', 5, TRUE,
+   '11110001-0000-0000-0000-000000000001',
+   NOW() - INTERVAL '15 days', NOW() - INTERVAL '15 days')
 
 ON CONFLICT (id) DO NOTHING;
