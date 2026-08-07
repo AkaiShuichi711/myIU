@@ -47,7 +47,7 @@ On local dev this is set automatically by the `.env` file (loaded by `spring-dot
 | Session security | JWT revocation via per-request DB check (`existsByIdAndRevokedFalse`) |
 | Database | PostgreSQL 16, Flyway V1–V8 migrations |
 | Real-time | WebSocket / STOMP over SockJS — notifications push |
-| Email | Gmail SMTP (JavaMailSender) — async HTML email on form approve/reject |
+| Email | JavaMailSender (optional) — async HTML email on form approve/reject |
 | Rate limiting | Bucket4j token-bucket — 5/min login, 60/min search, 10/hr upload |
 | Caching | Caffeine W-TinyLFU — rate limit buckets + L1 cache |
 | Observability | Spring Actuator → Prometheus → Grafana |
@@ -223,7 +223,6 @@ make start
 ```bash
 cp backend/.env.example backend/.env
 # Fill in: AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_TENANT_ID
-# Optional: SMTP_USER, SMTP_PASS (Gmail App Password) for email notifications
 ```
 
 ### 3. Start portal backend
@@ -294,13 +293,8 @@ Copy `backend/.env.example` → `backend/.env` and fill in your values.
 | `FRONTEND_URL` | — | `http://localhost:5173` | Allowed CORS origin + email CTA base URL |
 | `APP_BASE_URL` | — | `http://localhost:8080` | Backend public base URL |
 | `UPLOAD_DIR` | — | `./uploads` | File upload directory |
-| `SMTP_USER` | — | empty | Gmail address for email notifications |
-| `SMTP_PASS` | — | empty | Gmail App Password (16-char, not account password) |
 | `PROVISION_MAX_CREATE` | — | `200` | Max users per provisioning run |
 | `PROVISION_MAX_DELETE` | — | `100` | Max deactivations per provisioning run |
-
-> **SMTP setup:** Enable 2FA on Gmail → Google Account → Security → App Passwords → generate.
-> App refuses to send emails (but won't crash) if `SMTP_USER` is empty.
 
 > **Dev/prod:** `JWT_SECRET` has **no fallback** — app refuses to start if missing.
 > Generate: `openssl rand -hex 64`
@@ -328,22 +322,6 @@ Copy `backend/.env.example` → `backend/.env` and fill in your values.
      → check DB: existsByIdAndRevokedFalse(sessionId)
      → if revoked → 401 → client auto-redirects to /sign-in?reason=session_expired
 ```
-
----
-
-## Email notifications
-
-Khi admin duyệt hoặc từ chối đơn, `FormController` gọi `EmailService` (async):
-
-```
-FormController.updateSubmission()
-  └── emailService.sendFormApproved() / sendFormRejected()
-        └── @Async("emailExecutor") — chạy trên thread pool riêng (1-2 threads)
-              └── JavaMailSender → Gmail SMTP:587 (STARTTLS)
-                    → HTML email với badge trạng thái + CTA button → FRONTEND_URL/forms
-```
-
-Email chỉ được gửi nếu `SMTP_USER` được cấu hình. Nếu không có SMTP, backend log warning và tiếp tục bình thường.
 
 ---
 
