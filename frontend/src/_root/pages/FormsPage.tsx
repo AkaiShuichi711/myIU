@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useMutation } from '@tanstack/react-query';
 import {
   FileText, Download, Plus, Pencil, Trash2,
   Loader2, X, Check, ExternalLink, Send, Inbox, Search, FolderOpen,
-  Clock, CheckCircle2, XCircle, ChevronRight, ArrowUpDown,
+  Clock, CheckCircle2, XCircle, ChevronRight, ArrowUpDown, UploadCloud,
 } from 'lucide-react';
+import { upload } from '@/lib/api/client';
 import { useUserContext } from '@/context/AuthContext';
 import { isAdminRole } from '@/lib/utils';
 import {
@@ -192,70 +194,132 @@ type EditState = typeof BLANK_FORM;
 const EditPanel = ({ state, onChange, onSave, onCancel, isSaving, isNew }: {
   state: EditState; onChange: (k: keyof EditState, v: any) => void;
   onSave: () => void; onCancel: () => void; isSaving: boolean; isNew: boolean;
-}) => (
-  <div className="bg-white dark:bg-slate-800/80 rounded-xl border border-[#0057A8]/20 p-5 mb-4">
-    <div className="flex items-center justify-between mb-4">
-      <p className="text-sm font-bold text-slate-700 dark:text-slate-200">
-        {isNew ? 'Thêm biểu mẫu mới' : 'Chỉnh sửa biểu mẫu'}
-      </p>
-      <button onClick={onCancel} className="text-slate-400 hover:text-slate-600 transition-colors"><X size={16} /></button>
-    </div>
-    <div className="grid grid-cols-2 gap-3">
-      <div className="col-span-2">
-        <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Tiêu đề *</label>
-        <input value={state.title} onChange={(e) => onChange('title', e.target.value)} placeholder="VD: Đơn xin nghỉ học" className={INPUT_CLS} />
+}) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Upload file template trực tiếp lên portal backend — URL trả về luôn thuộc portal
+  const { mutate: uploadFile, isPending: isUploading, isError: hasUploadError } = useMutation({
+    mutationFn: (file: File) => upload('/api/storage/upload', file),
+    onSuccess: (url: string, file: File) => {
+      onChange('fileUrl', url);
+      // Tự điền fileName nếu chưa có
+      if (!state.fileName) onChange('fileName', file.name);
+    },
+  });
+
+  const isStoredOnPortal = Boolean(state.fileUrl?.includes('/api/storage/files/'));
+
+  return (
+    <div className="bg-white dark:bg-slate-800/80 rounded-xl border border-[#0057A8]/20 p-5 mb-4">
+      <div className="flex items-center justify-between mb-4">
+        <p className="text-sm font-bold text-slate-700 dark:text-slate-200">
+          {isNew ? 'Thêm biểu mẫu mới' : 'Chỉnh sửa biểu mẫu'}
+        </p>
+        <button onClick={onCancel} className="text-slate-400 hover:text-slate-600 transition-colors"><X size={16} /></button>
       </div>
-      <div className="col-span-2">
-        <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Mô tả (tùy chọn)</label>
-        <input value={state.description} onChange={(e) => onChange('description', e.target.value)} placeholder="Mô tả ngắn..." className={INPUT_CLS} />
-      </div>
-      <div>
-        <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Danh mục</label>
-        <select value={state.category} onChange={(e) => onChange('category', e.target.value as FormCategory)} className={INPUT_CLS}>
-          {FORM_CATEGORIES.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
-        </select>
-      </div>
-      <div>
-        <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Loại file</label>
-        <select value={state.fileType} onChange={(e) => onChange('fileType', e.target.value as FormFileType)} className={INPUT_CLS}>
-          {Object.entries(FILE_TYPE_META).map(([v, { label }]) => <option key={v} value={v}>{label}</option>)}
-        </select>
-      </div>
-      <div>
-        <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Tên file hiển thị *</label>
-        <input value={state.fileName} onChange={(e) => onChange('fileName', e.target.value)} placeholder="don_xin_nghi_hoc.pdf" className={INPUT_CLS} />
-      </div>
-      <div>
-        <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Thứ tự hiển thị</label>
-        <input type="number" value={state.sortOrder} onChange={(e) => onChange('sortOrder', parseInt(e.target.value)||0)} className={INPUT_CLS} min={0} />
-      </div>
-      <div className="col-span-2">
-        <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
-          Link tải file * <span className="text-slate-300 font-normal">(Google Drive, SharePoint...)</span>
-        </label>
-        <div className="flex gap-2">
-          <input value={state.fileUrl} onChange={(e) => onChange('fileUrl', e.target.value)} placeholder="https://drive.google.com/..." className={INPUT_CLS} />
-          {state.fileUrl && (
-            <a href={state.fileUrl} target="_blank" rel="noopener noreferrer" className="px-2.5 rounded-lg border border-slate-200 dark:border-slate-600 flex items-center text-slate-400 hover:text-[#0085b3] transition-colors shrink-0">
-              <ExternalLink size={13} />
-            </a>
+      <div className="grid grid-cols-2 gap-3">
+        <div className="col-span-2">
+          <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Tiêu đề *</label>
+          <input value={state.title} onChange={(e) => onChange('title', e.target.value)} placeholder="VD: Đơn xin nghỉ học" className={INPUT_CLS} />
+        </div>
+        <div className="col-span-2">
+          <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Mô tả (tùy chọn)</label>
+          <input value={state.description} onChange={(e) => onChange('description', e.target.value)} placeholder="Mô tả ngắn..." className={INPUT_CLS} />
+        </div>
+        <div>
+          <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Danh mục</label>
+          <select value={state.category} onChange={(e) => onChange('category', e.target.value as FormCategory)} className={INPUT_CLS}>
+            {FORM_CATEGORIES.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
+          </select>
+        </div>
+        <div>
+          <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Loại file</label>
+          <select value={state.fileType} onChange={(e) => onChange('fileType', e.target.value as FormFileType)} className={INPUT_CLS}>
+            {Object.entries(FILE_TYPE_META).map(([v, { label }]) => <option key={v} value={v}>{label}</option>)}
+          </select>
+        </div>
+        <div>
+          <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Tên file hiển thị *</label>
+          <input value={state.fileName} onChange={(e) => onChange('fileName', e.target.value)} placeholder="don_xin_nghi_hoc.pdf" className={INPUT_CLS} />
+        </div>
+        <div>
+          <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Thứ tự hiển thị</label>
+          <input type="number" value={state.sortOrder} onChange={(e) => onChange('sortOrder', parseInt(e.target.value)||0)} className={INPUT_CLS} min={0} />
+        </div>
+        <div className="col-span-2">
+          <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+            File biểu mẫu *{' '}
+            <span className="text-slate-300 dark:text-slate-600 font-normal">(upload file hoặc dán link ngoài)</span>
+          </label>
+          <div className="flex gap-2 items-stretch">
+            <input
+              value={state.fileUrl}
+              onChange={(e) => onChange('fileUrl', e.target.value)}
+              placeholder="Nhấn Upload ↑ hoặc dán link Google Drive, SharePoint..."
+              className={`${INPUT_CLS} flex-1 min-w-0`}
+            />
+            {/* Upload trực tiếp lên portal backend */}
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isUploading}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border border-[#0057A8]/40 text-[#0057A8] hover:bg-[#0057A8]/5 dark:hover:bg-[#0057A8]/10 transition-colors disabled:opacity-60 shrink-0 whitespace-nowrap"
+            >
+              {isUploading
+                ? <Loader2 size={12} className="animate-spin" />
+                : <UploadCloud size={12} />}
+              {isUploading ? 'Đang tải...' : 'Upload'}
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              className="hidden"
+              accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) uploadFile(f);
+                e.target.value = ''; // cho phép chọn lại cùng file
+              }}
+            />
+            {state.fileUrl && !isUploading && (
+              <a
+                href={state.fileUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-2.5 rounded-lg border border-slate-200 dark:border-slate-600 flex items-center text-slate-400 hover:text-[#0085b3] transition-colors shrink-0"
+                title="Xem trước"
+              >
+                <ExternalLink size={13} />
+              </a>
+            )}
+          </div>
+          {/* Trạng thái upload */}
+          {isStoredOnPortal && (
+            <p className="text-[10px] text-emerald-500 mt-1 flex items-center gap-1">
+              <Check size={9} /> File đã lưu trên portal — có thể download ngay không cần server admin
+            </p>
+          )}
+          {hasUploadError && (
+            <p className="text-[10px] text-red-500 mt-1">
+              Upload thất bại. Thử lại hoặc dán link ngoài (Google Drive, SharePoint...) thủ công.
+            </p>
           )}
         </div>
       </div>
+      <div className="flex justify-end gap-2 mt-4">
+        <button onClick={onCancel} className="px-4 py-2 rounded-lg text-xs text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">Hủy</button>
+        <button
+          onClick={onSave}
+          disabled={isSaving || isUploading || !state.title.trim() || !state.fileUrl.trim() || !state.fileName.trim()}
+          className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold text-white bg-[#0057A8] hover:bg-[#0087b3] transition-colors disabled:opacity-60"
+        >
+          {isSaving ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />}
+          {isNew ? 'Thêm biểu mẫu' : 'Lưu thay đổi'}
+        </button>
+      </div>
     </div>
-    <div className="flex justify-end gap-2 mt-4">
-      <button onClick={onCancel} className="px-4 py-2 rounded-lg text-xs text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">Hủy</button>
-      <button
-        onClick={onSave}
-        disabled={isSaving || !state.title.trim() || !state.fileUrl.trim() || !state.fileName.trim()}
-        className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold text-white bg-[#0057A8] hover:bg-[#0087b3] transition-colors disabled:opacity-60"
-      >
-        {isSaving ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />}
-        {isNew ? 'Thêm biểu mẫu' : 'Lưu thay đổi'}
-      </button>
-    </div>
-  </div>
-);
+  );
+};
 
 // ── Empty state ────────────────────────────────────────────────────────────────
 const Empty = ({ icon: Icon, label, action }: { icon: typeof Inbox; label: string; action?: React.ReactNode }) => (
