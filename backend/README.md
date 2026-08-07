@@ -1,71 +1,196 @@
-# myIU Backend — Java Spring Boot
+# myIU Portal — Backend
+
+Java 21 · Spring Boot 3.4 · PostgreSQL 16 · Flyway · JWT · Microsoft Azure AD SSO
+
+---
 
 ## Prerequisites
-- Java 21
-- PostgreSQL 15+ running locally
-- Maven 3.9+
 
-## Setup
+| Tool | Version |
+|------|---------|
+| Java JDK | 21+ |
+| Maven | 3.9+ |
+| PostgreSQL | 15+ |
 
-### 1. Create PostgreSQL database
+---
+
+## Quick Start
+
+### 1. Tạo database
+
 ```sql
-CREATE DATABASE myIU_dev;
--- default user: postgres / password: postgres (change in application.yml)
+CREATE DATABASE "myIU_dev";
 ```
 
-### 2. Configure (optional)
-Edit `src/main/resources/application.yml`:
-- Change DB password if needed
-- Change `app.jwt.secret` for production
-- Change `app.storage.upload-dir` if you want uploads elsewhere
+### 2. Cấu hình môi trường
 
-### 3. Run
 ```bash
-cd backend-java
+cp .env.example .env
+# Mở .env và điền các giá trị thực
+```
+
+### 3. Chạy ứng dụng
+
+```bash
+cd backend
 mvn spring-boot:run
 ```
-API available at `http://localhost:8080`
 
-## API Endpoints
+API sẽ khởi động tại `http://localhost:8080`.  
+Flyway tự động apply migrations khi khởi động lần đầu.
+
+---
+
+## Biến môi trường
+
+| Biến | Bắt buộc | Mặc định | Mô tả |
+|------|----------|----------|-------|
+| `AZURE_CLIENT_ID` | ✅ | — | Azure App Registration Client ID |
+| `AZURE_CLIENT_SECRET` | ✅ | — | Azure App Registration Client Secret |
+| `AZURE_TENANT_ID` | ✅ | — | Azure AD Tenant ID |
+| `DB_URL` | ✅ | — | JDBC URL PostgreSQL |
+| `DB_USERNAME` | ✅ | — | Database username |
+| `DB_PASSWORD` | ✅ | — | Database password |
+| `JWT_SECRET` | ✅ | — | HMAC-SHA256 secret (≥ 256-bit, hex) |
+| `FRONTEND_URL` | — | `http://localhost:5173` | URL frontend (CORS + OAuth2 redirect) |
+| `APP_BASE_URL` | — | `http://localhost:8080` | URL backend (OAuth2 redirect URI) |
+| `UPLOAD_DIR` | — | `./uploads` | Thư mục lưu file upload |
+| `PROVISION_MAX_CREATE` | — | `200` | Số tài khoản tối đa tạo mỗi lần upload Excel |
+| `PROVISION_MAX_DELETE` | — | `100` | Số tài khoản tối đa xóa mỗi lần upload Excel |
+
+> Sinh JWT secret: `openssl rand -hex 32`
+
+---
+
+## Azure AD Setup
+
+1. Vào [Azure Portal](https://portal.azure.com) → **App registrations** → New registration
+2. **Redirect URI**: `http://localhost:8080/login/oauth2/code/microsoft` (Web)
+3. **Certificates & secrets** → New client secret → copy vào `AZURE_CLIENT_SECRET`
+4. **Overview** → copy **Application (client) ID** → `AZURE_CLIENT_ID`
+5. **Overview** → copy **Directory (tenant) ID** → `AZURE_TENANT_ID`
+6. **API permissions**: `openid`, `profile`, `email` (Microsoft Graph, Delegated)
+
+---
+
+## Database Migrations (Flyway)
+
+Migrations nằm trong `src/main/resources/db/`:
+
+```
+db/
+├── migration/          # Schema — chạy ở mọi môi trường
+│   ├── V1__initial_schema.sql
+│   ├── V2__sso_columns.sql
+│   ├── V3__login_sessions.sql
+│   ├── V4__timetable_attendance.sql
+│   └── ...
+└── seed/               # Dữ liệu mẫu — chỉ local/dev
+    ├── V7__seed_base.sql
+    └── V10__seed_extended.sql
+```
+
+Seed data được kích hoạt bằng profile `local` hoặc `dev`:
+
+```bash
+SPRING_PROFILES_ACTIVE=local mvn spring-boot:run
+```
+
+---
+
+## API Reference
 
 ### Auth
 | Method | Path | Auth |
 |--------|------|------|
-| POST | /api/auth/register | Public |
-| POST | /api/auth/login | Public |
-| GET | /api/auth/me | Bearer |
+| POST | `/api/auth/register` | Public |
+| POST | `/api/auth/login` | Public |
+| POST | `/api/auth/logout` | Bearer |
+| GET | `/api/auth/me` | Bearer |
+| GET | `/api/auth/sessions` | Bearer |
+| DELETE | `/api/auth/sessions/{id}` | Bearer |
 
 ### Users
-| Method | Path |
-|--------|------|
-| GET | /api/users/{id} |
-| GET | /api/users/by-username/{username} |
-| PUT | /api/users/{id} |
-| GET | /api/users/search?q= |
-| POST | /api/users/{id}/avatar |
+| Method | Path | Auth |
+|--------|------|------|
+| GET | `/api/users/{id}` | Bearer |
+| PUT | `/api/users/{id}` | Bearer |
+| GET | `/api/users/by-username/{username}` | Bearer |
+| GET | `/api/users/search?q=` | Bearer |
+| POST | `/api/users/{id}/avatar` | Bearer |
+| POST | `/api/users/provision` | Bearer (Admin) |
 
 ### Posts
 | Method | Path |
 |--------|------|
-| POST | /api/posts |
-| GET | /api/posts?page=0&size=10 |
-| GET | /api/posts/{id} |
-| GET | /api/posts/user/{userId} |
-| PUT | /api/posts/{id} |
-| DELETE | /api/posts/{id} |
-| POST | /api/posts/{id}/like |
-| POST | /api/posts/{id}/save |
-| DELETE | /api/posts/{id}/save |
-| GET | /api/posts/saved |
-| POST | /api/posts/upload-image |
+| POST | `/api/posts` |
+| GET | `/api/posts?page=0&size=10` |
+| GET | `/api/posts/{id}` |
+| PUT | `/api/posts/{id}` |
+| DELETE | `/api/posts/{id}` |
+| POST | `/api/posts/{id}/like` |
+| POST | `/api/posts/{id}/save` |
+| GET | `/api/posts/saved` |
 
-### Courses, Groups, Grades, Forms, Notifications, Comments, Blocks
-All under `/api/courses`, `/api/course-groups`, `/api/group-members`,
-`/api/course-posts`, `/api/grades`, `/api/forms`, `/api/notifications`,
-`/api/comments`, `/api/blocks`
+### Courses & Academic
+| Method | Path | Mô tả |
+|--------|------|-------|
+| GET/POST | `/api/courses` | Danh sách / tạo khóa học |
+| GET/PUT/DELETE | `/api/courses/{id}` | Chi tiết / sửa / xóa |
+| GET/POST | `/api/course-groups` | Nhóm học |
+| GET | `/api/course-groups/lecturer/{id}/courses` | Khóa học của giảng viên |
+| GET/POST/DELETE | `/api/group-members` | Thành viên nhóm |
+| GET | `/api/group-members/student/{id}/courses` | Khóa học của sinh viên |
+| GET/POST | `/api/course-posts` | Bài đăng trong khóa học |
+| GET/POST | `/api/grades` | Bảng điểm |
+
+### Timetable
+| Method | Path |
+|--------|------|
+| GET | `/api/timetable` |
+| GET | `/api/timetable/course/{courseId}` |
+| POST | `/api/timetable/{courseId}/schedules` |
+| DELETE | `/api/timetable/schedules/{id}` |
+
+### Attendance & Submissions
+| Method | Path |
+|--------|------|
+| GET/POST/PUT | `/api/attendance` |
+| GET/POST | `/api/submissions` |
+
+### Forms
+| Method | Path |
+|--------|------|
+| GET | `/api/forms/templates` |
+| POST | `/api/forms/submit` |
+| GET/PUT | `/api/forms/submissions/{id}` |
 
 ### Storage
-Files served at: `GET /api/storage/files/{filename}`
+| Method | Path |
+|--------|------|
+| POST | `/api/storage/upload` |
+| GET | `/api/storage/files/{filename}` (Public) |
 
-## Flyway Migrations
-Schema auto-applied from `src/main/resources/db/migration/V1__initial_schema.sql`
+### Notifications & Social
+| Method | Path |
+|--------|------|
+| GET | `/api/notifications` |
+| PATCH | `/api/notifications/{id}/read` |
+| GET/POST | `/api/comments` |
+| POST | `/api/blocks` |
+
+---
+
+## Kiến trúc bảo mật
+
+- **Session**: STATELESS — không tạo `HttpSession`
+- **Token**: JWT (HMAC-SHA256), 24h expiry, blacklist in-memory khi logout
+- **Session revocation**: Bảng `login_sessions` với cột `is_revoked`
+- **OAuth2**: Microsoft Azure AD (Authorization Code Flow), cookie-based state
+- **CORS**: Configured via `app.cors.allowed-origins`
+
+---
+
+## Swagger UI
+
+Sau khi chạy: `http://localhost:8080/swagger-ui.html`
