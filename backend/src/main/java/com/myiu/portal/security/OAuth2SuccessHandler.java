@@ -42,6 +42,9 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             return;
         }
 
+        // Normalize to lowercase — Microsoft can return email in any case
+        email = email.toLowerCase();
+
         Optional<User> userOpt = userRepository.findByEmail(email);
 
         // User must be pre-provisioned by admin via Excel upload
