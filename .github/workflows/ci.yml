@@ -1,9 +1,14 @@
 # ─────────────────────────────────────────────────────────────────
 #  CI — Runs on every PR to main/develop
-#  Jobs: lint → test-portal → test-admin → build-images (dry run)
+#  Jobs: lint → test-portal → build-check (dry run)
 #
 #  Uses GitHub Actions Ubuntu runner + Testcontainers (real PostgreSQL)
 #  Caches Maven dependencies between runs for faster builds
+#
+#  NOTE: myIU-admin is a separate sibling repo, not a subdirectory of
+#  this one — it is NOT checked out here and has no CI of its own yet.
+#  Admin-specific lint/test/build steps were removed because they
+#  referenced a "myIU-admin/" path that doesn't exist in this checkout.
 # ─────────────────────────────────────────────────────────────────
 name: CI
 
@@ -44,26 +49,6 @@ jobs:
         working-directory: frontend
         run: npm run lint --if-present
 
-  lint-admin-frontend:
-    name: Admin frontend lint & type-check
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: npm
-          cache-dependency-path: myIU-admin/frontend/package-lock.json
-
-      - name: Install dependencies
-        working-directory: myIU-admin/frontend
-        run: npm ci --frozen-lockfile
-
-      - name: Type-check
-        working-directory: myIU-admin/frontend
-        run: npx tsc --noEmit
-
   # ── Portal backend tests ───────────────────────────────────────
   test-portal:
     name: Portal backend tests
@@ -77,10 +62,10 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: temurin
           cache: maven
-          cache-dependency-path: backend-java/pom.xml
+          cache-dependency-path: backend/pom.xml
 
       - name: Run tests (Testcontainers spins up real PostgreSQL)
-        working-directory: backend-java
+        working-directory: backend
         run: ./mvnw test --no-transfer-progress
         env:
           SPRING_PROFILES_ACTIVE: test
@@ -93,49 +78,22 @@ jobs:
         if: failure()
         with:
           name: portal-test-results
-          path: backend-java/target/surefire-reports/
-
-  # ── Admin backend tests ────────────────────────────────────────
-  test-admin:
-    name: Admin backend tests
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-java@v4
-        with:
-          java-version: ${{ env.JAVA_VERSION }}
-          distribution: temurin
-          cache: maven
-          cache-dependency-path: myIU-admin/backend/pom.xml
-
-      - name: Run tests
-        working-directory: myIU-admin/backend
-        run: ./mvnw test --no-transfer-progress
-        env:
-          SPRING_PROFILES_ACTIVE: test
+          path: backend/target/surefire-reports/
 
   # ── Docker build check (no push) ──────────────────────────────
   build-check:
     name: Docker build check
     runs-on: ubuntu-latest
-    needs: [test-portal, test-admin]
+    needs: [test-portal]
     steps:
       - uses: actions/checkout@v4
 
       - name: Build portal backend image
         uses: docker/build-push-action@v6
         with:
-          context: backend-java
+          context: backend
           push: false
           tags: myiu-portal-backend:pr-${{ github.sha }}
-
-      - name: Build admin backend image
-        uses: docker/build-push-action@v6
-        with:
-          context: myIU-admin/backend
-          push: false
-          tags: myiu-admin-backend:pr-${{ github.sha }}
 
       - name: Build portal frontend image
         uses: docker/build-push-action@v6
