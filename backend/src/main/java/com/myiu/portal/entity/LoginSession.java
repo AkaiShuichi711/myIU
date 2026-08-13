@@ -31,6 +31,14 @@ public class LoginSession {
     @Column(name = "country_code", length = 10)
     private String countryCode;
 
+    // ── Precise location — populated only if the user grants browser GPS
+    // permission after login. NULL otherwise; UI falls back to country/city.
+    private Double latitude;
+    private Double longitude;
+    private String province;  // Tỉnh/Thành phố
+    private String district;  // Quận/Huyện
+    private String ward;      // Phường/Xã
+
     @Column(length = 100)
     private String browser;
 

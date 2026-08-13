@@ -16,14 +16,15 @@
 │          ▼                    ▼                     │              │
 │  ┌──────────────────────────────────────┐            │              │
 │  │  myIU Portal  :5173 / :8080          │◄───────────┘              │
-│  │  (students + lecturers + /admin)     │  OAuth2 callback          │
+│  │  (students + lecturers)              │  OAuth2 callback          │
 │  └──────────────────────────────────────┘                          │
 │          │                                                         │
 │          ▼                                                         │
-│  ┌────────────────┐    ┌────────────────────┐                     │
-│  │  PostgreSQL 16 │    │  ip-api.com (ext)  │                     │
-│  │  myiu_{env}    │    │  GeoIP lookup      │                     │
-│  └────────────────┘    └────────────────────┘                     │
+│  ┌────────────────┐  ┌──────────────────┐  ┌─────────────────────┐│
+│  │  PostgreSQL 16 │  │  ip-api.com (ext)│  │  Nominatim (ext)    ││
+│  │  myiu_{env}    │  │  IP → city/      │  │  GPS → ward/district/││
+│  └────────────────┘  │  country         │  │  province (opt-in)  ││
+│                       └──────────────────┘  └─────────────────────┘│
 │                                                                    │
 │                         ┌────────────────────┐                    │
 │                         │  Gmail SMTP (ext)  │                    │
@@ -46,8 +47,8 @@
 │  :8080 portal-backend            →   myiu_local                     │
 │  :5173 portal-frontend (Vite)        (safe to wipe anytime)         │
 └──────────────────────────────────────────────────────────────────────┘
-                          │ git push develop
-                          ▼ GitHub Actions: deploy-dev.yml
+                          │ manual deploy (no CI pipeline yet — see docs/DEPLOYMENT.md)
+                          ▼
 ┌──────────────────────────────────────────────────────────────────────┐
 │  DEV SERVER  (SPRING_PROFILES_ACTIVE=dev)                            │
 │                                                                      │
@@ -55,8 +56,8 @@
 │  portal-backend  → myiu_dev                                          │
 │  portal-frontend, postgres                                           │
 └──────────────────────────────────────────────────────────────────────┘
-                          │ git tag v1.x.x
-                          ▼ GitHub Actions: deploy-prod.yml
+                          │ manual deploy (no CI pipeline yet)
+                          ▼
 ┌──────────────────────────────────────────────────────────────────────┐
 │  PRODUCTION  (SPRING_PROFILES_ACTIVE=prod)                           │
 │                                                                      │
@@ -242,15 +243,15 @@ Attendance statuses: `PRESENT` | `ABSENT` | `LATE` | `EXCUSED`
 │  Portal Frontend  (React 18 + Vite + TypeScript)                  │
 │                                                                   │
 │  AuthContext → JWT in localStorage                                │
-│  AdminAuthContext → Admin JWT in localStorage                     │
 │  React Query v5 → staleTime 5min, invalidateQueries on mutation  │
 │  useNotificationSocket → WebSocket STOMP (SockJS)                │
+│  geoLocation.ts → opt-in browser GPS after login (fire-and-forget)│
 │  i18next → VI/EN translations + Google Translate widget          │
 │  401 received → clearToken() → /sign-in?reason=session_expired   │
 │                                                                   │
 │  Routes:                                                          │
 │    /              → student/lecturer app (RootLayout)            │
-│    /admin         → admin panel (AdminLayout, JWT-protected)     │
+│    (no /admin — that's the separate myIU-admin app, :3000)        │
 └─────────────────────────────────┬─────────────────────────────────┘
                                   │ HTTPS + JWT Bearer
                                   │ WebSocket (SockJS/STOMP)
@@ -266,10 +267,11 @@ Attendance statuses: `PRESENT` | `ABSENT` | `LATE` | `EXCUSED`
 │    Comment · Block · CoursePost · Grade · GroupMember            │
 │    AssignmentSubmission · Attendance                             │
 │    Form · Timetable · Notification · Storage · Support · Session │
-│    Admin (stats · users · tickets · provision)                   │
+│    Admin (stats · users · tickets)                                │
 │                                                                   │
 │  Thread pools:                                                    │
-│    geoIpExecutor  — 2-4 threads, async GeoIP HTTP calls         │
+│    geoIpExecutor  — 2-4 threads, async IP lookup + GPS reverse   │
+│                     geocoding HTTP calls                         │
 │    emailExecutor  — 1-2 threads, async Gmail SMTP sends         │
 │                                                                   │
 │  WebSocket broker — /ws endpoint, /topic/notifications/{id}      │
@@ -358,7 +360,7 @@ admin_users (separate table — email/password auth, different JWT secret)
 
 | Pool | Bean name | Core | Max | Queue | Purpose |
 |---|---|---|---|---|---|
-| geoIpExecutor | `geoIpExecutor` | 2 | 4 | 100 | Async GeoIP HTTP to ip-api.com |
+| geoIpExecutor | `geoIpExecutor` | 2 | 4 | 100 | Async IP lookup (ip-api.com) + opt-in GPS reverse geocoding (Nominatim) |
 | emailExecutor | `emailExecutor` | 1 | 2 | 50 | Async SMTP email sending |
 | Virtual threads | (all other) | — | — | — | Java 21 Project Loom for I/O-bound work |
 
@@ -406,17 +408,9 @@ GitHub Actions: ci.yml
     ├── test-portal (mvnw test, Testcontainers)
     └── build-check (docker build — no push)
 
-    │ PR merged → push to develop
+    │ PR merged → push to develop / git tag v1.x.x
     ▼
-GitHub Actions: deploy-dev.yml
-    ├── docker build + push → ghcr.io/org/myiu-*:dev-{sha}
-    └── SSH deploy → docker compose pull && up -d
-
-    │ git tag v1.x.x
-    ▼
-GitHub Actions: deploy-prod.yml (requires "prod" environment approval)
-    ├── docker build + push → ghcr.io/org/myiu-*:v1.x.x + :latest
-    └── SSH deploy → docker compose pull && up -d
+No auto-deploy yet — build & ship images manually (see docs/DEPLOYMENT.md)
 ```
 
 ---
@@ -452,7 +446,9 @@ GitHub Actions: deploy-prod.yml (requires "prod" environment approval)
 |---|---|---|
 | Auth for users | Microsoft 365 only | All IU staff/students have Microsoft accounts |
 | Session tracking | JWT + DB revocation check | Stateless JWT + real-time revocation |
-| GeoIP | Async enrichment | 3s external HTTP call must not block login |
+| GeoIP | Async enrichment, city-level only | 3s external HTTP call must not block login; IP alone can never resolve district/ward |
+| Precise location | Opt-in browser GPS, reverse-geocoded async | Only way to reach province/district/ward; never forced — denying the permission prompt just keeps city/country |
+| Client IP trust | Only honor `X-Forwarded-For` from a private/loopback peer | Prevents spoofing the rate-limit key and session audit IP by forging headers directly |
 | Email | Async SMTP (Gmail free tier) | No extra cost; degrades gracefully if unconfigured |
 | WebSocket | STOMP over SockJS | Browser-compatible; SockJS fallback for non-WS networks |
 | Rate limiting | In-process Caffeine (no Redis) | O(1), sufficient for single-node deployment |

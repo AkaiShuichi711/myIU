@@ -7,7 +7,7 @@
 #    macOS:   xcode-select --install  (make is included)
 #    Linux:   sudo apt install make
 # ─────────────────────────────────────────────────────────────────
-.PHONY: help start stop logs db-only build test clean deploy-dev deploy-prod
+.PHONY: help start stop logs portal admin fe-portal fe-admin build test test-portal test-admin images clean db-reset db-logs
 
 # ── Default ────────────────────────────────────────────────────
 help:
@@ -40,51 +40,51 @@ logs:
 
 # ── Backend (run on host for hot reload) ──────────────────────
 portal:
-	cd backend-java && SPRING_PROFILES_ACTIVE=local ./mvnw spring-boot:run
+	cd backend && SPRING_PROFILES_ACTIVE=local ./mvnw spring-boot:run
 
 admin:
-	cd myIU-admin/backend && SPRING_PROFILES_ACTIVE=local ./mvnw spring-boot:run
+	cd ../myIU-admin/backend && SPRING_PROFILES_ACTIVE=local ./mvnw spring-boot:run
 
 # Windows alternative (Git Bash):
-#   cd backend-java && SPRING_PROFILES_ACTIVE=local ./mvnw spring-boot:run
+#   cd backend && SPRING_PROFILES_ACTIVE=local ./mvnw spring-boot:run
 
 # ── Frontend ───────────────────────────────────────────────────
 fe-portal:
 	cd frontend && npm run dev
 
 fe-admin:
-	cd myIU-admin/frontend && npm run dev
+	cd ../myIU-admin/frontend && npm run dev
 
 # ── Build ──────────────────────────────────────────────────────
 build:
-	cd backend-java && ./mvnw package -DskipTests -q
-	cd myIU-admin/backend && ./mvnw package -DskipTests -q
+	cd backend && ./mvnw package -DskipTests -q
+	cd ../myIU-admin/backend && ./mvnw package -DskipTests -q
 	@echo "Build complete"
 
 # ── Test ───────────────────────────────────────────────────────
 test:
-	cd backend-java && ./mvnw test -Dspring.profiles.active=test
-	cd myIU-admin/backend && ./mvnw test -Dspring.profiles.active=test
+	cd backend && ./mvnw test -Dspring.profiles.active=test
+	cd ../myIU-admin/backend && ./mvnw test -Dspring.profiles.active=test
 
 test-portal:
-	cd backend-java && ./mvnw test -Dspring.profiles.active=test
+	cd backend && ./mvnw test -Dspring.profiles.active=test
 
 test-admin:
-	cd myIU-admin/backend && ./mvnw test -Dspring.profiles.active=test
+	cd ../myIU-admin/backend && ./mvnw test -Dspring.profiles.active=test
 
 # ── Docker images ──────────────────────────────────────────────
 images:
-	docker build -t myiu-portal-backend:local backend-java/
-	docker build -t myiu-admin-backend:local myIU-admin/backend/
+	docker build -t myiu-portal-backend:local backend/
+	docker build -t myiu-admin-backend:local ../myIU-admin/backend/
 	docker build --build-arg VITE_API_URL=http://localhost:8080 -t myiu-portal-frontend:local frontend/
-	docker build --build-arg VITE_API_URL=http://localhost:8081 -t myiu-admin-frontend:local myIU-admin/frontend/
+	docker build --build-arg VITE_API_URL=http://localhost:8081 -t myiu-admin-frontend:local ../myIU-admin/frontend/
 
 # ── Clean ──────────────────────────────────────────────────────
 clean:
-	cd backend-java && ./mvnw clean -q
-	cd myIU-admin/backend && ./mvnw clean -q
+	cd backend && ./mvnw clean -q
+	cd ../myIU-admin/backend && ./mvnw clean -q
 	cd frontend && rm -rf dist node_modules
-	cd myIU-admin/frontend && rm -rf dist node_modules
+	cd ../myIU-admin/frontend && rm -rf dist node_modules
 
 # ── DB helpers ─────────────────────────────────────────────────
 db-reset:

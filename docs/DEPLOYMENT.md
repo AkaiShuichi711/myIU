@@ -9,12 +9,11 @@ Three environments, one codebase:
 | Environment | Trigger | DB |
 |---|---|---|
 | **local** | `make start` + `make portal` | `myiu_local` |
-| **dev** | Push to `develop` branch | `myiu_dev` |
-| **prod** | Push tag `v*.*.*` or manual dispatch | `myiu_prod` |
+| **dev / prod** | Manual — no CI/CD pipeline yet (see below) | `myiu_dev` / `myiu_prod` |
 
-All deployments use Docker. Images are stored in GitHub Container Registry (`ghcr.io`).
+> **Admin panel is a separate deployment.** `myIU-admin` is its own sibling repo (not a subdirectory of this one) with its own backend (`:8081`) and frontend (`:3000`). It must be built/deployed independently of the portal.
 
-> The admin panel (`/admin`) is part of the portal frontend — there is no separate admin deployment.
+> **No automated dev/prod deploy pipeline currently exists.** Earlier drafts of `deploy-dev.yml` / `deploy-prod.yml` / `docker-compose.dev.yml` / `docker-compose.prod.yml` assumed `myIU-admin` was a subdirectory of this repo (`context: myIU-admin/backend`) — since it's actually a separate repo, those workflows could never check it out and were removed rather than left broken. Building a real dev/prod pipeline means either deploying the two apps independently (separate workflows per repo) or checking out both repos in one workflow (e.g. via a second `actions/checkout` step with `repository: your-org/myIU-admin`).
 
 ---
 
@@ -49,18 +48,14 @@ make portal
 ```bash
 # Terminal 2
 make fe-portal   # → http://localhost:5173
-# Admin panel → http://localhost:5173/admin
 ```
 
-### Create first admin account (one-time)
+### Admin panel
 
-```bash
-curl -X POST http://localhost:8080/api/admin/auth/setup \
-  -H "Content-Type: application/json" \
-  -d '{"email":"admin@iu.edu.vn","name":"Admin","password":"yourpassword"}'
-```
-
-Then log in at `http://localhost:5173/admin`.
+Separate app, separate repo (`myIU-admin`) — not started by anything in this repo. First admin
+account is auto-seeded on its first boot from `ADMIN_DEFAULT_EMAIL`/`ADMIN_DEFAULT_PASSWORD` in its
+own `.env` (defaults `admin@iu.edu.vn` / `Admin@123`, change them). See that repo's README for setup.
+Log in at `http://localhost:3000` once it's running.
 
 ### Run tests
 
@@ -112,78 +107,21 @@ docker build \
 
 ---
 
-## Dev Server Deployment
+## Dev / Production Deployment (manual)
 
-### Automated deployment (GitHub Actions)
-
-Push to `develop` branch triggers `.github/workflows/deploy-dev.yml`:
-
-1. Builds 2 Docker images (backend + frontend) and pushes to `ghcr.io`
-2. SSHs into dev server and runs:
-   ```bash
-   docker compose -f docker-compose.dev.yml --env-file .env.dev pull
-   docker compose -f docker-compose.dev.yml --env-file .env.dev up -d --remove-orphans
-   docker image prune -f
-   ```
-
-### Manual deployment to dev
+There is currently no CI/CD pipeline for dev/prod (see note above). Until one is built, deploy manually per app:
 
 ```bash
-scp .env.dev.example user@dev-server:/opt/myiu/.env.dev
-# Edit .env.dev with real credentials
+# Portal (this repo)
+docker build -t myiu-portal-backend:TAG backend/
+docker build --build-arg VITE_API_URL=<api-url> -t myiu-portal-frontend:TAG frontend/
 
-docker compose -f docker-compose.dev.yml --env-file .env.dev pull
-docker compose -f docker-compose.dev.yml --env-file .env.dev up -d
+# Admin (separate repo — run from inside myIU-admin/)
+docker build -t myiu-admin-backend:TAG backend/
+docker build --build-arg VITE_API_URL=<admin-api-url> -t myiu-admin-frontend:TAG frontend/
 ```
 
----
-
-## Production Deployment
-
-### Required GitHub Secrets
-
-Go to **GitHub → Settings → Secrets and variables → Actions** and add:
-
-| Secret | Description |
-|---|---|
-| `REGISTRY` | e.g. `ghcr.io/your-org` |
-| `PROD_SSH_HOST` | Production server IP or hostname |
-| `PROD_SSH_USER` | SSH username |
-| `PROD_SSH_KEY` | Private SSH key (Ed25519 recommended) |
-| `PROD_DB_USERNAME` | PostgreSQL username |
-| `PROD_DB_PASSWORD` | Strong PostgreSQL password |
-| `PROD_PORTAL_JWT` | Portal JWT secret — `openssl rand -hex 64` |
-| `PROD_AZURE_CLIENT_ID` | Azure production app client ID |
-| `PROD_AZURE_CLIENT_SECRET` | Azure production app client secret |
-| `PROD_AZURE_TENANT_ID` | Azure tenant ID |
-| `PROD_PORTAL_FRONTEND_URL` | e.g. `https://myiu.edu.vn` |
-| `PROD_PORTAL_API_URL` | e.g. `https://api.myiu.edu.vn` |
-| `PROD_SMTP_USER` | Gmail address for email notifications |
-| `PROD_SMTP_PASS` | Gmail App Password (16-char) |
-
-Same pattern for `DEV_*` secrets (pointing to dev server).
-
-### Deploy to production
-
-```bash
-# Tag a release (triggers deploy-prod.yml automatically)
-git tag v1.2.0
-git push origin v1.2.0
-```
-
-**Production requires approval**: set up a GitHub **Environment** named `prod` with required reviewers.
-
----
-
-## Rollback
-
-```bash
-# On server — change the TAG env var and redeploy
-export TAG=dev-abc1234   # previous known-good tag
-docker compose -f docker-compose.prod.yml --env-file .env.prod up -d
-```
-
-Or via GitHub Actions manual dispatch → enter previous tag.
+Push each image to your registry and run it on the target server with the right env file (`.env.dev`/`.env.prod`, not committed — see `backend/.env.example` in each repo for the variables each service needs). Point both backends at the same PostgreSQL instance/database; only the portal backend runs Flyway.
 
 ---
 
@@ -294,6 +232,8 @@ ports:
 ```
 Then update `DB_URL=jdbc:postgresql://localhost:5433/myiu_local`.
 
-### Admin panel: 403 on /api/admin/* endpoints
+### "Network Error" in the admin frontend
 
-The logged-in user does not have the `admin` role. Admin users authenticate via `/api/admin/auth/login`, which uses a **separate `admin_users` table** — not the regular `users` table. Make sure you're sending the admin JWT (stored in `AdminAuthContext`), not the student/lecturer JWT.
+The admin backend (separate `myIU-admin` repo, port 8081) isn't running — it's never started by
+anything in this repo (`make portal`/`make fe-portal` only touch the portal). Start it from that
+repo, or via `make admin` here if you have both repos checked out as siblings.

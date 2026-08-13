@@ -8,6 +8,7 @@ import com.myiu.portal.util.UserAgentParser;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,8 +31,18 @@ public class SessionService {
      * Login latency drops from ~3s (GeoIP timeout worst case) to <10ms.
      *
      * Pattern: write-then-enrich, used by Stripe for async fraud checks.
+     *
+     * NOT @Transactional on purpose: sessionRepo.save() below is already
+     * transactional on its own (Spring Data wraps every repository call).
+     * If this method itself were @Transactional, the INSERT wouldn't commit
+     * until the method returns — but geoIpService.lookupAndEnrich() below
+     * kicks off its UPDATE on a separate thread/connection immediately, so
+     * it would race the still-open transaction, find no matching row under
+     * READ COMMITTED, and silently update zero rows. That's exactly what
+     * was happening: every session stayed on "Resolving" forever with no
+     * error anywhere. Keeping save() as its own short transaction ensures
+     * the INSERT is durably committed before the async enrichment fires.
      */
-    @Transactional
     public LoginSession createSession(User user, HttpServletRequest request) {
         String ip = IpUtils.extractIp(request);
         String ua = request.getHeader("User-Agent");
@@ -82,6 +93,25 @@ public class SessionService {
     public void updateLastActive(UUID sessionId) {
         if (sessionId != null) {
             sessionRepo.updateLastActive(sessionId, Instant.now());
+        }
+    }
+
+    /**
+     * Called when the frontend gets browser GPS coordinates for the current
+     * session (only happens if the user grants the location permission
+     * prompt — see useReportGeoLocation on the frontend). Reverse-geocodes
+     * on the geoIpExecutor pool (external HTTP call, same as IP lookup)
+     * so this never blocks the request. Scoped to (sessionId, userId) —
+     * a user can only ever update their own session's location.
+     */
+    @Async("geoIpExecutor")
+    @Transactional
+    public void updatePreciseLocation(UUID sessionId, UUID userId, double lat, double lng) {
+        GeoIpService.AddressDetail addr = geoIpService.reverseGeocode(lat, lng);
+        int updated = sessionRepo.updatePreciseLocation(
+                sessionId, userId, lat, lng, addr.province(), addr.district(), addr.ward());
+        if (updated == 0) {
+            log.debug("updatePreciseLocation: no session {} owned by user {}", sessionId, userId);
         }
     }
 

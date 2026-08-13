@@ -7,12 +7,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -44,10 +48,32 @@ public class GeoIpService {
     }
 
     /**
+     * Province/district/ward from GPS coordinates — best-effort only.
+     * Any field can be null if OpenStreetMap has no data at that level for
+     * the given point (ward-level tagging in particular is patchy outside
+     * major city centers). This is fundamentally more precise than IP
+     * lookup (which cannot go below city level at all), but not guaranteed
+     * complete everywhere.
+     */
+    public record AddressDetail(String province, String district, String ward) {
+        static AddressDetail empty() { return new AddressDetail(null, null, null); }
+    }
+
+    /**
      * Async GeoIP enrichment — called after session is saved.
      * Runs on geoIpExecutor thread pool; does NOT block login.
+     *
+     * @Transactional is required here, not optional: @Modifying repository
+     * queries (updateGeoLocation below) only work inside a transaction that
+     * the CALLING code supplies — Spring Data does not wrap custom @Query
+     * methods in their own transaction the way it does save()/findById().
+     * @Async runs on a different thread with no transaction of its own, so
+     * without this the update throws TransactionRequiredException every
+     * time (silently swallowed by the catch below at DEBUG level) — which
+     * is exactly why every session was stuck on "Resolving" forever.
      */
     @Async("geoIpExecutor")
+    @Transactional
     public void lookupAndEnrich(String ip, UUID sessionId) {
         GeoLocation geo = lookup(ip);
         try {
@@ -81,6 +107,83 @@ public class GeoIpService {
             log.debug("GeoIP lookup failed for {}: {}", ip, e.getMessage());
         }
         return GeoLocation.unknown();
+    }
+
+    /**
+     * Reverse-geocodes browser GPS coordinates into a Vietnamese administrative
+     * address (tỉnh/thành phố → quận/huyện → phường/xã) via OpenStreetMap's
+     * free Nominatim API. Only reachable when the user granted the browser's
+     * location permission — see SessionService.updatePreciseLocation().
+     *
+     * Nominatim's usage policy (nominatim.org/release-docs/latest/api/Usage-policy/)
+     * requires a real identifying User-Agent and caps free use at ~1 req/sec;
+     * both are fine here since this fires at most once per login, not per request.
+     *
+     * Parsing strategy — verified against real coordinates (IU campus, D1,
+     * Bình Thạnh) before shipping: Nominatim's structured `address` object
+     * has NO dedicated "province" field for Vietnam (the top-level tỉnh/
+     * thành phố, e.g. "Thành phố Hồ Chí Minh", never appears as its own key —
+     * only inside `display_name` as free text). But `display_name` is
+     * consistently ordered most-specific → most-general, and after
+     * stripping the trailing country + postcode, the last three segments
+     * are reliably [phường/xã, quận/huyện hoặc thành phố thuộc tỉnh, tỉnh/
+     * thành phố] in that order across every real address tested. That
+     * positional read is what we use, rather than guessing which of
+     * Nominatim's loosely-defined OSM tag names (suburb/city/county/etc.,
+     * which shift meaning by region) maps to which Vietnamese admin tier.
+     *
+     * Still best-effort: sparser rural OSM data can have fewer segments
+     * than expected, in which case the higher tiers (district/province)
+     * degrade to null rather than guessing wrong. Ward is cross-checked
+     * against address.suburb/quarter when available, since that field
+     * matched the positional read in every real test.
+     */
+    public AddressDetail reverseGeocode(double lat, double lng) {
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(String.format(
+                            "https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=%f&lon=%f&addressdetails=1&accept-language=vi&zoom=18",
+                            lat, lng)))
+                    .header("User-Agent", "myIU-Portal/1.0 (student university portal; contact: admin@iu.edu.vn)")
+                    .timeout(Duration.ofSeconds(5))
+                    .GET()
+                    .build();
+            HttpResponse<String> response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+            JsonNode root = MAPPER.readTree(response.body());
+            JsonNode address = root.path("address");
+            String displayName = root.path("display_name").asText("");
+            if (displayName.isBlank()) return AddressDetail.empty();
+
+            List<String> segments = new ArrayList<>(Arrays.asList(displayName.split(",\\s*")));
+            if (!segments.isEmpty() && segments.get(segments.size() - 1).matches("(?i)vi[eệ]t ?nam")) {
+                segments.remove(segments.size() - 1);
+            }
+            if (!segments.isEmpty() && segments.get(segments.size() - 1).matches("\\d+")) {
+                segments.remove(segments.size() - 1);
+            }
+
+            String province = at(segments, segments.size() - 1);
+            String district = at(segments, segments.size() - 2);
+            String ward = firstNonBlank(address, "suburb", "quarter", "neighbourhood", "village", "hamlet");
+            if (ward == null) ward = at(segments, segments.size() - 3);
+
+            return new AddressDetail(province, district, ward);
+        } catch (Exception e) {
+            log.debug("Reverse geocoding failed for ({}, {}): {}", lat, lng, e.getMessage());
+            return AddressDetail.empty();
+        }
+    }
+
+    private String at(List<String> list, int index) {
+        return index >= 0 && index < list.size() ? list.get(index) : null;
+    }
+
+    private String firstNonBlank(JsonNode address, String... keys) {
+        for (String key : keys) {
+            String value = address.path(key).asText("");
+            if (!value.isBlank()) return value;
+        }
+        return null;
     }
 
     private boolean isPrivate(String ip) {

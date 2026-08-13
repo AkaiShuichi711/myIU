@@ -1,0 +1,401 @@
+<title>myIU Codebase Reference</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:       #f8fafc;
+    --surface:  #ffffff;
+    --border:   #e2e8f0;
+    --text:     #1e293b;
+    --muted:    #64748b;
+    --accent:   #0057A8;
+    --accent2:  #0284c7;
+    --portal:   #0057A8;
+    --admin:    #7c3aed;
+    --chip-bg:  #f1f5f9;
+    --chip-fg:  #334155;
+    --fn-bg:    #f8fafc;
+    --fn-fg:    #1e40af;
+    --shadow:   0 1px 3px rgba(0,0,0,.08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:      #0f172a;
+      --surface: #1e293b;
+      --border:  #334155;
+      --text:    #e2e8f0;
+      --muted:   #94a3b8;
+      --chip-bg: #1e293b;
+      --chip-fg: #94a3b8;
+      --fn-bg:   #1e293b;
+      --fn-fg:   #7dd3fc;
+      --shadow:  0 1px 3px rgba(0,0,0,.3);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg:      #0f172a; --surface: #1e293b; --border: #334155;
+    --text:    #e2e8f0; --muted:   #94a3b8;
+    --chip-bg: #1e293b; --chip-fg: #94a3b8;
+    --fn-bg:   #1e293b; --fn-fg:   #7dd3fc;
+    --shadow:  0 1px 3px rgba(0,0,0,.3);
+  }
+  :root[data-theme="light"] {
+    --bg:#f8fafc; --surface:#fff; --border:#e2e8f0; --text:#1e293b; --muted:#64748b;
+    --chip-bg:#f1f5f9; --chip-fg:#334155; --fn-bg:#f8fafc; --fn-fg:#1e40af; --shadow:0 1px 3px rgba(0,0,0,.08);
+  }
+
+  body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* ── Header ── */
+  .header { background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 20; padding: 14px 20px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; box-shadow: var(--shadow); }
+  .header-title { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .header-title h1 { font-size: 15px; font-weight: 700; color: var(--text); }
+  .header-title .badge { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 99px; background: var(--accent); color: #fff; }
+  .search-wrap { flex: 1; min-width: 200px; max-width: 380px; position: relative; }
+  .search-wrap input { width: 100%; padding: 7px 10px 7px 32px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font-size: 13px; outline: none; transition: border-color .15s; }
+  .search-wrap input:focus { border-color: var(--accent); }
+  .search-wrap .icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+  .count { margin-left: auto; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+  /* ── Tabs ── */
+  .tabs { display: flex; gap: 4px; padding: 12px 20px 0; border-bottom: 1px solid var(--border); background: var(--surface); }
+  .tab-btn { padding: 8px 18px; font-size: 13px; font-weight: 600; border: none; background: none; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px; transition: color .15s, border-color .15s; border-radius: 0; }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active-portal { color: var(--portal); border-bottom-color: var(--portal); }
+  .tab-btn.active-admin  { color: var(--admin);  border-bottom-color: var(--admin); }
+
+  /* ── Table wrapper ── */
+  .content { display: none; padding: 20px; }
+  .content.active { display: block; }
+  .tbl-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: var(--shadow); }
+  .tbl-wrap .overflow { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead tr { background: var(--bg); }
+  th { padding: 10px 14px; text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); white-space: nowrap; border-bottom: 1px solid var(--border); }
+  th:nth-child(1) { width: 200px; }
+  th:nth-child(2) { width: 240px; }
+  th:nth-child(3) { }
+  td { padding: 10px 14px; vertical-align: top; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: none; }
+  tr.hidden { display: none; }
+  tr:hover td { background: rgba(0,87,168,.03); }
+
+  /* ── Feature cell ── */
+  .feat { display: flex; flex-direction: column; gap: 4px; }
+  .feat-name { font-weight: 600; font-size: 13px; color: var(--text); line-height: 1.3; }
+  .proj-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 99px; width: fit-content; }
+  .proj-badge.portal { background: rgba(0,87,168,.1); color: var(--portal); }
+  .proj-badge.admin  { background: rgba(124,58,237,.1); color: var(--admin); }
+
+  /* ── Vars cell ── */
+  .vars { display: flex; flex-wrap: wrap; gap: 4px; }
+  .var-chip { display: inline-block; font-family: 'Menlo', 'Consolas', monospace; font-size: 10.5px; padding: 2px 7px; border-radius: 5px; background: var(--chip-bg); color: var(--chip-fg); white-space: nowrap; border: 1px solid var(--border); }
+  .no-var { font-size: 11px; color: var(--muted); font-style: italic; }
+
+  /* ── Functions cell ── */
+  .fns { display: flex; flex-direction: column; gap: 2px; max-height: 130px; overflow-y: auto; padding-right: 2px; }
+  .fns::-webkit-scrollbar { width: 3px; }
+  .fns::-webkit-scrollbar-track { background: transparent; }
+  .fns::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+  .fn-item { font-family: 'Menlo', 'Consolas', monospace; font-size: 11px; color: var(--fn-fg); white-space: nowrap; }
+
+  /* ── Empty ── */
+  .empty { padding: 48px; text-align: center; color: var(--muted); font-size: 14px; }
+
+  /* ── Legend ── */
+  .legend { display: flex; gap: 16px; padding: 0 20px 12px; font-size: 12px; color: var(--muted); flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+</style>
+
+<div class="header">
+  <div class="header-title">
+    <h1>myIU Codebase Reference</h1>
+    <span class="badge">var · function · feature</span>
+  </div>
+  <div class="search-wrap">
+    <svg class="icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="search" id="q" placeholder="Search feature, var, function…" autocomplete="off" />
+  </div>
+  <span class="count" id="cnt"></span>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active-portal" data-tab="portal">🏛 myIU Portal</button>
+  <button class="tab-btn" data-tab="admin">⚙️ myIU Admin</button>
+</div>
+
+<div class="legend">
+  <span class="legend-item"><span class="proj-badge portal">portal</span> Portal backend (port 8080) + React frontend (port 5173)</span>
+  <span class="legend-item"><span class="proj-badge admin">admin</span> Admin backend (port 8081) + React frontend (port 3000)</span>
+</div>
+
+<div id="tab-portal" class="content active">
+  <div class="tbl-wrap"><div class="overflow">
+    <table id="tbl-portal">
+      <thead><tr><th>Feature</th><th>Var</th><th>Function</th></tr></thead>
+      <tbody id="body-portal"></tbody>
+    </table>
+  </div></div>
+</div>
+<div id="tab-admin" class="content">
+  <div class="tbl-wrap"><div class="overflow">
+    <table id="tbl-admin">
+      <thead><tr><th>Feature</th><th>Var</th><th>Function</th></tr></thead>
+      <tbody id="body-admin"></tbody>
+    </table>
+  </div></div>
+</div>
+
+<script>
+const PORTAL = [
+  {
+    feature: "Microsoft SSO Login",
+    vars: ["AZURE_CLIENT_ID","AZURE_CLIENT_SECRET","AZURE_TENANT_ID","FRONTEND_URL","APP_BASE_URL"],
+    fns: ["OAuth2SuccessHandler.onAuthenticationSuccess","CustomAuthorizationRequestResolver.resolve","CustomAuthorizationRequestResolver.addPrompt","HttpCookieOAuth2AuthorizationRequestRepository.loadAuthorizationRequest","HttpCookieOAuth2AuthorizationRequestRepository.saveAuthorizationRequest","HttpCookieOAuth2AuthorizationRequestRepository.removeAuthorizationRequest","SecurityConfig.filterChain"]
+  },
+  {
+    feature: "JWT Auth",
+    vars: ["JWT_SECRET","JWT_EXPIRATION_MS (default 86400000ms = 24h)"],
+    fns: ["JwtService.generateToken","JwtService.extractUsername","JwtService.extractJti","JwtService.extractSessionId","JwtService.isTokenValid","JwtAuthenticationFilter.doFilterInternal","UserDetailsServiceImpl.loadUserByUsername","AuthController.me","AuthController.login","AuthController.logout","JwtBlacklistService.revoke","JwtBlacklistService.isRevoked"]
+  },
+  {
+    feature: "Session Management (Meta-style) + GPS Location",
+    vars: [],
+    fns: ["SessionService.createSession","SessionService.getSessions","SessionService.revokeSession","SessionService.revokeOtherSessions","SessionService.updateLastActive","SessionService.updatePreciseLocation (@Async @Transactional)","GeoIpService.lookupAndEnrich (@Async @Transactional)","GeoIpService.reverseGeocode (Nominatim, parses display_name positionally)","SessionController.getSessions","SessionController.revokeSession","SessionController.revokeOtherSessions","SessionController.heartbeat","SessionController.reportLocation (PUT /current/location, opt-in GPS)","useGetAccountSessions","useRevokeSession","useRevokeOtherSessions","requestAndReportGeoLocation (frontend, fire-and-forget after login)"]
+  },
+  {
+    feature: "WebSocket Notifications",
+    vars: [],
+    fns: ["WebSocketAuthInterceptor.preSend","NotificationService.create","NotificationService.getForUser","NotificationService.getUnreadCount","NotificationService.markAllRead","NotificationController.get","NotificationController.unreadCount","NotificationController.markAllRead","useGetNotifications","useCreateNotification","useMarkNotificationRead","useMarkAllNotificationsRead"]
+  },
+  {
+    feature: "Rate Limiting (Bucket4j)",
+    vars: ["LOGIN_LIMIT — 5 req/min/IP (brute-force)","SEARCH_LIMIT — 60 req/min/user","UPLOAD_LIMIT — 10 req/hr/user","GENERAL_LIMIT — 120 req/min/IP"],
+    fns: ["RateLimitFilter.doFilterInternal","RateLimitFilter.resolveBandwidth","RateLimitFilter.resolveKey","RateLimitFilter.normalizePath"]
+  },
+  {
+    feature: "Client IP Trust (anti-spoofing)",
+    vars: [],
+    fns: ["IpUtils.extractIp","IpUtils.isTrustedProxy (only honors X-Forwarded-For/X-Real-IP from a private/loopback peer)","IpUtils.normalize (0:0:0:0:0:0:0:1 → 127.0.0.1 for display)"]
+  },
+  {
+    feature: "Course Management",
+    vars: [],
+    fns: ["CourseService.getAll","CourseService.getById","CourseService.create","CourseService.update","CourseService.delete","CourseController.getAll","CourseController.getById","CourseController.create","CourseController.update","CourseController.delete","CourseGroupController.get","CourseGroupController.create","CourseGroupController.delete","CourseGroupController.getLecturerCourses","GroupMemberController.get","GroupMemberController.add","GroupMemberController.remove","GroupMemberController.getStudentCourses","useGetAllCourses","useGetCourseById","useGetCoursesByLecturer","useGetCoursesByStudent","useCreateCourse","useUpdateCourse","useGetCourseGroups","useCreateCourseGroup","useDeleteCourseGroup","useGetGroupMembers","useAddGroupMember","useRemoveGroupMember","useGetAllCourseMembers"]
+  },
+  {
+    feature: "Course Posts",
+    vars: [],
+    fns: ["CoursePostController.get","CoursePostController.create","CoursePostController.delete","useGetCoursePosts","useCreateCoursePost","useDeleteCoursePost"]
+  },
+  {
+    feature: "Assignment Submissions",
+    vars: ["UPLOAD_DIR","APP_BASE_URL"],
+    fns: ["AssignmentSubmissionController.submit","AssignmentSubmissionController.listByPost","AssignmentSubmissionController.mine","AssignmentSubmissionController.grade","useSubmitAssignment","useGetAssignmentSubmissions","useGetMySubmission","useGradeSubmission"]
+  },
+  {
+    feature: "Attendance",
+    vars: [],
+    fns: ["AttendanceController.get","AttendanceController.mine","AttendanceController.upsert","AttendanceController.bulk","AttendanceController.delete","useGetAttendance","useGetMyAttendance","useUpsertAttendance","useBulkUpsertAttendance","useDeleteAttendanceRecord"]
+  },
+  {
+    feature: "Grades",
+    vars: [],
+    fns: ["GradeController.get","GradeController.upsert","useGetCourseGrades","useGetStudentGrade","useUpsertCourseGrades"]
+  },
+  {
+    feature: "Timetable / Schedules",
+    vars: [],
+    fns: ["TimetableService.getForUser","TimetableService.getForCourse","TimetableService.addSchedule","TimetableService.deleteSchedule","TimetableController.getMyTimetable","TimetableController.getCourseSchedules","TimetableController.addSchedule","TimetableController.deleteSchedule","useGetTimetable","useGetCourseSchedules","useCreateCourseSchedule","useDeleteCourseSchedule"]
+  },
+  {
+    feature: "Forms & Approvals",
+    vars: ["MAIL_HOST","MAIL_PORT","MAIL_USERNAME","MAIL_PASSWORD","FRONTEND_URL","UPLOAD_DIR","APP_BASE_URL"],
+    fns: ["FormController.getTemplates","FormController.createTemplate","FormController.updateTemplate","FormController.deleteTemplate","FormController.uploadTemplateFile","FormController.createSubmission","FormController.mySubmissions","FormController.approverSubmissions","FormController.getSubmission","FormController.updateSubmission","FormController.uploadSubmissionFile","useGetFormTemplates","useCreateFormTemplate","useUpdateFormTemplate","useDeleteFormTemplate","useCreateFormSubmission","useGetFormSubmissionsByUser","useGetFormSubmissionsForApprover","useGetFormSubmissionById","useUpdateFormSubmission"]
+  },
+  {
+    feature: "Email Notifications",
+    vars: ["MAIL_HOST","MAIL_PORT","MAIL_USERNAME","MAIL_PASSWORD","FRONTEND_URL"],
+    fns: ["EmailService.sendFormApproved","EmailService.sendFormRejected","EmailService.send","EmailService.buildHtml"]
+  },
+  {
+    feature: "Support Tickets",
+    vars: [],
+    fns: ["SupportController.create","SupportController.mine","useCreateSupportTicket","useGetMySupportTickets"]
+  },
+  {
+    feature: "File Storage",
+    vars: ["UPLOAD_DIR (default ./uploads)","APP_BASE_URL"],
+    fns: ["StorageService.store","StorageService.getUrl","StorageService.resolve","StorageService.delete","StorageController.upload","StorageController.serve"]
+  },
+  {
+    feature: "User Profile & Search",
+    vars: ["UPLOAD_DIR","APP_BASE_URL"],
+    fns: ["UserService.getById","UserService.getByUsername","UserService.update","UserService.search","UserService.searchByRole","UserController.getById","UserController.getByUsername","UserController.update","UserController.search","UserController.uploadAvatar","useGetUserById","useUpdateUser","useSearchUsers","useUpdateUserPrivacy"]
+  },
+  {
+    feature: "Social Feed (Posts, Likes, Saves)",
+    vars: ["UPLOAD_DIR","APP_BASE_URL"],
+    fns: ["PostService.create","PostService.getAll","PostService.getByUser","PostService.getById","PostService.update","PostService.delete","PostService.toggleLike","PostService.savePost","PostService.unsavePost","PostService.getSavedPosts","PostController.create","PostController.getAll","PostController.getById","PostController.update","PostController.delete","PostController.like","PostController.save","PostController.unsave","PostController.getSaved","PostController.uploadImage","useCreatePost","useGetRecentPosts","useGetInfinitePosts","useUpdatePost","useDeletePost","useLikePost","useSavePost","useDeleteSavedPost","useGetSavedPosts","useSearchPosts"]
+  },
+  {
+    feature: "Comments",
+    vars: [],
+    fns: ["CommentService.add","CommentService.getByPost","CommentService.delete","CommentController.add","CommentController.getByPost","CommentController.delete","useGetPostComments","useCreateComment","useDeleteComment","useGetUserComments"]
+  },
+  {
+    feature: "User Blocking",
+    vars: [],
+    fns: ["BlockController.block","BlockController.unblock","BlockController.getBlocked","useGetBlockedUsers","useBlockUser","useUnblockUser"]
+  }
+];
+
+const ADMIN = [
+  {
+    feature: "Admin Auth",
+    vars: ["JWT_SECRET","JWT_EXPIRATION_MS (default 86400000ms)","ADMIN_FRONTEND_URL","ADMIN_DEFAULT_EMAIL (admin@iu.edu.vn)","ADMIN_DEFAULT_PASSWORD (Admin@123)"],
+    fns: ["AuthController.login","AuthController.logout","AuthService.login","JwtService.generate","JwtService.extractEmail","JwtService.isValid","JwtAuthFilter.doFilterInternal","AdminUserDetailsService.loadUserByUsername","JwtBlacklistService.revoke","JwtBlacklistService.isRevoked"]
+  },
+  {
+    feature: "User Management",
+    vars: ["DB_URL","DB_USERNAME","DB_PASSWORD"],
+    fns: ["UserController.list","UserController.lecturers","UserController.getById","UserController.create","UserController.update","UserController.toggleActive","UserController.delete (cascades — portal migration V11)","UserService.list","UserService.getById","UserService.getLecturers","UserService.create","UserService.update","UserService.toggleActive","UserService.delete","GlobalExceptionHandler.handleDataIntegrity (409 + human-readable reason if delete is still blocked)","useGetUsers","useGetAllActiveUsers","useCreateUser","useUpdateUser","useToggleUserActive","useDeleteUser","useBulkDeleteUsers (Promise.allSettled, surfaces real per-item reason)"]
+  },
+  {
+    feature: "Course Management",
+    vars: ["DB_URL","DB_USERNAME","DB_PASSWORD"],
+    fns: ["CourseController.list","CourseController.getById","CourseController.create","CourseController.update","CourseController.delete","CourseController.toggleActive","CourseService.list","CourseService.getById","CourseService.create","CourseService.update","CourseService.delete","CourseService.toggleActive","CourseService.resolveCreator","useGetCourses","useGetAllCourses","useSaveCourse","useDeleteCourse","useToggleCourseActive"]
+  },
+  {
+    feature: "Form Templates",
+    vars: ["DB_URL","UPLOAD_DIR","APP_BASE_URL"],
+    fns: ["FormController.listTemplates","FormController.createTemplate","FormController.updateTemplate","FormController.deleteTemplate","FormController.toggleTemplate","FormService.listTemplates","FormService.createTemplate","FormService.updateTemplate","FormService.deleteTemplate","FormService.toggleTemplate","useGetFormTemplates","useSaveFormTemplate","useDeleteFormTemplate","useToggleFormTemplateActive"]
+  },
+  {
+    feature: "Form Approvals",
+    vars: ["DB_URL"],
+    fns: ["FormController.listSubmissions","FormController.updateStatus","FormService.listSubmissions","FormService.updateSubmissionStatus","useGetFormSubmissions","useUpdateSubmissionStatus"]
+  },
+  {
+    feature: "Broadcast Notifications",
+    vars: ["DB_URL"],
+    fns: ["NotificationController.list","NotificationController.broadcast","NotificationService.list","NotificationService.broadcast","useGetAdminNotifications","useBroadcastNotification"]
+  },
+  {
+    feature: "Grades",
+    vars: ["DB_URL"],
+    fns: ["GradeController.list","GradeController.upsert","GradeController.update","GradeController.delete","GradeService.list","GradeService.upsert","GradeService.update","GradeService.delete","GradeService.applyFields","useGetGrades","useUpsertGrade","useDeleteGrade"]
+  },
+  {
+    feature: "Posts Moderation",
+    vars: ["DB_URL"],
+    fns: ["PostController.list","PostController.delete","PostService.list","PostService.delete","PostService.getRecent","useGetPosts","useDeletePost"]
+  },
+  {
+    feature: "Comments Moderation",
+    vars: ["DB_URL"],
+    fns: ["CommentController.list","CommentController.delete","CommentService.list","CommentService.delete","useGetComments","useDeleteComment"]
+  },
+  {
+    feature: "Enrollments",
+    vars: ["DB_URL"],
+    fns: ["EnrollmentController.listGroups","EnrollmentController.createGroup","EnrollmentController.updateGroup","EnrollmentController.deleteGroup","EnrollmentController.listMembers","EnrollmentController.addMember","EnrollmentController.removeMember","EnrollmentService.listGroups","EnrollmentService.createGroup","EnrollmentService.updateGroup","EnrollmentService.deleteGroup","EnrollmentService.listMembers","EnrollmentService.addMember","EnrollmentService.removeMember","useGetEnrollGroups","useGetEnrollMembers","useSaveGroup","useDeleteGroup","useAddMember","useRemoveMember"]
+  },
+  {
+    feature: "Support Tickets",
+    vars: ["DB_URL"],
+    fns: ["SupportController.list","SupportController.updateStatus","SupportService.list","SupportService.updateStatus","useGetSupportTickets","useUpdateSupportStatus"]
+  },
+  {
+    feature: "Dashboard / Stats",
+    vars: ["DB_URL"],
+    fns: ["StatsController.stats","useGetStats"]
+  },
+  {
+    feature: "Session Viewer (+ precise GPS location, read-only mirror)",
+    vars: ["DB_URL","JWT_SECRET"],
+    fns: ["SessionController.listAll","SessionController.getUserSessions","SessionController.revoke","SessionController.stats","SessionController.SessionDetailDTO.from (includes province/district/ward — only the portal backend writes these)"]
+  },
+  {
+    feature: "File Storage",
+    vars: ["UPLOAD_DIR","APP_BASE_URL"],
+    fns: ["FileController.upload","FileController.serve"]
+  },
+  {
+    feature: "Security / Rate Limiting",
+    vars: ["JWT_SECRET","JWT_EXPIRATION_MS","RATE_LIMIT_LOGIN — 5 req/min/IP","RATE_LIMIT_GENERAL — 120 req/min/IP"],
+    fns: ["RateLimitFilter.doFilterInternal","RateLimitFilter.initLimits","RateLimitFilter.resolveBandwidth","RateLimitFilter.normalizePath","JwtAuthFilter.doFilterInternal"]
+  }
+];
+
+function makeRow(row, proj) {
+  const tr = document.createElement('tr');
+  tr.dataset.text = [row.feature, ...row.vars, ...row.fns].join(' ').toLowerCase();
+
+  // Feature cell
+  const tdF = document.createElement('td');
+  tdF.innerHTML = `<div class="feat"><span class="feat-name">${row.feature}</span><span class="proj-badge ${proj}">${proj}</span></div>`;
+
+  // Vars cell
+  const tdV = document.createElement('td');
+  if (row.vars.length === 0) {
+    tdV.innerHTML = '<span class="no-var">—</span>';
+  } else {
+    const wrap = document.createElement('div');
+    wrap.className = 'vars';
+    row.vars.forEach(v => { const s = document.createElement('span'); s.className = 'var-chip'; s.textContent = v; wrap.appendChild(s); });
+    tdV.appendChild(wrap);
+  }
+
+  // Functions cell
+  const tdFn = document.createElement('td');
+  const list = document.createElement('div');
+  list.className = 'fns';
+  row.fns.forEach(f => { const s = document.createElement('span'); s.className = 'fn-item'; s.textContent = f; list.appendChild(s); });
+  tdFn.appendChild(list);
+
+  tr.appendChild(tdF); tr.appendChild(tdV); tr.appendChild(tdFn);
+  return tr;
+}
+
+function render(data, bodyId, proj) {
+  const tbody = document.getElementById(bodyId);
+  data.forEach(row => tbody.appendChild(makeRow(row, proj)));
+}
+render(PORTAL, 'body-portal', 'portal');
+render(ADMIN,  'body-admin',  'admin');
+
+// ── Tabs ──
+let activeTab = 'portal';
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    activeTab = btn.dataset.tab;
+    document.querySelectorAll('.tab-btn').forEach(b => b.className = 'tab-btn');
+    btn.classList.add(activeTab === 'portal' ? 'active-portal' : 'active-admin');
+    document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+    document.getElementById('tab-' + activeTab).classList.add('active');
+    updateCount();
+  });
+});
+
+// ── Search ──
+function updateCount() {
+  const tbody = document.getElementById('body-' + activeTab);
+  const rows = tbody.querySelectorAll('tr');
+  const visible = [...rows].filter(r => !r.classList.contains('hidden')).length;
+  document.getElementById('cnt').textContent = visible + ' / ' + rows.length + ' features';
+}
+
+document.getElementById('q').addEventListener('input', function() {
+  const q = this.value.trim().toLowerCase();
+  ['portal','admin'].forEach(proj => {
+    const tbody = document.getElementById('body-' + proj);
+    tbody.querySelectorAll('tr').forEach(tr => {
+      tr.classList.toggle('hidden', q.length > 0 && !tr.dataset.text.includes(q));
+    });
+  });
+  updateCount();
+});
+
+updateCount();
+</script>

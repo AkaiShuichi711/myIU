@@ -55,8 +55,6 @@ Flyway tự động apply migrations khi khởi động lần đầu.
 | `FRONTEND_URL` | — | `http://localhost:5173` | URL frontend (CORS + OAuth2 redirect) |
 | `APP_BASE_URL` | — | `http://localhost:8080` | URL backend (OAuth2 redirect URI) |
 | `UPLOAD_DIR` | — | `./uploads` | Thư mục lưu file upload |
-| `PROVISION_MAX_CREATE` | — | `200` | Số tài khoản tối đa tạo mỗi lần upload Excel |
-| `PROVISION_MAX_DELETE` | — | `100` | Số tài khoản tối đa xóa mỗi lần upload Excel |
 
 > Sinh JWT secret: `openssl rand -hex 32`
 
@@ -81,13 +79,19 @@ Migrations nằm trong `src/main/resources/db/`:
 db/
 ├── migration/          # Schema — chạy ở mọi môi trường
 │   ├── V1__initial_schema.sql
-│   ├── V2__sso_columns.sql
-│   ├── V3__login_sessions.sql
-│   ├── V4__timetable_attendance.sql
-│   └── ...
+│   ├── V2__admin_users.sql
+│   ├── V3__user_provisioning.sql          # cột audit provisionedBy/provisionedAt — feature Excel
+│   │                                      #   upload dùng chúng đã bị xóa, cột thì vẫn giữ
+│   ├── V4__support_tickets.sql
+│   ├── V5__login_sessions.sql
+│   ├── V6__course_schedules.sql
+│   ├── V8__assignment_submissions.sql
+│   ├── V9__attendance_records.sql
+│   ├── V11__cascade_user_deletes.sql      # xóa user giờ cascade qua course/grade/... user đó tạo
+│   └── V12__login_session_precise_location.sql  # lat/lng/province/district/ward
 └── seed/               # Dữ liệu mẫu — chỉ local/dev
-    ├── V7__seed_base.sql
-    └── V10__seed_extended.sql
+    ├── V7__seed_data.sql
+    └── V10__seed_data_extended.sql
 ```
 
 Seed data được kích hoạt bằng profile `local` hoặc `dev`:
@@ -105,12 +109,21 @@ SPRING_PROFILES_ACTIVE=local mvn spring-boot:run
 ### Auth
 | Method | Path | Auth |
 |--------|------|------|
-| POST | `/api/auth/register` | Public |
-| POST | `/api/auth/login` | Public |
-| POST | `/api/auth/logout` | Bearer |
+| GET | `/oauth2/authorization/microsoft` | Public — starts Microsoft SSO redirect |
 | GET | `/api/auth/me` | Bearer |
-| GET | `/api/auth/sessions` | Bearer |
-| DELETE | `/api/auth/sessions/{id}` | Bearer |
+
+There is no local email/password registration for the portal — accounts are pre-provisioned by an
+admin (in myIU-admin) and log in exclusively via Microsoft SSO. `not_provisioned` is the error code
+returned when the SSO email has no matching row in `users`.
+
+### Sessions
+| Method | Path | Auth |
+|--------|------|------|
+| GET | `/api/sessions` | Bearer |
+| DELETE | `/api/sessions/{id}` | Bearer |
+| DELETE | `/api/sessions/others` | Bearer |
+| PUT | `/api/sessions/heartbeat` | Bearer |
+| PUT | `/api/sessions/current/location` | Bearer — opt-in GPS enrichment, see docs/API_ROUTES.md |
 
 ### Users
 | Method | Path | Auth |
@@ -120,7 +133,6 @@ SPRING_PROFILES_ACTIVE=local mvn spring-boot:run
 | GET | `/api/users/by-username/{username}` | Bearer |
 | GET | `/api/users/search?q=&role=` | Bearer — `role` optional; `role=lecturer` restricts results to lecturers |
 | POST | `/api/users/{id}/avatar` | Bearer |
-| POST | `/api/users/provision` | Bearer (Admin) |
 
 ### Posts
 | Method | Path |
@@ -191,6 +203,7 @@ SPRING_PROFILES_ACTIVE=local mvn spring-boot:run
 - **OAuth2**: Microsoft Azure AD (Authorization Code Flow), cookie-based state
 - **Email normalization**: Microsoft có thể trả về email dạng HOA (`ITITIU21354@...`). `OAuth2SuccessHandler` và `UserDetailsServiceImpl` đều gọi `.toLowerCase()` trước khi lookup. **Không xóa bước này.**
 - **CORS**: Configured via `app.cors.allowed-origins`
+- **Client IP trust**: `IpUtils.extractIp()` chỉ tin `X-Forwarded-For`/`X-Real-IP` khi peer TCP trực tiếp (`getRemoteAddr()`, client không giả được) là địa chỉ private/loopback — tức request thật sự đi qua reverse proxy của chính mình. Nếu không, dùng đúng `getRemoteAddr()`, bỏ qua header. Bảo vệ rate-limit login (5/phút/IP) khỏi bị bypass bằng cách giả `X-Forwarded-For` mỗi request.
 
 ---
 
@@ -220,3 +233,9 @@ Roles lưu **không có prefix** `ROLE_` (ví dụ: `student`, `lecturer`). `Use
 
 ### File storage
 Tất cả file (form template, submission) được serve từ **portal backend** tại `/api/storage/files/{filename}`. Admin backend cũng tạo URL theo format này để portal user có thể download. Không tạo file-serving endpoint riêng ở admin.
+
+### `@Modifying` query cần `@Transactional` ngay trên method gọi nó — kể cả (nhất là) từ `@Async`
+Spring Data **không** tự bọc transaction cho custom `@Query`+`@Modifying` như nó làm với `save()`/`findById()`. `GeoIpService.lookupAndEnrich()` chạy `@Async` trên thread pool riêng (không kế thừa transaction nào), gọi `sessionRepo.updateGeoLocation(...)` mà thiếu `@Transactional` → mọi lần đều ném `TransactionRequiredException`, bị catch âm thầm và log ở mức DEBUG. Hệ quả: **mọi session đăng nhập bị kẹt `country="Resolving"` vĩnh viễn**, hàng tuần liền, không 1 lỗi nào hiện ra. Chỉ phát hiện được khi query thẳng vào DB. Bài học: thêm `@Transactional` **ngay trên method `@Async`**, không phải ở nơi gọi nó.
+
+### Xóa user giờ cascade — đây là chủ đích, không phải bug
+`courses.creator_id`, `course_groups.lecturer_id`, `course_posts.author_id`, `course_grades.graded_by`, `form_templates.created_by` đều `ON DELETE CASCADE` (từ V11). Xóa 1 giảng viên sẽ xóa luôn khóa học họ tạo, kéo theo điểm số/bài nộp/điểm danh của **sinh viên khác** trong khóa đó. Nếu cần xóa "an toàn" không ảnh hưởng người khác, dùng `is_active = false` (deactivate) thay vì xóa.

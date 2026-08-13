@@ -87,12 +87,41 @@ public class SessionController extends BaseController {
         return ResponseEntity.ok(ApiResponse.ok("OK", null));
     }
 
+    /**
+     * Called once, right after login, if the browser's geolocation
+     * permission prompt was granted — see useReportGeoLocation on the
+     * frontend. Silently no-ops if denied/unavailable (IP-based
+     * country/city from login already covers that case). Scoped to the
+     * caller's own current session — see SessionService.updatePreciseLocation.
+     */
+    @PutMapping("/current/location")
+    public ResponseEntity<ApiResponse<Void>> reportLocation(
+            @AuthenticationPrincipal UserDetails userDetails,
+            HttpServletRequest request,
+            @RequestBody LocationRequest body) {
+
+        User user = currentUser(userDetails);
+        String sessionIdStr = (String) request.getAttribute("sessionId");
+        if (sessionIdStr != null) {
+            try {
+                sessionService.updatePreciseLocation(
+                        UUID.fromString(sessionIdStr), user.getId(), body.latitude(), body.longitude());
+            } catch (IllegalArgumentException ignored) {}
+        }
+        return ResponseEntity.ok(ApiResponse.ok("OK", null));
+    }
+
+    public record LocationRequest(double latitude, double longitude) {}
+
     public record SessionDTO(
             String id,
             String ipAddress,
             String country,
             String city,
             String countryCode,
+            String province,
+            String district,
+            String ward,
             String browser,
             String browserVersion,
             String os,
@@ -108,6 +137,9 @@ public class SessionController extends BaseController {
                     s.getCountry(),
                     s.getCity(),
                     s.getCountryCode(),
+                    s.getProvince(),
+                    s.getDistrict(),
+                    s.getWard(),
                     s.getBrowser(),
                     s.getBrowserVersion(),
                     s.getOs(),

@@ -26,7 +26,8 @@ public class AuthController {
     /**
      * Regular users authenticate via Microsoft 365 OAuth2 only.
      * Email/password login is disabled for students and lecturers.
-     * Admin login uses a separate endpoint: POST /api/admin/auth/login
+     * Admin login lives in the separate myIU-admin app (port 8081, its own
+     * POST /api/auth/login) — not an endpoint on this backend.
      */
     @PostMapping("/login")
     public ResponseEntity<?> login() {
