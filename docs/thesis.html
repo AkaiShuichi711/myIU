@@ -1,0 +1,886 @@
+<title>myIU Portal — Luận Văn Tốt Nghiệp</title>
+
+<style>
+:root {
+  --bg:#F5F7FB; --surface:#FFFFFF; --text:#1A2540; --text-muted:#5A6A8A;
+  --accent:#1668F5; --accent-dim:#E8EFFF; --navy:#0A2558;
+  --code-bg:#EEF1F8; --code-border:#CDD5E8; --border:#D4DAEA;
+  --toc-bg:#F0F3FA;
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#0D1117; --surface:#161B27; --text:#E6EDF3; --text-muted:#8B98B1;
+    --accent:#4D94FF; --accent-dim:#1A2845; --navy:#4D94FF;
+    --code-bg:#161B2A; --code-border:#2A3450; --border:#30363D;
+    --toc-bg:#111722;
+  }
+}
+:root[data-theme="light"]{--bg:#F5F7FB;--surface:#FFFFFF;--text:#1A2540;--text-muted:#5A6A8A;--accent:#1668F5;--accent-dim:#E8EFFF;--navy:#0A2558;--code-bg:#EEF1F8;--code-border:#CDD5E8;--border:#D4DAEA;--toc-bg:#F0F3FA;}
+:root[data-theme="dark"]{--bg:#0D1117;--surface:#161B27;--text:#E6EDF3;--text-muted:#8B98B1;--accent:#4D94FF;--accent-dim:#1A2845;--navy:#4D94FF;--code-bg:#161B2A;--code-border:#2A3450;--border:#30363D;--toc-bg:#111722;}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;line-height:1.78;}
+
+.layout{display:flex;max-width:1200px;margin:0 auto;padding:0 1.5rem;gap:2.5rem;align-items:flex-start;}
+
+/* TOC */
+.toc-sidebar{width:215px;flex-shrink:0;position:sticky;top:2rem;max-height:calc(100vh - 4rem);overflow-y:auto;background:var(--toc-bg);border:1px solid var(--border);border-radius:10px;padding:1.2rem 1rem;}
+.toc-sidebar h3{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);margin-bottom:.8rem;}
+.toc-list{list-style:none;}
+.toc-list li{margin-bottom:.15rem;}
+.toc-list a{display:block;font-size:12px;color:var(--text-muted);text-decoration:none;padding:.22rem .5rem;border-radius:4px;border-left:2px solid transparent;transition:all .15s;}
+.toc-list a:hover,.toc-list a.active{color:var(--accent);border-left-color:var(--accent);background:var(--accent-dim);}
+.toc-list .sub a{font-size:11.5px;padding-left:1.1rem;}
+
+/* Content */
+.content{flex:1;min-width:0;padding:2.5rem 0 6rem;}
+
+/* Cover */
+.cover{text-align:center;padding-bottom:3rem;margin-bottom:4rem;border-bottom:2px solid var(--border);}
+.cover .univ{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);margin-bottom:.6rem;}
+.cover .faculty{font-size:11px;color:var(--text-muted);margin-bottom:2.5rem;}
+.cover h1{font-family:Georgia,'Times New Roman',serif;font-size:clamp(1.4rem,2.8vw,2.1rem);font-weight:700;color:var(--navy);line-height:1.3;text-wrap:balance;max-width:700px;margin:0 auto 1.25rem;}
+.cover .en-title{font-size:13px;font-style:italic;color:var(--text-muted);margin-bottom:2.5rem;max-width:640px;margin-left:auto;margin-right:auto;}
+.cover-meta{display:flex;justify-content:center;gap:3.5rem;flex-wrap:wrap;}
+.cover-meta .item .lbl{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);display:block;margin-bottom:.25rem;}
+.cover-meta .item .val{color:var(--text);font-weight:600;font-size:13.5px;}
+
+/* Chapter */
+.chapter{margin-bottom:5rem;scroll-margin-top:2rem;}
+.chapter-header{margin-bottom:2rem;padding-bottom:1rem;border-bottom:2px solid var(--border);}
+.ch-num{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);display:block;margin-bottom:.4rem;}
+.chapter h2{font-family:Georgia,'Times New Roman',serif;font-size:clamp(1.25rem,2.3vw,1.75rem);font-weight:700;color:var(--navy);line-height:1.25;text-wrap:balance;}
+
+/* Section */
+.section{margin-bottom:2.5rem;scroll-margin-top:2rem;}
+.section h3{font-family:Georgia,'Times New Roman',serif;font-size:1.1rem;font-weight:700;color:var(--text);margin-bottom:.7rem;}
+.section h4{font-size:.82rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin:1.5rem 0 .5rem;}
+p{margin-bottom:.9rem;max-width:72ch;}
+ul,ol{padding-left:1.5rem;margin-bottom:.9rem;}
+li{margin-bottom:.3rem;}
+
+/* Code */
+.code-block{background:var(--code-bg);border:1px solid var(--code-border);border-radius:8px;overflow-x:auto;margin:1.25rem 0;}
+.code-label{display:flex;align-items:center;gap:.5rem;padding:.45rem 1rem;border-bottom:1px solid var(--code-border);font-size:11px;font-weight:600;color:var(--text-muted);letter-spacing:.05em;}
+.code-label .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);opacity:.7;}
+.code-block pre{padding:.85rem 1.1rem;font-family:'Consolas','Cascadia Code','Courier New',monospace;font-size:12.5px;line-height:1.65;color:var(--text);}
+code{font-family:'Consolas','Cascadia Code','Courier New',monospace;font-size:.83em;background:var(--code-bg);border:1px solid var(--code-border);border-radius:3px;padding:.08em .32em;}
+
+/* Callout */
+.callout{border-left:3px solid var(--accent);background:var(--accent-dim);border-radius:0 8px 8px 0;padding:.75rem 1rem;margin:1rem 0;font-size:13.5px;}
+.callout strong{color:var(--navy);}
+
+/* Table */
+.table-wrap{overflow-x:auto;margin:1.25rem 0;}
+table{width:100%;border-collapse:collapse;font-size:13.5px;}
+th{background:var(--accent-dim);color:var(--navy);font-weight:700;text-align:left;padding:.55rem .85rem;border-bottom:2px solid var(--accent);font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;}
+td{padding:.5rem .85rem;border-bottom:1px solid var(--border);vertical-align:top;}
+tr:last-child td{border-bottom:none;}
+
+/* References */
+.references ol{padding-left:1.4rem;}
+.references li{margin-bottom:.5rem;font-size:13.5px;color:var(--text-muted);}
+
+@media(max-width:768px){.toc-sidebar{display:none;}.layout{padding:0 1rem;}}
+</style>
+
+<div class="layout">
+
+<!-- ══ TOC ══════════════════════════════════════════════════ -->
+<nav class="toc-sidebar" aria-label="Mục lục">
+  <h3>Mục lục</h3>
+  <ul class="toc-list">
+    <li><a href="#ch1">1. Giới thiệu</a></li>
+    <li class="sub"><a href="#ch1-1">1.1 Bối cảnh</a></li>
+    <li class="sub"><a href="#ch1-2">1.2 Mục tiêu</a></li>
+    <li class="sub"><a href="#ch1-3">1.3 Phạm vi</a></li>
+    <li><a href="#ch2">2. Tổng quan tài liệu</a></li>
+    <li class="sub"><a href="#ch2-1">2.1 LMS hiện có</a></li>
+    <li class="sub"><a href="#ch2-2">2.2 OAuth 2.0 / OIDC</a></li>
+    <li class="sub"><a href="#ch2-3">2.3 Khoảng trống</a></li>
+    <li><a href="#ch3">3. Thiết kế hệ thống</a></li>
+    <li class="sub"><a href="#ch3-1">3.1 Kiến trúc</a></li>
+    <li class="sub"><a href="#ch3-2">3.2 Cơ sở dữ liệu</a></li>
+    <li class="sub"><a href="#ch3-3">3.3 Bảo mật & JWT</a></li>
+    <li class="sub"><a href="#ch3-4">3.4 Flyway migration</a></li>
+    <li><a href="#ch4">4. Triển khai</a></li>
+    <li class="sub"><a href="#ch4-1">4.1 Tầng thực thể</a></li>
+    <li class="sub"><a href="#ch4-2">4.2 Tầng dịch vụ</a></li>
+    <li class="sub"><a href="#ch4-3">4.3 Tầng API</a></li>
+    <li class="sub"><a href="#ch4-4">4.4 Giao diện React</a></li>
+    <li class="sub"><a href="#ch4-5">4.5 Hệ thống quản trị</a></li>
+    <li><a href="#ch5">5. Thảo luận</a></li>
+    <li><a href="#ch6">6. Kết luận</a></li>
+    <li><a href="#refs">Tài liệu tham khảo</a></li>
+  </ul>
+</nav>
+
+<!-- ══ MAIN CONTENT ═════════════════════════════════════════ -->
+<main class="content">
+
+<!-- Cover -->
+<div class="cover">
+  <p class="univ">Trường Đại học Quốc tế — Đại học Quốc gia TP.HCM</p>
+  <p class="faculty">Khoa Công nghệ Thông tin</p>
+  <h1>myIU: Thiết Kế và Xây Dựng Cổng Thông Tin Sinh Viên Đại Học Tích Hợp với Xác Thực Danh Tính Liên Kết và Kiến Trúc Quản Trị Song Song</h1>
+  <p class="en-title">myIU: Design and Implementation of an Integrated University Student Portal with Federated Identity Authentication and Dual-Interface Management Architecture</p>
+  <div class="cover-meta">
+    <div class="item"><span class="lbl">Công nghệ backend</span><span class="val">Spring Boot 3.4 · Java 21</span></div>
+    <div class="item"><span class="lbl">Công nghệ frontend</span><span class="val">React 18 · Vite · React Query v5</span></div>
+    <div class="item"><span class="lbl">Cơ sở dữ liệu</span><span class="val">PostgreSQL 16 · Flyway</span></div>
+    <div class="item"><span class="lbl">Xác thực</span><span class="val">Microsoft Azure AD · JWT</span></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     CHƯƠNG 1: GIỚI THIỆU
+══════════════════════════════════════════════════════════ -->
+<section class="chapter" id="ch1">
+  <div class="chapter-header">
+    <span class="ch-num">Chương 1</span>
+    <h2>Giới thiệu</h2>
+  </div>
+
+  <div class="section" id="ch1-1">
+    <h3>1.1 Bối cảnh và động lực nghiên cứu</h3>
+    <p>Trong bối cảnh chuyển đổi số đang diễn ra mạnh mẽ trong giáo dục đại học, nhu cầu xây dựng một nền tảng kỹ thuật số thống nhất để hỗ trợ sinh viên và giảng viên trong toàn bộ vòng đời học tập ngày càng trở nên cấp thiết. Các hệ thống học tập truyền thống như Moodle, Canvas hay Blackboard, mặc dù cung cấp đầy đủ tính năng quản lý khóa học, vẫn tồn tại nhiều hạn chế khi tích hợp với hệ thống danh tính nội bộ của từng trường đại học — đặc biệt là các tổ chức đang sử dụng Microsoft 365 như một nền tảng cộng tác chính.</p>
+    <p>Đề tài này xuất phát từ thực tế vận hành tại một trường đại học quốc tế ở Việt Nam, nơi sinh viên và giảng viên sử dụng tài khoản Microsoft cấp bởi nhà trường cho toàn bộ hoạt động học thuật. Việc yêu cầu người dùng duy trì thêm một tài khoản riêng biệt trên nền tảng học tập gây ra ma sát không cần thiết, tiềm ẩn rủi ro bảo mật từ việc tái sử dụng mật khẩu, và làm phức tạp quá trình cung ứng tài khoản (<em>user provisioning</em>) khi sinh viên nhập học hoặc thôi học.</p>
+    <p>Hệ thống myIU được thiết kế để giải quyết những vấn đề trên bằng cách xây dựng một cổng thông tin tích hợp, trong đó xác thực danh tính được ủy quyền hoàn toàn cho Microsoft Azure Active Directory thông qua giao thức OAuth 2.0 / OpenID Connect, trong khi dữ liệu học thuật vẫn được kiểm soát hoàn toàn bởi hệ thống nội bộ.</p>
+  </div>
+
+  <div class="section" id="ch1-2">
+    <h3>1.2 Mục tiêu nghiên cứu</h3>
+    <p>Đề tài đặt ra các mục tiêu cụ thể sau:</p>
+    <ol>
+      <li>Thiết kế và triển khai hệ thống xác thực liên kết (<em>federated authentication</em>) tích hợp Microsoft Azure AD, cho phép đăng nhập bằng tài khoản nhà trường cấp.</li>
+      <li>Xây dựng cơ sở dữ liệu quan hệ phục vụ các nghiệp vụ học thuật cốt lõi: quản lý khóa học, nhóm học, thời khóa biểu, điểm danh, bài tập và điểm số.</li>
+      <li>Phát triển API RESTful với Spring Boot 3.4, áp dụng kiến trúc stateless và các kỹ thuật bảo mật hiện đại.</li>
+      <li>Xây dựng giao diện người dùng đa nền tảng bằng React 18 kết hợp React Query v5 cho quản lý trạng thái bất đồng bộ.</li>
+      <li>Thiết kế hệ thống quản trị riêng biệt (<em>admin panel</em>) với kiến trúc backend song song, cho phép quản lý người dùng và nội dung học thuật độc lập.</li>
+    </ol>
+  </div>
+
+  <div class="section" id="ch1-3">
+    <h3>1.3 Phạm vi và giới hạn</h3>
+    <p>Hệ thống tập trung vào các nghiệp vụ học thuật cốt lõi: quản lý khóa học và nhóm học, thời khóa biểu, tường thông báo xã hội (<em>social feed</em>), nộp bài tập, điểm danh và bảng điểm. Đề tài không bao gồm tích hợp với hệ thống tài chính học phí, module kiểm tra trực tuyến với phòng thi ảo, hay tích hợp video conference. Hệ thống được triển khai và kiểm nghiệm trong môi trường phát triển cục bộ (<em>local development</em>) với dữ liệu mẫu được seed thông qua Flyway migration.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     CHƯƠNG 2: TỔNG QUAN TÀI LIỆU
+══════════════════════════════════════════════════════════ -->
+<section class="chapter" id="ch2">
+  <div class="chapter-header">
+    <span class="ch-num">Chương 2</span>
+    <h2>Tổng quan tài liệu</h2>
+  </div>
+
+  <div class="section" id="ch2-1">
+    <h3>2.1 Các hệ thống quản lý học tập hiện có</h3>
+    <p><strong>Moodle</strong> là nền tảng LMS (<em>Learning Management System</em>) mã nguồn mở phổ biến nhất thế giới với hơn 300 triệu người dùng (Moodle, 2024). Điểm mạnh của Moodle nằm ở tính linh hoạt và hệ sinh thái plugin phong phú; tuy nhiên, giao diện người dùng phức tạp và cơ chế xác thực tách rời khỏi hệ thống danh tính doanh nghiệp là những rào cản đáng kể.</p>
+    <p><strong>Canvas LMS</strong> (Instructure, 2024) cung cấp trải nghiệm người dùng hiện đại hơn và hỗ trợ tích hợp với Microsoft 365 thông qua SSO. Tuy nhiên, cả hai nền tảng đều là sản phẩm thương mại hoặc cộng đồng với kiến trúc nguyên khối (<em>monolithic</em>), gây khó khăn khi cần tùy biến sâu.</p>
+    <p><strong>Microsoft Teams for Education</strong> tích hợp trực tiếp với Azure AD nhưng định vị như một công cụ cộng tác hơn là LMS thuần túy — thiếu các tính năng quản lý học thuật chi tiết như thời khóa biểu tự động, điểm danh hàng ngày hay báo cáo điểm thành phần.</p>
+
+    <div class="table-wrap">
+      <table>
+        <tr><th>Tiêu chí</th><th>Moodle</th><th>Canvas</th><th>MS Teams Edu</th><th>myIU</th></tr>
+        <tr><td>SSO Microsoft Azure AD</td><td>Plugin bên thứ ba</td><td>Có (Enterprise)</td><td>Có (Native)</td><td>Có (Native OIDC)</td></tr>
+        <tr><td>Quản lý thời khóa biểu</td><td>Module add-on</td><td>Hạn chế</td><td>Không</td><td>Có (CRUD đầy đủ)</td></tr>
+        <tr><td>Provisioning tự động</td><td>CSV/Plugin</td><td>API/SIS</td><td>AD-synced</td><td>Thủ công qua Admin UI (không tự động hàng loạt — xem 5.5)</td></tr>
+        <tr><td>Tính tùy biến</td><td>Cao (PHP)</td><td>Trung bình</td><td>Thấp</td><td>Cao (source mở)</td></tr>
+        <tr><td>Kiến trúc API</td><td>REST/Webservices</td><td>REST</td><td>MS Graph API</td><td>REST + JWT Stateless</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="section" id="ch2-2">
+    <h3>2.2 Xác thực liên kết: OAuth 2.0 và OpenID Connect</h3>
+    <p>OAuth 2.0 (RFC 6749) là framework ủy quyền cho phép ứng dụng bên thứ ba truy cập tài nguyên của người dùng mà không cần biết mật khẩu. OpenID Connect (OIDC) là lớp xác thực danh tính được xây dựng trên nền OAuth 2.0, cung cấp <em>ID Token</em> dạng JWT chứa thông tin nhận dạng người dùng (Sakimura et al., 2014).</p>
+    <p>Trong ngữ cảnh Microsoft Azure Active Directory, luồng OAuth 2.0 Authorization Code Flow with PKCE được sử dụng cho ứng dụng web. Sau khi người dùng xác thực thành công với Azure AD, ứng dụng nhận được Access Token và ID Token. Hệ thống myIU sử dụng thông tin trong ID Token (email, tên, tenant ID) để tra cứu hoặc tạo mới tài khoản người dùng trong cơ sở dữ liệu nội bộ, sau đó phát hành JWT riêng cho mọi trao đổi tiếp theo — tách biệt hoàn toàn phạm vi xác thực của Microsoft với phạm vi ủy quyền của ứng dụng.</p>
+  </div>
+
+  <div class="section" id="ch2-3">
+    <h3>2.3 Khoảng trống nghiên cứu</h3>
+    <p>Qua phân tích các giải pháp hiện có, nhóm xác định ba khoảng trống chính: (1) thiếu nền tảng tùy biến cao tích hợp Native SSO với Microsoft cho bối cảnh đại học Việt Nam; (2) không có giải pháp mã nguồn mở nào kết hợp thời khóa biểu, điểm danh, bài tập và mạng xã hội học thuật trong một hệ thống thống nhất; (3) cơ chế quản trị song song (<em>dual-backend</em>) tách biệt giữa giao diện sinh viên và giao diện quản trị viên ít được nghiên cứu trong bối cảnh Spring Boot.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     CHƯƠNG 3: THIẾT KẾ HỆ THỐNG
+══════════════════════════════════════════════════════════ -->
+<section class="chapter" id="ch3">
+  <div class="chapter-header">
+    <span class="ch-num">Chương 3</span>
+    <h2>Thiết kế hệ thống</h2>
+  </div>
+
+  <div class="section" id="ch3-1">
+    <h3>3.1 Kiến trúc tổng quan</h3>
+    <p>Hệ thống myIU được tổ chức theo mô hình kiến trúc <em>dual-backend</em> với hai máy chủ Spring Boot độc lập chia sẻ chung một cơ sở dữ liệu PostgreSQL:</p>
+    <ul>
+      <li><strong>Portal backend</strong> (cổng 8080): Phục vụ sinh viên và giảng viên. Đây là nguồn duy nhất kiểm soát lược đồ cơ sở dữ liệu thông qua Flyway (<em>schema ownership</em>). Tích hợp xác thực Microsoft SSO.</li>
+      <li><strong>Admin backend</strong> (cổng 8081): Phục vụ quản trị viên hệ thống. Chạy với <code>ddl-auto: none</code>, chỉ đọc/ghi dữ liệu — không tự ý thay đổi lược đồ. Sử dụng hệ thống JWT và xác thực riêng biệt với Portal.</li>
+    </ul>
+    <p>Frontend React (Vite, cổng 5173) giao tiếp với Portal backend qua REST API. Admin frontend (cổng 3000) giao tiếp riêng với Admin backend. Hai luồng người dùng hoàn toàn tách biệt, giảm thiểu bề mặt tấn công (<em>attack surface</em>) và cho phép phân quyền triển khai độc lập.</p>
+    <p>Cấu hình ứng dụng sử dụng Spring profiles (<code>local</code>, <code>dev</code>, <code>prod</code>) với các thuộc tính nhạy cảm được inject qua biến môi trường — không hardcode trong codebase.</p>
+
+    <div class="code-block">
+      <div class="code-label"><span class="dot"></span>backend/src/main/resources/application-local.yml (trích)</div>
+      <pre>spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/myIU_dev}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    open-in-view: false          # Tắt OSIV — transaction phải explicit
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    locations: classpath:db/migration,classpath:db/seed
+    enabled: true
+
+app:
+  jwt:
+    secret: ${JWT_SECRET}
+    expiration-ms: 86400000      # 24 giờ
+  cors:
+    allowed-origins: http://localhost:5173</pre>
+    </div>
+
+    <div class="callout">
+      <strong>Quyết định kỹ thuật quan trọng:</strong> Cấu hình <code>open-in-view: false</code> đóng Hibernate session ngay sau khi transaction kết thúc, buộc mọi truy cập quan hệ LAZY phải nằm trong phạm vi một transaction tường minh. Đây là thực hành tốt nhất cho hiệu năng nhưng đòi hỏi chú ý cẩn thận khi thiết kế service layer.
+    </div>
+  </div>
+
+  <div class="section" id="ch3-2">
+    <h3>3.2 Thiết kế cơ sở dữ liệu</h3>
+    <p>Cơ sở dữ liệu PostgreSQL được tổ chức thành 5 nhóm nghiệp vụ chính với tổng cộng 16 bảng. Toàn bộ khoá chính sử dụng kiểu <code>UUID</code> với giá trị sinh bởi hàm <code>gen_random_uuid()</code> của PostgreSQL — đảm bảo tính phân tán và tránh xung đột khi merge dữ liệu giữa các môi trường.</p>
+
+    <div class="code-block">
+      <div class="code-label"><span class="dot"></span>db/migration/V1__initial_schema.sql (trích — nhóm Người dùng và Khóa học)</div>
+      <pre>-- ── Người dùng ──────────────────────────────────────────────
+CREATE TABLE users (
+    id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name          VARCHAR(255)        NOT NULL,
+    username      VARCHAR(100) UNIQUE NOT NULL,
+    email         VARCHAR(255) UNIQUE NOT NULL,
+    password      VARCHAR(255),        -- BCrypt hash; NULL cho tài khoản SSO
+    image_url     TEXT,
+    bio           TEXT,
+    is_private    BOOLEAN      NOT NULL DEFAULT FALSE,
+    auth_provider VARCHAR(50)  NOT NULL DEFAULT 'local',  -- 'local' | 'microsoft'
+    created_at    TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    updated_at    TIMESTAMPTZ  NOT NULL DEFAULT now()
+);
+
+CREATE TABLE user_roles (
+    user_id UUID        NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    role    VARCHAR(100) NOT NULL,
+    PRIMARY KEY (user_id, role)
+);
+
+-- ── Khóa học ────────────────────────────────────────────────
+CREATE TABLE courses (
+    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name        VARCHAR(255) NOT NULL,
+    code        VARCHAR(50)  NOT NULL,
+    semester    VARCHAR(100),
+    description TEXT,
+    cover_color VARCHAR(20)  NOT NULL DEFAULT '#0B2275',
+    is_active   BOOLEAN      NOT NULL DEFAULT TRUE,
+    creator_id  UUID         NOT NULL REFERENCES users(id),
+    created_at  TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    updated_at  TIMESTAMPTZ  NOT NULL DEFAULT now()
+);
+
+CREATE TABLE course_groups (
+    id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    course_id     UUID         NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+    lecturer_id   UUID         NOT NULL REFERENCES users(id),
+    lecturer_name VARCHAR(255),
+    name          VARCHAR(255) NOT NULL,
+    description   TEXT,
+    created_at    TIMESTAMPTZ  NOT NULL DEFAULT now()
+);
+
+CREATE TABLE group_members (
+    id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    group_id     UUID NOT NULL REFERENCES course_groups(id) ON DELETE CASCADE,
+    course_id    UUID NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+    student_id   UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    student_name VARCHAR(255),
+    created_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (group_id, student_id)   -- Mỗi sinh viên chỉ thuộc một nhóm mỗi khóa học
+);</pre>
+    </div>
+
+    <p>Cột <code>is_active</code>, <code>ms_tenant_id</code>, <code>provisioned_by</code>, <code>provisioned_at</code> trên bảng <code>users</code> — dùng cho việc xác định tài khoản đã được admin tạo trước hay chưa (bắt buộc với đăng nhập SSO-only) — <strong>không nằm trong V1</strong> mà được thêm sau bởi <code>V3__user_provisioning.sql</code> qua <code>ALTER TABLE</code>:</p>
+
+    <div class="code-block">
+      <div class="code-label"><span class="dot"></span>db/migration/V3__user_provisioning.sql</div>
+      <pre>ALTER TABLE users
+  ADD COLUMN IF NOT EXISTS is_active      BOOLEAN      NOT NULL DEFAULT TRUE,
+  ADD COLUMN IF NOT EXISTS ms_tenant_id   VARCHAR(100),
+  ADD COLUMN IF NOT EXISTS provisioned_by VARCHAR(255),
+  ADD COLUMN IF NOT EXISTS provisioned_at TIMESTAMPTZ;</pre>
+    </div>
+    <p>Tên migration này bắt nguồn từ một tính năng cung ứng tài khoản hàng loạt qua Excel từng tồn tại (xem 5.5) nay đã bị gỡ bỏ khỏi cả hai backend — nhưng 4 cột audit này vẫn còn nguyên và vẫn được dùng để ghi nhận ai/khi nào tạo tài khoản, dù việc tạo giờ chỉ còn thao tác thủ công từng người một trong Admin Panel.</p>
+
+    <p>Thiết kế bảng <code>group_members</code> lưu dư thừa có chủ ý cả <code>group_id</code> và <code>course_id</code>. Điều này cho phép truy vấn thời khóa biểu của sinh viên (<em>"khóa học nào sinh viên này đang học?"</em>) chỉ bằng một join đơn giản vào bảng <code>group_members</code>, mà không cần phải đi qua <code>course_groups</code>.</p>
+
+    <div class="code-block">
+      <div class="code-label"><span class="dot"></span>db/migration/V6__course_schedules.sql, V8__assignment_submissions.sql, V9__attendance_records.sql (trích)</div>
+      <pre>-- V6
+CREATE TABLE course_schedules (
+    id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+    course_id   UUID        NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+    day_of_week VARCHAR(3)  NOT NULL,   -- 'MON'..'SAT'
+    start_time  TIME        NOT NULL,
+    end_time    TIME        NOT NULL,
+    room        VARCHAR(100),
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+    CONSTRAINT chk_dow  CHECK (day_of_week IN ('MON','TUE','WED','THU','FRI','SAT')),
+    CONSTRAINT chk_time CHECK (end_time > start_time)
+);
+
+-- V9 — tên bảng thật là attendance_records, không phải attendance
+CREATE TABLE attendance_records (
+    id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    course_id    UUID         NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+    student_id   UUID         NOT NULL REFERENCES users(id)   ON DELETE CASCADE,
+    student_name VARCHAR(255) NOT NULL,
+    date         DATE         NOT NULL,
+    status       VARCHAR(20)  NOT NULL DEFAULT 'PRESENT',  -- PRESENT|ABSENT|LATE|EXCUSED
+    note         VARCHAR(500),
+    marked_by    UUID         REFERENCES users(id) ON DELETE SET NULL,
+    created_at   TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    CONSTRAINT uq_attendance UNIQUE (course_id, student_id, date)
+);
+
+-- V8 — course_post_id ban đầu KHÔNG có FK (lỗ hổng thật, vá lại ở V11 — xem 5.6)
+CREATE TABLE assignment_submissions (
+    id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    course_post_id UUID         NOT NULL,
+    student_id     UUID         NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    student_name   VARCHAR(255) NOT NULL,
+    file_url       TEXT, file_id TEXT, file_name TEXT, text_content TEXT,
+    status         VARCHAR(20)  NOT NULL DEFAULT 'SUBMITTED',
+    score          NUMERIC(5,2),
+    feedback       TEXT,
+    submitted_at   TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    CONSTRAINT uq_submission_post_student UNIQUE (course_post_id, student_id)
+);</pre>
+    </div>
+  </div>
+
+  <div class="section" id="ch3-3">
+    <h3>3.3 Kiến trúc bảo mật và JWT</h3>
+    <p>Hệ thống xác thực của myIU Portal được xây dựng trên ba thành phần chính: <code>SecurityConfig</code>, <code>JwtService</code> và <code>JwtAuthenticationFilter</code>, hoạt động phối hợp để cung cấp xác thực stateless hai lớp — tích hợp SSO với Microsoft Azure AD đồng thời hỗ trợ đăng nhập cục bộ (<em>local authentication</em>).</p>
+
+    <h4>3.3.1 Chuỗi bộ lọc bảo mật (Security Filter Chain)</h4>
+    <div class="code-block">
+      <div class="code-label"><span class="dot"></span>config/SecurityConfig.java</div>
+      <pre>@Bean
+public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    var cookieRepo = new HttpCookieOAuth2AuthorizationRequestRepository();
+
+    http
+        .cors(cors -&gt; cors.configurationSource(corsConfigurationSource()))
+        .csrf(AbstractHttpConfigurer::disable)           // API stateless, không cần CSRF
+        .sessionManagement(s -&gt; s
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .authorizeHttpRequests(auth -&gt; auth
+            .requestMatchers("/api/auth/**").permitAll()
+            .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
+            .requestMatchers(HttpMethod.GET, "/api/storage/**").permitAll()
+            .anyRequest().authenticated()
+        )
+        .oauth2Login(oauth2 -&gt; oauth2
+            .authorizationEndpoint(ep -&gt; ep
+                .authorizationRequestResolver(
+                    new CustomAuthorizationRequestResolver(clientRegistrationRepository))
+                .authorizationRequestRepository(cookieRepo)
+            )
+            .successHandler(oAuth2SuccessHandler)
+            .failureUrl(frontendUrl + "/sign-in?error=oauth2")
+        )
+        .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+
+    return http.build();
+}</pre>
+    </div>
+    <p>Điểm đáng chú ý: <code>SessionCreationPolicy.STATELESS</code> đảm bảo Spring Security không tạo <code>HttpSession</code>, phù hợp với kiến trúc API RESTful. <code>JwtAuthenticationFilter</code> được chèn trước <code>UsernamePasswordAuthenticationFilter</code>, nghĩa là mọi request có Bearer token đều được xử lý trước khi Spring Security thực hiện xác thực form mặc định. <code>HttpCookieOAuth2AuthorizationRequestRepository</code> lưu trạng thái OAuth2 trong cookie thay vì session — cần thiết vì session đã bị tắt.</p>
+
+    <h4>3.3.2 Phát hành và xác thực JWT</h4>
+    <div class="code-block">
+      <div class="code-label"><span class="dot"></span>security/JwtService.java</div>
+      <pre>public String generateToken(String subject, Map&lt;String, Object&gt; extraClaims) {
+    return Jwts.builder()
+            .claims(extraClaims)
+            .subject(subject)
+            .id(UUID.randomUUID().toString())   // jti — JWT ID dùng cho blacklist
+            .issuedAt(new Date())
+            .expiration(new Date(System.currentTimeMillis() + expirationMs))
+            .signWith(key())                    // HS384 — jjwt tự chọn theo độ dài secret
+            .compact();
+}
+
+public boolean isTokenValid(String token, UserDetails userDetails) {
+    try {
+        String username = extractUsername(token);
+        if (!username.equals(userDetails.getUsername()) || isExpired(token)) return false;
+        String jti = extractJti(token);
+        return jti == null || !blacklistService.isRevoked(jti);  // Kiểm tra blacklist
+    } catch (JwtException e) {
+        return false;
+    }
+}
+
+private SecretKey key() {
+    return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+}</pre>
+    </div>
+    <p>Mỗi token được gán một <em>JWT ID</em> (<code>jti</code>) duy nhất khi phát hành. Khi người dùng đăng xuất, <code>jti</code> được thêm vào <code>JwtBlacklistService</code> — một <code>ConcurrentHashMap&lt;String, Instant&gt;</code> trong bộ nhớ. Cơ chế này cho phép thu hồi token ngay lập tức mà không cần lưu trữ toàn bộ token vào database. Các entry hết hạn được dọn dẹp định kỳ bằng <code>@Scheduled</code>.</p>
+
+    <h4>3.3.3 Kiểm tra thu hồi phiên đăng nhập</h4>
+    <div class="code-block">
+      <div class="code-label"><span class="dot"></span>security/JwtAuthenticationFilter.java (trích)</div>
+      <pre>String sessionId = jwtService.extractSessionId(jwt);
+
+if (sessionId != null) {
+    try {
+        UUID sessionUuid = UUID.fromString(sessionId);
+        if (!loginSessionRepository.existsByIdAndRevokedFalse(sessionUuid)) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json;charset=UTF-8");
+            response.getWriter().write(
+                "{\"success\":false,\"message\":\"Session has been revoked\"}");
+            return;                             // Chặn request hoàn toàn
+        }
+    } catch (Exception e) {
+        log.warn("Session check failed: {}", e.getMessage());
+        // Fail-open: không chặn request khi DB tạm thời không khả dụng
+    }
+}</pre>
+    </div>
+    <p>Ngoài blacklist JWT trong bộ nhớ, hệ thống còn duy trì bảng <code>login_sessions</code> với cột <code>is_revoked</code>. Mỗi token có thể mang thêm claim <code>sessionId</code>; khi đó, filter kiểm tra xem phiên đăng nhập tương ứng có còn hợp lệ trong database không. Thiết kế <em>fail-open</em> — khi database tạm thời không phản hồi, request vẫn được cho qua để tránh ngừng dịch vụ hoàn toàn.</p>
+  </div>
+
+  <div class="section" id="ch3-4">
+    <h3>3.4 Chiến lược migration với Flyway</h3>
+    <p>Flyway được cấu hình với hai thư mục nguồn: <code>db/migration</code> (schema) và <code>db/seed</code> (dữ liệu mẫu). Các migration schema luôn chạy ở mọi môi trường; các migration seed (V7, V10) chỉ chạy ở môi trường <code>local</code> và <code>dev</code> thông qua Spring profile-specific Flyway configuration (<code>spring.flyway.locations: classpath:db/migration,classpath:db/seed</code>). Cách tiếp cận này đảm bảo môi trường production không bao giờ nhận dữ liệu test. Tại thời điểm viết, schema đã lên tới <strong>V12</strong>.</p>
+
+    <div class="table-wrap">
+      <table>
+        <tr><th>Migration</th><th>Mô tả</th><th>Môi trường</th></tr>
+        <tr><td><code>V1__initial_schema.sql</code></td><td>Toàn bộ schema gốc — users, posts, courses, course_groups, group_members, course_posts, form_templates, form_submissions, course_grades, stored_files</td><td>Tất cả</td></tr>
+        <tr><td><code>V2__admin_users.sql</code></td><td>Bảng admin_users (email/password, dùng chung với myIU-admin)</td><td>Tất cả</td></tr>
+        <tr><td><code>V3__user_provisioning.sql</code></td><td>ALTER users: thêm is_active, ms_tenant_id, provisioned_by, provisioned_at</td><td>Tất cả</td></tr>
+        <tr><td><code>V4__support_tickets.sql</code></td><td>Bảng support_tickets</td><td>Tất cả</td></tr>
+        <tr><td><code>V5__login_sessions.sql</code></td><td>Bảng login_sessions (ip/country/city/browser/os/device_type, is_revoked)</td><td>Tất cả</td></tr>
+        <tr><td><code>V6__course_schedules.sql</code></td><td>Bảng course_schedules</td><td>Tất cả</td></tr>
+        <tr><td><code>V7__seed_data.sql</code></td><td>Dữ liệu mẫu cơ bản (users, courses, groups)</td><td>local / dev</td></tr>
+        <tr><td><code>V8__assignment_submissions.sql</code></td><td>Bảng assignment_submissions (ban đầu thiếu FK course_post_id — xem 5.6)</td><td>Tất cả</td></tr>
+        <tr><td><code>V9__attendance_records.sql</code></td><td>Bảng attendance_records</td><td>Tất cả</td></tr>
+        <tr><td><code>V10__seed_data_extended.sql</code></td><td>Dữ liệu mẫu mở rộng (group_members, schedules, grades, attendance, submissions)</td><td>local / dev</td></tr>
+        <tr><td><code>V11__cascade_user_deletes.sql</code></td><td>7 FK NO ACTION → CASCADE trên users(id); thêm FK còn thiếu cho assignment_submissions.course_post_id</td><td>Tất cả</td></tr>
+        <tr><td><code>V12__login_session_precise_location.sql</code></td><td>Thêm latitude/longitude/province/district/ward vào login_sessions</td><td>Tất cả</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     CHƯƠNG 4: TRIỂN KHAI VÀ KẾT QUẢ
+══════════════════════════════════════════════════════════ -->
+<section class="chapter" id="ch4">
+  <div class="chapter-header">
+    <span class="ch-num">Chương 4</span>
+    <h2>Triển khai và kết quả</h2>
+  </div>
+
+  <div class="section" id="ch4-1">
+    <h3>4.1 Tầng thực thể (Entity Layer)</h3>
+    <p>Lớp entity sử dụng Jakarta Persistence API (JPA) kết hợp với Lombok để giảm thiểu boilerplate. Tất cả entity đều sử dụng <code>GenerationType.UUID</code> — cho phép ứng dụng kiểm soát việc sinh UUID thay vì phụ thuộc vào trigger database.</p>
+
+    <div class="code-block">
+      <div class="code-label"><span class="dot"></span>entity/User.java</div>
+      <pre>@Entity
+@Table(name = "users")
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+public class User {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+
+    @Column(unique = true, nullable = false, length = 100)
+    private String username;
+
+    @Column(unique = true, nullable = false)
+    private String email;
+
+    @Column
+    private String password;           // BCrypt hash; NULL cho tài khoản Microsoft SSO
+
+    @Column(name = "auth_provider", length = 50)
+    private String authProvider = "local";  // 'local' | 'microsoft'
+
+    @Column(name = "ms_tenant_id", length = 100)
+    private String msTenantId;         // Azure AD tenant ID sau khi đăng nhập SSO
+
+    @Column(name = "provisioned_by")
+    private String provisionedBy;      // Email admin thực hiện cung ứng hàng loạt
+
+    @Column(name = "provisioned_at")
+    private Instant provisionedAt;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "user_roles",
+                     joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "role")
+    @Builder.Default
+    private Set&lt;String&gt; roles = new HashSet&lt;&gt;();   // "student" | "lecturer"
+
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private Instant createdAt;
+}</pre>
+    </div>
+    <p>Trường <code>roles</code> sử dụng <code>@ElementCollection(fetch = FetchType.EAGER)</code> — phù hợp vì Spring Security cần load roles ngay khi xác thực người dùng. Vai trò được lưu dạng chuỗi thuần (<code>"student"</code>, <code>"lecturer"</code>) và được tiền tố thành <code>ROLE_student</code>, <code>ROLE_lecturer</code> trong <code>UserDetails</code>, tương thích với <code>@PreAuthorize("hasRole('lecturer')")</code> của Spring Security.</p>
+
+    <p>Entity <code>CourseSchedule</code> dùng <code>FetchType.LAZY</code> cho quan hệ với <code>Course</code> — đây là trung tâm của một sự cố kỹ thuật được phân tích chi tiết ở Chương 5:</p>
+    <div class="code-block">
+      <div class="code-label"><span class="dot"></span>entity/CourseSchedule.java (trích)</div>
+      <pre>@ManyToOne(fetch = FetchType.LAZY)
+@JoinColumn(name = "course_id", nullable = false)
+private Course course;   // LAZY — chỉ tải khi truy cập, cần trong transaction</pre>
+    </div>
+  </div>
+
+  <div class="section" id="ch4-2">
+    <h3>4.2 Tầng dịch vụ (Service Layer) — xử lý @Transactional</h3>
+    <p><code>TimetableService</code> là ví dụ điển hình về cách xử lý LAZY loading đúng cách trong ngữ cảnh <code>open-in-view: false</code>. Phương thức <code>getForUser()</code> cần truy cập quan hệ <code>schedule.getCourse()</code> bên trong <code>toDTO()</code> — nếu không có <code>@Transactional</code>, Hibernate session sẽ đã đóng trước khi luồng thực thi đến đó.</p>
+
+    <div class="code-block">
+      <div class="code-label"><span class="dot"></span>service/TimetableService.java</div>
+      <pre>@Service
+@RequiredArgsConstructor
+public class TimetableService {
+
+    @Transactional(readOnly = true)       // Giữ session mở trong toàn bộ phương thức
+    public List&lt;TimetableEntryDTO&gt; getForUser(UUID userId, Collection&lt;String&gt; roles) {
+        boolean isLecturerOrAdmin = roles.stream()
+                .anyMatch(r -&gt; r.equals("ROLE_LECTURER") || r.equals("ROLE_ADMIN"));
+
+        List&lt;UUID&gt; courseIds;
+        if (isLecturerOrAdmin) {
+            courseIds = courseRepository.findByCreatorId(userId)
+                    .stream().map(Course::getId).toList();
+        } else {
+            // Sinh viên: lấy danh sách khóa học từ bảng group_members
+            courseIds = groupMemberRepository.findByStudentId(userId)
+                    .stream().map(GroupMember::getCourseId).distinct().toList();
+        }
+
+        if (courseIds.isEmpty()) return List.of();
+
+        return scheduleRepository.findByCourseIdIn(courseIds)
+                .stream().map(this::toDTO).toList();  // toDTO() truy cập LAZY course
+    }
+
+    private TimetableEntryDTO toDTO(CourseSchedule s) {
+        return TimetableEntryDTO.builder()
+                .courseName(s.getCourse().getName())    // LAZY — cần transaction còn mở
+                .courseCode(s.getCourse().getCode())
+                .coverColor(s.getCourse().getCoverColor())
+                .dayOfWeek(s.getDayOfWeek())
+                .startTime(s.getStartTime().format(TIME_FMT))
+                .endTime(s.getEndTime().format(TIME_FMT))
+                .room(s.getRoom())
+                .build();
+    }
+}</pre>
+    </div>
+    <p>Annotation <code>@Transactional(readOnly = true)</code> thực hiện hai việc: (1) giữ Hibernate session mở suốt thời gian thực thi phương thức, cho phép LAZY proxy được khởi tạo; (2) tối ưu hoá hiệu năng database — PostgreSQL nhận được hint rằng đây là transaction chỉ đọc và có thể định tuyến đến replica đọc nếu có.</p>
+  </div>
+
+  <div class="section" id="ch4-3">
+    <h3>4.3 Tầng API (Controller Layer)</h3>
+    <p>Controllers trong myIU Portal được thiết kế theo nguyên tắc gầy (<em>thin controllers</em>): chỉ xử lý HTTP, ủy quyền logic nghiệp vụ cho service hoặc trực tiếp cho repository trong các trường hợp CRUD đơn giản.</p>
+
+    <h4>GroupMemberController — truy vấn đa điều kiện</h4>
+    <div class="code-block">
+      <div class="code-label"><span class="dot"></span>controller/GroupMemberController.java</div>
+      <pre>@GetMapping
+public ResponseEntity&lt;ApiResponse&lt;List&lt;GroupMember&gt;&gt;&gt; get(
+        @RequestParam(required = false) UUID groupId,
+        @RequestParam(required = false) UUID courseId,
+        @RequestParam(required = false) UUID studentId) {
+    List&lt;GroupMember&gt; result;
+    if (groupId != null &amp;&amp; studentId != null) {
+        result = groupMemberRepository.findByGroupId(groupId).stream()
+                .filter(m -&gt; m.getStudentId().equals(studentId)).toList();
+    } else if (groupId != null) {
+        result = groupMemberRepository.findByGroupId(groupId);
+    } else if (courseId != null &amp;&amp; studentId != null) {
+        result = groupMemberRepository.findByStudentId(studentId).stream()
+                .filter(m -&gt; m.getCourseId().equals(courseId)).toList();
+    } else if (courseId != null) {
+        result = groupMemberRepository.findByCourseId(courseId);  // Added
+    } else if (studentId != null) {
+        result = groupMemberRepository.findByStudentId(studentId);
+    } else {
+        result = groupMemberRepository.findAll();
+    }
+    return ResponseEntity.ok(ApiResponse.ok(result));
+}</pre>
+    </div>
+    <p>Endpoint này hỗ trợ 5 tổ hợp query parameter khác nhau thông qua một chuỗi điều kiện if-else tường minh. Cách tiếp cận này ưu tiên tính dễ đọc và dự đoán được (<em>explicitness</em>) hơn là tính tổng quát. Phương thức <code>findByCourseId()</code> trong repository là kết quả của một sửa lỗi: thiếu nhánh <code>courseId != null</code> khiến request <code>?courseId=X</code> rơi xuống <code>findAll()</code>, trả về toàn bộ thành viên của mọi nhóm.</p>
+
+    <h4>CourseGroupController — giải quyết LAZY trên controller</h4>
+    <div class="code-block">
+      <div class="code-label"><span class="dot"></span>controller/CourseGroupController.java (trích)</div>
+      <pre>@Transactional(readOnly = true)
+@GetMapping("/lecturer/{lecturerId}/courses")
+public ResponseEntity&lt;ApiResponse&lt;List&lt;Course&gt;&gt;&gt; getLecturerCourses(
+        @PathVariable UUID lecturerId) {
+    List&lt;UUID&gt; courseIds = courseGroupRepository.findByLecturerId(lecturerId)
+            .stream()
+            .map(g -&gt; g.getCourse().getId())   // Truy cập LAZY — cần @Transactional
+            .distinct()
+            .toList();
+    return ResponseEntity.ok(ApiResponse.ok(courseRepository.findAllById(courseIds)));
+}</pre>
+    </div>
+    <p>Đặt <code>@Transactional</code> ở tầng controller thay vì tách ra service là một quyết định có chủ ý — endpoint này đơn giản, không tái sử dụng ở nơi khác, và việc tạo ra một service method chỉ để wrap hai dòng logic sẽ vi phạm nguyên tắc không over-engineer.</p>
+  </div>
+
+  <div class="section" id="ch4-4">
+    <h3>4.4 Giao diện người dùng (React + Vite)</h3>
+    <p>Frontend được xây dựng bằng React 18 với Vite làm build tool, React Query v5 (<code>@tanstack/react-query</code>) quản lý toàn bộ trạng thái server (<em>server state</em>). Kiến trúc này tách biệt rõ ràng giữa UI state (React) và dữ liệu từ API (React Query), tránh các anti-pattern như lưu dữ liệu server vào <code>useState</code>.</p>
+
+    <div class="code-block">
+      <div class="code-label"><span class="dot"></span>src/lib/queriesAndMutations.ts (trích — hooks thời khóa biểu)</div>
+      <pre>export const useGetTimetable = () =&gt;
+    useQuery({
+        queryKey: ['timetable'],
+        queryFn: getTimetable,
+        staleTime: 5 * 60 * 1000,   // Cache 5 phút, không refetch khi tab focus
+    });
+
+export const useGetCourseSchedules = (courseId: string) =&gt;
+    useQuery({
+        queryKey: ['course-schedules', courseId],
+        queryFn: () =&gt; getCourseSchedules(courseId),
+        enabled: !!courseId,         // Chỉ chạy khi có courseId
+    });</pre>
+    </div>
+
+    <p>Component <code>TimetablePage</code> hiển thị thời khóa biểu dạng lưới CSS grid với 6 cột (thứ Hai đến thứ Bảy) và chiều cao cố định 64px mỗi giờ (<code>HOUR_PX = 64</code>). Hàm <code>timeToPx()</code> chuyển đổi giờ học sang toạ độ pixel CSS:</p>
+
+    <div class="code-block">
+      <div class="code-label"><span class="dot"></span>src/pages/TimetablePage.tsx (trích)</div>
+      <pre>const HOUR_PX = 64;
+const START_HOUR = 6;   // 06:00
+
+function timeToPx(time: string): number {
+    const [h, m] = time.split(':').map(Number);
+    return (h - START_HOUR + m / 60) * HOUR_PX;
+}
+
+// Render block thời gian học
+&lt;div
+    className="schedule-block"
+    style={{
+        top: timeToPx(entry.startTime),
+        height: timeToPx(entry.endTime) - timeToPx(entry.startTime),
+        backgroundColor: entry.coverColor + '22',  // alpha 13%
+        borderLeft: `3px solid ${entry.coverColor}`,
+    }}
+&gt;</pre>
+    </div>
+
+    <p>Module <code>AuthContext.tsx</code> quản lý vòng đời xác thực: lưu JWT vào <code>localStorage</code>, inject token vào mọi request qua Axios interceptor, và xử lý luồng đăng xuất Microsoft SSO — redirect đến endpoint Azure AD logout (<code>https://login.microsoftonline.com/{tenant}/oauth2/v2.0/logout</code>) để thu hồi session cả phía Microsoft.</p>
+  </div>
+
+  <div class="section" id="ch4-5">
+    <h3>4.5 Hệ thống quản trị (Admin Panel)</h3>
+    <p>Admin backend là một ứng dụng Spring Boot độc lập (repo <code>myIU-admin</code> riêng, không phải subdirectory của repo này), chạy trên cổng 8081, kết nối cùng một PostgreSQL database với Portal nhưng với <code>ddl-auto: none</code> — không bao giờ tự thay đổi schema.</p>
+
+    <p>Phiên bản đầu của hệ thống có tính năng cung ứng người dùng hàng loạt qua upload file Excel (<code>POST /api/users/provision</code>, xử lý bằng Apache POI). Tính năng này đã <strong>bị gỡ bỏ hoàn toàn</strong> ở cả hai backend trong quá trình phát triển — xem thảo luận ở 5.5 về lý do. Quản trị viên hiện tạo/vô hiệu hóa tài khoản từng người một qua giao diện Users của Admin Panel; các cột audit <code>provisioned_by</code>/<code>provisioned_at</code> trên bảng <code>users</code> (mục 3.2) vẫn được ghi nhận cho mỗi thao tác tạo tài khoản thủ công này.</p>
+
+    <h4>Bảo mật OWASP — HTTP Security Headers</h4>
+    <div class="code-block">
+      <div class="code-label"><span class="dot"></span>myIU-admin/config/SecurityConfig.java (headers trích)</div>
+      <pre>http.headers(headers -&gt; headers
+    .contentSecurityPolicy(csp -&gt; csp.policyDirectives(
+        "default-src 'self'; " +
+        "script-src 'self'; " +
+        "style-src 'self' 'unsafe-inline'; " +
+        "img-src 'self' data:; " +
+        "frame-ancestors 'none'"
+    ))
+    .httpStrictTransportSecurity(hsts -&gt; hsts
+        .maxAgeInSeconds(31536000)
+        .includeSubDomains(true)
+    )
+    .frameOptions(frame -&gt; frame.deny())
+    .referrerPolicy(ref -&gt; ref
+        .policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
+    .permissionsPolicy(pp -&gt; pp.policy(
+        "camera=(), microphone=(), geolocation=()"
+    ))
+);</pre>
+    </div>
+    <p>Admin backend áp dụng bộ đầy đủ OWASP security headers: Content Security Policy ngăn XSS; HSTS buộc HTTPS trong 1 năm; <code>frame-ancestors 'none'</code> trong CSP ngăn clickjacking (kết hợp với <code>X-Frame-Options: DENY</code>); Permissions Policy thu hồi quyền truy cập camera/microphone/geolocation không cần thiết.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     CHƯƠNG 5: THẢO LUẬN VÀ ĐÁNH GIÁ
+══════════════════════════════════════════════════════════ -->
+<section class="chapter" id="ch5">
+  <div class="chapter-header">
+    <span class="ch-num">Chương 5</span>
+    <h2>Thảo luận và đánh giá</h2>
+  </div>
+
+  <div class="section">
+    <h3>5.1 Đánh đổi giữa OSIV=false và @Transactional tường minh</h3>
+    <p>Trong quá trình phát triển, trang thời khóa biểu liên tục trả về danh sách rỗng mặc dù database đã có đủ dữ liệu. Debug cho thấy <code>open-in-view: false</code> kết hợp với việc thiếu <code>@Transactional</code> trên <code>TimetableService.getForUser()</code> dẫn đến <code>LazyInitializationException</code>: Hibernate session đóng trước khi luồng stream mapping gọi đến <code>s.getCourse().getName()</code>. Spring Boot bắt ngoại lệ, trả về HTTP 500, và frontend xử lý lỗi bằng cách hiển thị danh sách rỗng.</p>
+    <p>Cấu hình mặc định của Spring Boot (<code>open-in-view: true</code>) che giấu vấn đề này bằng cách giữ session mở suốt vòng đời request HTTP — một anti-pattern hiệu năng vì session database bị giữ qua cả quá trình serialization JSON, thường tốn thêm 5–50ms. Cấu hình <code>open-in-view: false</code> là thực hành tốt hơn nhưng đòi hỏi kiến thức cụ thể về các điểm cần đặt <code>@Transactional</code>.</p>
+
+    <div class="callout">
+      <strong>Bài học rút ra:</strong> Trong hệ thống có <code>open-in-view: false</code>, mọi service/controller method nào gọi <code>toDTO()</code> hoặc phương thức khác truy cập quan hệ LAZY đều phải được đánh dấu <code>@Transactional(readOnly = true)</code>. Đây là một quy ước không hiện diện trong interface hay signature phương thức, cần được ghi chép rõ ràng trong tài liệu kỹ thuật.
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>5.2 Đánh giá kiến trúc dual-backend</h3>
+    <p>Kiến trúc dual-backend — hai máy chủ Spring Boot cùng chia sẻ một database PostgreSQL — cung cấp nhiều lợi ích: phân tách mối quan tâm (<em>separation of concerns</em>) giữa giao diện người dùng cuối và quản trị hệ thống; hạn chế bề mặt tấn công (admin API không bao giờ tiếp xúc với internet công cộng); khả năng scale độc lập (Portal nhận nhiều traffic hơn Admin).</p>
+    <p>Rủi ro chính là nguy cơ xung đột schema nếu Admin cố ý hoặc vô ý thực hiện DDL. Điều này được ngăn chặn bằng cấu hình <code>ddl-auto: none</code> trên Admin và chỉ cho Portal quyền Flyway. Tuy nhiên, đây là ràng buộc theo quy ước (<em>convention over enforcement</em>) — không có cơ chế kỹ thuật ngăn Admin thực hiện DDL qua SQL thuần. Một giải pháp hoàn thiện hơn là cấp cho Admin database user chỉ có quyền DML (<code>SELECT</code>, <code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code>) nhưng không có quyền DDL.</p>
+  </div>
+
+  <div class="section">
+    <h3>5.3 JWT và quản lý phiên</h3>
+    <p>Hệ thống sử dụng hai lớp thu hồi JWT chồng nhau: JWT blacklist trong bộ nhớ (<code>JwtBlacklistService</code>) cho thu hồi tức thì trên một node, và bảng <code>login_sessions</code> trong database cho thu hồi bền vững và kiểm tra lịch sử. JWT blacklist trong bộ nhớ không được chia sẻ giữa các instance khi scale horizontal — đây là hạn chế cần giải quyết bằng Redis nếu hệ thống được triển khai trên nhiều node.</p>
+  </div>
+
+  <div class="section">
+    <h3>5.4 Hiệu năng và Java 21 Virtual Threads</h3>
+    <p>Ứng dụng kích hoạt <em>Project Loom Virtual Threads</em> qua <code>spring.threads.virtual.enabled: true</code>. Với virtual threads, mỗi request I/O-bound (query database, đọc file) được xử lý trên một carrier thread riêng biệt được quản lý bởi JVM, giúp tăng throughput đáng kể so với thread-per-request truyền thống khi số lượng concurrent request tăng cao mà không tăng số thread hệ điều hành. Đây là tính năng phù hợp cho workload của một portal đại học với nhiều request nhỏ, chờ I/O.</p>
+  </div>
+
+  <div class="section">
+    <h3>5.5 Gỡ bỏ tính năng cung ứng tài khoản qua Excel</h3>
+    <p>Phiên bản đầu triển khai cung ứng tài khoản hàng loạt (<em>bulk user provisioning</em>) qua upload file Excel ở cả hai backend — một tính năng khá điển hình cho các hệ thống quản lý sinh viên. Khi rà soát lại toàn bộ codebase, nhóm phát hiện bản triển khai ở <strong>Portal backend hoàn toàn là dead code</strong>: <code>UserProvisioningService</code> tồn tại nhưng không có controller nào inject và gọi tới nó — tức tính năng chưa từng thực sự chạy được ở phía Portal, chỉ tồn tại ở myIU-admin.</p>
+    <p>Quyết định gỡ bỏ hoàn toàn (thay vì chỉ xóa phần dead code) dựa trên: (1) endpoint duy nhất còn hoạt động (<code>POST /api/users/provision</code> ở Admin) tăng bề mặt tấn công không cần thiết cho một thao tác ít dùng; (2) dependency Apache POI chỉ phục vụ đúng tính năng này; (3) việc tạo/vô hiệu hóa từng tài khoản một qua UI vẫn đáp ứng đủ nhu cầu vận hành thực tế ở quy mô hiện tại. Các cột audit <code>provisioned_by</code>/<code>provisioned_at</code> được giữ nguyên vì vẫn có giá trị truy vết độc lập với cơ chế tạo tài khoản.</p>
+  </div>
+
+  <div class="section">
+    <h3>5.6 Cascade delete và lỗ hổng khóa ngoại bị thiếu</h3>
+    <p>Ban đầu, xóa một người dùng đã từng tạo khóa học, dẫn dắt nhóm lớp, hoặc chấm điểm sẽ thất bại với lỗi 500 chung chung — 7 khóa ngoại tham chiếu <code>users(id)</code> (<code>courses.creator_id</code>, <code>course_groups.lecturer_id</code>, <code>course_posts.author_id</code>, <code>course_grades.graded_by</code>, <code>form_templates.created_by</code>, và 2 khóa ngoại "dữ liệu của chính người dùng" <code>form_submissions.submitter_id</code>, <code>support_tickets.submitter_id</code>) đều ở chế độ <code>ON DELETE NO ACTION</code>.</p>
+    <p>Nhóm phân loại 7 khóa ngoại này thành hai nhóm bản chất khác nhau: (a) <em>dữ liệu thuộc sở hữu riêng</em> của người dùng đó (form_submissions, support_tickets) — xóa kèm là hợp lý; (b) <em>nội dung người dùng tạo ra mà người khác phụ thuộc vào</em> (courses, course_groups, course_posts, course_grades, form_templates) — xóa kèm nghĩa là ảnh hưởng tới dữ liệu của người khác (ví dụ xóa một giảng viên sẽ xóa luôn khóa học và mọi điểm số của sinh viên khác trong khóa đó). Quyết định cuối cùng — cascade toàn bộ cả hai nhóm — được chọn có chủ đích cho ngữ cảnh dữ liệu demo/seed hiện tại của hệ thống, với ghi chú rõ trong tài liệu kỹ thuật rằng quyết định này cần xem lại nếu triển khai với dữ liệu sinh viên thật.</p>
+    <p>Trong lúc kiểm thử cascade delete end-to-end, nhóm phát hiện thêm một lỗ hổng khóa ngoại có sẵn từ trước: <code>assignment_submissions.course_post_id</code> (từ V8) <strong>chưa từng có ràng buộc khóa ngoại nào</strong> — chỉ là cột UUID trơn. Hệ quả: xóa một <code>course_post</code> để lại các dòng <code>assignment_submissions</code> mồ côi, trỏ tới bản ghi không tồn tại, mà không báo lỗi gì. Đã vá bằng cách thêm khóa ngoại <code>ON DELETE CASCADE</code> trong cùng migration V11, sau khi dọn 5 dòng seed data đã mồ côi từ trước không thể tự động thỏa ràng buộc mới.</p>
+  </div>
+
+  <div class="section">
+    <h3>5.7 IP giả mạo qua X-Forwarded-For — lỗ hổng bypass rate-limit</h3>
+    <p><code>IpUtils.extractIp()</code> ban đầu tin tưởng vô điều kiện header <code>X-Forwarded-For</code>/<code>X-Real-IP</code> do client gửi lên, dùng làm khóa cho rate-limit chống brute-force đăng nhập (5 lần/phút/IP) và cho trường IP trong audit log <code>login_sessions</code>. Vì header HTTP hoàn toàn do client kiểm soát, bất kỳ ai gửi request trực tiếp tới backend (bỏ qua reverse proxy, nếu có) đều có thể giả một IP khác nhau ở mỗi request — vô hiệu hóa hoàn toàn rate-limit chống brute-force, đồng thời giả mạo được vị trí đăng nhập hiển thị cho người dùng.</p>
+    <p>Giải pháp: chỉ tin các header này khi peer TCP kết nối trực tiếp (<code>request.getRemoteAddr()</code>, giá trị client không thể giả mạo) là địa chỉ private/loopback — tức request thực sự đi qua reverse proxy nội bộ của hệ thống. Với một peer là địa chỉ public bất kỳ (kịch bản kẻ tấn công kết nối thẳng), header bị bỏ qua hoàn toàn và <code>getRemoteAddr()</code> được dùng trực tiếp. Đây là dạng "trust boundary" phổ biến trong các framework production (Express <code>trust proxy</code>, Nginx <code>real_ip</code> module) nhưng chưa được áp dụng ở phiên bản đầu của hệ thống.</p>
+  </div>
+
+  <div class="section">
+    <h3>5.8 Định vị GPS tùy chọn và một lỗi @Transactional tinh vi</h3>
+    <p>Định vị theo IP (ip-api.com) có giới hạn vật lý ở cấp thành phố — khối IP do ISP cấp phát không đủ mịn để suy ra quận/phường. Để hiển thị vị trí chi tiết hơn trong tính năng quản lý phiên đăng nhập, hệ thống bổ sung một luồng <em>opt-in</em>: sau khi đăng nhập thành công, frontend xin quyền vị trí GPS của trình duyệt một lần; nếu người dùng đồng ý, tọa độ được gửi lên backend và reverse-geocode qua OpenStreetMap Nominatim xuống tới phường/quận/tỉnh. Từ chối quyền thì hệ thống giữ nguyên hành vi cũ (IP-based), không có gì thay đổi.</p>
+    <p>Đáng chú ý, dữ liệu <code>address</code> trả về từ Nominatim <strong>không có field "province" riêng</strong> cho địa chỉ Việt Nam — cấp tỉnh/thành phố chỉ xuất hiện dưới dạng text tự do trong <code>display_name</code>. Sau khi kiểm chứng với toạ độ thật (khuôn viên IU, Quận 1, Bình Thạnh), nhóm nhận ra <code>display_name</code> luôn có cấu trúc nhất quán: sau khi loại bỏ mã bưu chính và tên quốc gia ở cuối chuỗi, 3 phân đoạn cuối cùng luôn đúng thứ tự [phường/xã, quận/huyện hoặc thành phố thuộc tỉnh, tỉnh/thành phố] — nên việc phân tích theo vị trí trong chuỗi cho kết quả đáng tin cậy hơn nhiều so với việc đoán field OSM nào ứng với cấp hành chính nào.</p>
+    <p>Trong lúc kiểm thử tính năng này, nhóm phát hiện nguyên nhân thật của một lỗi đã tồn tại từ trước: <strong>mọi phiên đăng nhập, không ngoại lệ, đều bị kẹt vĩnh viễn ở <code>country = "Resolving"</code></strong> — không phải vì GeoIP lookup chậm, mà vì <code>@Modifying</code> query trong Spring Data JPA <strong>không tự có transaction riêng</strong> như các method CRUD kế thừa từ <code>JpaRepository</code> (<code>save()</code>, <code>findById()</code>). <code>GeoIpService.lookupAndEnrich()</code> chạy <code>@Async</code> trên một thread pool riêng — không kế thừa transaction của thread gọi nó — và gọi <code>sessionRepo.updateGeoLocation(...)</code> mà thiếu <code>@Transactional</code>. Kết quả: mọi lần gọi đều ném <code>jakarta.persistence.TransactionRequiredException</code>, bị try/catch nuốt và chỉ log ở mức DEBUG — không một dấu vết lỗi nào hiển thị trong vận hành bình thường. Chỉ phát hiện được khi query trực tiếp vào database và thấy 100% bản ghi bị ảnh hưởng suốt nhiều tuần liền. Bài học: annotation <code>@Transactional</code> phải đặt <em>ngay trên chính method <code>@Async</code></em>, không phải ở nơi gọi nó — một biến thể ít được nhắc tới của gotcha OSIV=false ở mục 5.1.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     CHƯƠNG 6: KẾT LUẬN
+══════════════════════════════════════════════════════════ -->
+<section class="chapter" id="ch6">
+  <div class="chapter-header">
+    <span class="ch-num">Chương 6</span>
+    <h2>Kết luận và hướng phát triển</h2>
+  </div>
+
+  <div class="section">
+    <h3>6.1 Tóm tắt đóng góp</h3>
+    <p>Đề tài đã thiết kế và triển khai thành công hệ thống myIU Portal — một cổng thông tin sinh viên đại học tích hợp với các tính năng: đăng nhập liên kết qua Microsoft Azure AD, quản lý khóa học và nhóm học, hiển thị thời khóa biểu dạng lưới CSS grid, tường thông tin xã hội học thuật, nộp bài tập, điểm danh và bảng điểm, cùng theo dõi phiên đăng nhập với định vị GPS tùy chọn. Hệ thống được bổ sung bởi admin panel riêng biệt (myIU-admin) với bảo mật OWASP đầy đủ.</p>
+    <p>Về mặt kỹ thuật, đề tài đóng góp: (1) mô hình dual-backend với phân quyền schema ownership rõ ràng; (2) giải pháp thu hồi JWT hai lớp kết hợp in-memory blacklist và persistent session table; (3) chiến lược Flyway multi-location để tách schema migration khỏi seed data theo môi trường; (4) pattern xử lý LazyInitializationException đúng cách trong bối cảnh OSIV=false; (5) mô hình cascade-delete có chủ đích phân loại theo bản chất sở hữu dữ liệu (mục 5.6); (6) cơ chế chống giả mạo IP qua trust boundary dựa trên peer TCP (mục 5.7); (7) luồng định vị GPS opt-in kết hợp reverse geocoding, cùng phát hiện và khắc phục một lỗi <code>@Transactional</code>+<code>@Async</code> tinh vi từng khiến toàn bộ tính năng định vị không hoạt động trong âm thầm suốt nhiều tuần (mục 5.8).</p>
+  </div>
+
+  <div class="section">
+    <h3>6.2 Hướng phát triển</h3>
+    <p>Các hướng mở rộng được xác định cho giai đoạn tiếp theo:</p>
+    <ul>
+      <li><strong>Distributed JWT Blacklist:</strong> Thay thế <code>ConcurrentHashMap</code> bằng Redis để hỗ trợ horizontal scaling và thu hồi token đồng bộ giữa các instance.</li>
+      <li><strong>Phân quyền database:</strong> Tạo hai database user riêng biệt — một cho Portal (DML + DDL) và một cho Admin (DML only) — để đảm bảo tính toàn vẹn schema theo cơ chế kỹ thuật thay vì chỉ theo quy ước (xem 5.2).</li>
+      <li><strong>Kiểm thử tích hợp:</strong> Bổ sung bộ kiểm thử <code>@SpringBootTest</code> với Testcontainers PostgreSQL để xác nhận các truy vấn LAZY và @Transactional hoạt động đúng trên database thực thay vì H2 in-memory — đặc biệt hữu ích để bắt sớm các lỗi dạng mục 5.8 thay vì phát hiện qua kiểm tra thủ công.</li>
+      <li><strong>Module phân tích học tập:</strong> Xây dựng dashboard analytics cho giảng viên dựa trên dữ liệu điểm danh và điểm số hiện có — phục vụ phát hiện sớm sinh viên có nguy cơ bỏ học.</li>
+      <li><strong>Danh sách IP đáng tin cậy tường minh:</strong> Cơ chế trust boundary ở mục 5.7 hiện suy luận "đáng tin" từ việc peer là địa chỉ private/loopback; một allow-list tường minh các IP reverse-proxy (cấu hình qua biến môi trường) sẽ chính xác hơn cho các topology triển khai phức tạp hơn một host.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     TÀI LIỆU THAM KHẢO
+══════════════════════════════════════════════════════════ -->
+<section class="chapter references" id="refs">
+  <div class="chapter-header">
+    <h2>Tài liệu tham khảo</h2>
+  </div>
+  <ol>
+    <li>Hardt, D. (2012). <em>The OAuth 2.0 Authorization Framework</em>. RFC 6749. IETF.</li>
+    <li>Sakimura, N., Bradley, J., Jones, M., de Medeiros, B., &amp; Mortimore, C. (2014). <em>OpenID Connect Core 1.0</em>. OpenID Foundation.</li>
+    <li>Jones, M., Bradley, J., &amp; Sakimura, N. (2015). <em>JSON Web Token (JWT)</em>. RFC 7519. IETF.</li>
+    <li>Spring Framework Team. (2024). <em>Spring Boot Reference Documentation 3.4.x</em>. VMware Tanzu.</li>
+    <li>Hibernate ORM Team. (2024). <em>Hibernate ORM 6.6 User Guide: Fetching Strategies</em>. Red Hat.</li>
+    <li>Moodle. (2024). <em>Moodle Statistics</em>. Retrieved from moodle.org.</li>
+    <li>Instructure. (2024). <em>Canvas LMS Developer Documentation</em>. Instructure Inc.</li>
+    <li>OWASP Foundation. (2024). <em>HTTP Security Response Headers Cheat Sheet</em>. OWASP.</li>
+    <li>Lowe, D. (2023). <em>Project Loom: Fibers and Continuations for the Java Virtual Machine</em>. OpenJDK.</li>
+    <li>Flyway Team. (2024). <em>Flyway Documentation: Concepts and Configuration</em>. Redgate.</li>
+  </ol>
+</section>
+
+</main>
+</div>
+
+<script>
+(function() {
+  var tocLinks = document.querySelectorAll('.toc-list a');
+  var sections = [];
+  tocLinks.forEach(function(a) {
+    var id = a.getAttribute('href').slice(1);
+    var el = document.getElementById(id);
+    if (el) sections.push({ el: el, a: a });
+  });
+
+  function update() {
+    var scrollY = window.scrollY + 80;
+    var active = null;
+    for (var i = 0; i < sections.length; i++) {
+      if (sections[i].el.offsetTop <= scrollY) active = sections[i];
+    }
+    tocLinks.forEach(function(a) { a.classList.remove('active'); });
+    if (active) active.a.classList.add('active');
+  }
+
+  window.addEventListener('scroll', update, { passive: true });
+  update();
+
+  tocLinks.forEach(function(a) {
+    a.addEventListener('click', function(e) {
+      e.preventDefault();
+      var id = a.getAttribute('href').slice(1);
+      var el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+})();
+</script>

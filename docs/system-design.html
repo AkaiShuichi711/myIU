@@ -1,0 +1,1531 @@
+<title>myIU LMS — System Design</title>
+<style>
+:root {
+  --bg:        #0D1117;
+  --surface:   #161B22;
+  --elevated:  #21262D;
+  --border:    #30363D;
+  --accent:    #58A6FF;
+  --accent2:   #3FB950;
+  --accent3:   #F78166;
+  --text:      #E6EDF3;
+  --muted:     #8B949E;
+  --faint:     #484F58;
+
+  --ff-mono: ui-monospace,'Cascadia Code','Source Code Pro',Consolas,'Liberation Mono',monospace;
+  --ff-sans: system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+
+  --r: 6px;
+  --gap: 2rem;
+}
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg:       #FFFFFF;
+    --surface:  #F6F8FA;
+    --elevated: #EAEEF2;
+    --border:   #D0D7DE;
+    --text:     #0D1117;
+    --muted:    #57606A;
+    --faint:    #B0B7BE;
+  }
+}
+:root[data-theme="dark"] {
+  --bg:       #0D1117;
+  --surface:  #161B22;
+  --elevated: #21262D;
+  --border:   #30363D;
+  --text:     #E6EDF3;
+  --muted:    #8B949E;
+  --faint:    #484F58;
+}
+:root[data-theme="light"] {
+  --bg:       #FFFFFF;
+  --surface:  #F6F8FA;
+  --elevated: #EAEEF2;
+  --border:   #D0D7DE;
+  --text:     #0D1117;
+  --muted:    #57606A;
+  --faint:    #B0B7BE;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--ff-sans);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.65;
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  grid-template-rows: auto 1fr;
+  min-height: 100vh;
+}
+
+/* ── TOP BAR ─────────────────────────────── */
+.topbar {
+  grid-column: 1 / -1;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 2rem;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: .625rem;
+  text-decoration: none;
+}
+.topbar-logo {
+  width: 28px;
+  height: 28px;
+  background: var(--accent);
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+.topbar-logo svg { width: 16px; height: 16px; }
+.topbar-title {
+  font-family: var(--ff-mono);
+  font-size: .875rem;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+.topbar-meta {
+  font-family: var(--ff-mono);
+  font-size: .75rem;
+  color: var(--muted);
+}
+.theme-btn {
+  background: var(--elevated);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: 6px;
+  padding: .25rem .625rem;
+  font-size: .75rem;
+  cursor: pointer;
+  font-family: var(--ff-mono);
+  transition: color .15s, border-color .15s;
+}
+.theme-btn:hover { color: var(--text); border-color: var(--accent); }
+
+/* ── SIDEBAR ─────────────────────────────── */
+.sidebar {
+  grid-column: 1;
+  border-right: 1px solid var(--border);
+  padding: 1.5rem 0;
+  position: sticky;
+  top: 56px;
+  height: calc(100vh - 56px);
+  overflow-y: auto;
+}
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+.nav-section { margin-bottom: 1.25rem; }
+.nav-section-label {
+  font-family: var(--ff-mono);
+  font-size: .7rem;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--faint);
+  padding: 0 1.25rem;
+  margin-bottom: .375rem;
+}
+.nav-link {
+  display: block;
+  padding: .3rem 1.25rem;
+  font-size: .8125rem;
+  color: var(--muted);
+  text-decoration: none;
+  border-left: 2px solid transparent;
+  transition: color .12s, border-color .12s, background .12s;
+  line-height: 1.4;
+}
+.nav-link:hover, .nav-link.active {
+  color: var(--text);
+  border-left-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+.nav-link span {
+  font-family: var(--ff-mono);
+  font-size: .7rem;
+  color: var(--faint);
+  margin-right: .375rem;
+}
+
+/* ── MAIN ────────────────────────────────── */
+main {
+  grid-column: 2;
+  padding: 2.5rem 3rem 6rem;
+  max-width: 960px;
+}
+
+/* ── PAGE HEADER ─────────────────────────── */
+.page-header { margin-bottom: 3rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border); }
+.page-eyebrow {
+  font-family: var(--ff-mono);
+  font-size: .75rem;
+  font-weight: 500;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: .625rem;
+}
+.page-title {
+  font-family: var(--ff-mono);
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.2;
+  text-wrap: balance;
+  margin-bottom: .75rem;
+}
+.page-desc {
+  font-size: .9375rem;
+  color: var(--muted);
+  max-width: 60ch;
+  line-height: 1.7;
+}
+.system-badges { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1.25rem; }
+.badge {
+  font-family: var(--ff-mono);
+  font-size: .7rem;
+  padding: .25rem .625rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  white-space: nowrap;
+}
+.badge.accent { border-color: color-mix(in srgb, var(--accent) 40%, transparent); color: var(--accent); }
+.badge.green  { border-color: color-mix(in srgb, var(--accent2) 40%, transparent); color: var(--accent2); }
+.badge.red    { border-color: color-mix(in srgb, var(--accent3) 40%, transparent); color: var(--accent3); }
+
+/* ── SECTIONS ────────────────────────────── */
+.doc-section {
+  margin-bottom: 4rem;
+  scroll-margin-top: 72px;
+}
+.section-header {
+  display: flex;
+  align-items: baseline;
+  gap: .75rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+.section-num {
+  font-family: var(--ff-mono);
+  font-size: .8125rem;
+  color: var(--accent);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.section-title {
+  font-family: var(--ff-mono);
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.section-sub {
+  font-size: .8125rem;
+  color: var(--muted);
+  margin-top: .125rem;
+}
+
+/* ── DIAGRAM ARTICLES ────────────────────── */
+.diagram-article {
+  margin-bottom: 2.5rem;
+  scroll-margin-top: 72px;
+}
+.diagram-label {
+  display: flex;
+  align-items: center;
+  gap: .625rem;
+  margin-bottom: 1rem;
+}
+.diagram-num {
+  font-family: var(--ff-mono);
+  font-size: .7rem;
+  color: var(--muted);
+  background: var(--elevated);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: .125rem .5rem;
+}
+.diagram-title {
+  font-family: var(--ff-mono);
+  font-size: .9375rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.diagram-desc {
+  font-size: .875rem;
+  color: var(--muted);
+  margin-bottom: 1rem;
+  max-width: 72ch;
+  line-height: 1.6;
+}
+.diagram-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow-x: auto;
+  padding: 2rem;
+  min-height: 120px;
+}
+.diagram-wrap::-webkit-scrollbar { height: 6px; }
+.diagram-wrap::-webkit-scrollbar-track { background: transparent; }
+.diagram-wrap::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+.diagram-wrap .mermaid { min-width: max-content; }
+
+/* ── INFO TABLE ──────────────────────────── */
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+.info-cell {
+  background: var(--surface);
+  padding: .875rem 1.25rem;
+}
+.info-cell-label {
+  font-family: var(--ff-mono);
+  font-size: .7rem;
+  font-weight: 600;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin-bottom: .375rem;
+}
+.info-cell-value {
+  font-size: .875rem;
+  color: var(--text);
+}
+.info-cell-value code {
+  font-family: var(--ff-mono);
+  font-size: .8125rem;
+  color: var(--accent);
+}
+
+/* ── MERMAID OVERRIDE ────────────────────── */
+.mermaid svg { max-width: 100%; height: auto; }
+
+@media (max-width: 900px) {
+  body { grid-template-columns: 1fr; }
+  .sidebar { display: none; }
+  main { grid-column: 1; padding: 1.5rem 1.25rem 4rem; }
+  .topbar { padding: 0 1.25rem; }
+  .info-grid { grid-template-columns: 1fr; }
+}
+
+@media print {
+  body { display: block; }
+  .sidebar, .topbar, .theme-btn { display: none; }
+  main { max-width: 100%; padding: 1rem; }
+  .diagram-wrap { break-inside: avoid; }
+}
+</style>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <a class="topbar-brand" href="#">
+    <div class="topbar-logo">
+      <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="2" width="5" height="5" rx="1" fill="white"/>
+        <rect x="9" y="2" width="5" height="5" rx="1" fill="white" opacity=".6"/>
+        <rect x="2" y="9" width="5" height="5" rx="1" fill="white" opacity=".6"/>
+        <rect x="9" y="9" width="5" height="5" rx="1" fill="white" opacity=".3"/>
+      </svg>
+    </div>
+    <span class="topbar-title">myIU LMS / system-design</span>
+  </a>
+  <div style="display:flex;align-items:center;gap:1rem">
+    <span class="topbar-meta">v2.0 · 2026-08</span>
+    <button class="theme-btn" id="themeBtn">Toggle theme</button>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<nav class="sidebar" aria-label="Document navigation">
+  <div class="nav-section">
+    <div class="nav-section-label">Overview</div>
+    <a class="nav-link" href="#overview"><span>—</span>Introduction</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-label">1 · Requirement Analysis</div>
+    <a class="nav-link" href="#s1-1"><span>1.1</span>Activity — Auth</a>
+    <a class="nav-link" href="#s1-2"><span>1.2</span>Activity — Assignment</a>
+    <a class="nav-link" href="#s1-3"><span>1.3</span>Activity — Forms</a>
+    <a class="nav-link" href="#s1-4"><span>1.4</span>Use Case Diagram</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-label">2 · System Architecture</div>
+    <a class="nav-link" href="#s2-1"><span>2.1</span>Architecture Diagram</a>
+    <a class="nav-link" href="#s2-2"><span>2.2</span>Deployment Diagram</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-label">3 · Detailed Design</div>
+    <a class="nav-link" href="#s3-1"><span>3.1</span>Class Diagram</a>
+    <a class="nav-link" href="#s3-2"><span>3.2</span>Sequence — SSO Login</a>
+    <a class="nav-link" href="#s3-3"><span>3.3</span>Sequence — Assignment</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-label">4 · Data Design</div>
+    <a class="nav-link" href="#s4-1"><span>4.1</span>ERD — Core Academic</a>
+    <a class="nav-link" href="#s4-2"><span>4.2</span>ERD — Platform</a>
+    <a class="nav-link" href="#s4-3"><span>4.3</span>DFD Level 0</a>
+    <a class="nav-link" href="#s4-4"><span>4.4</span>DFD Level 1</a>
+  </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main>
+
+  <!-- PAGE HEADER -->
+  <div class="page-header" id="overview">
+    <p class="page-eyebrow">myIU Portal · Software Engineering Document</p>
+    <h1 class="page-title">System Design Document</h1>
+    <p class="page-desc">
+      Tài liệu thiết kế hệ thống toàn diện cho <strong>myIU LMS</strong> — nền tảng quản lý học tập cấp đại học gồm hai ứng dụng độc lập: <em>Portal</em> dành cho sinh viên/giảng viên và <em>Admin Panel</em> dành cho quản trị viên, giao tiếp qua REST API và cơ sở dữ liệu PostgreSQL chung.
+    </p>
+    <div class="system-badges">
+      <span class="badge accent">Java 21 · Spring Boot 3.4</span>
+      <span class="badge accent">React 18 · TypeScript · Vite</span>
+      <span class="badge green">PostgreSQL · Flyway</span>
+      <span class="badge green">Portal :8080 · Admin :8081</span>
+      <span class="badge red">Microsoft SSO OAuth2</span>
+      <span class="badge">Docker · Nginx</span>
+    </div>
+
+    <div class="info-grid" style="margin-top:1.5rem">
+      <div class="info-cell">
+        <div class="info-cell-label">Portal (myIU)</div>
+        <div class="info-cell-value">Backend <code>:8080</code> · Frontend <code>:5173</code> · Auth: Microsoft SSO</div>
+      </div>
+      <div class="info-cell">
+        <div class="info-cell-label">Admin (myIU-admin)</div>
+        <div class="info-cell-value">Backend <code>:8081</code> · Frontend <code>:3000</code> · Auth: email/password JWT</div>
+      </div>
+      <div class="info-cell">
+        <div class="info-cell-label">Database</div>
+        <div class="info-cell-value">PostgreSQL <code>myiu_local / myiu_dev / myiu_prod</code> · Schema owned by Portal (Flyway)</div>
+      </div>
+      <div class="info-cell">
+        <div class="info-cell-label">Shared Infrastructure</div>
+        <div class="info-cell-value">Caffeine cache · JWT blacklist · Bucket4j rate-limit · Virtual threads (Loom)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       SECTION 1 — REQUIREMENT ANALYSIS
+  ════════════════════════════════════════ -->
+  <section class="doc-section" id="s1">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <div>
+        <div class="section-title">Requirement Analysis</div>
+        <div class="section-sub">Mô hình hóa luồng nghiệp vụ và các ca sử dụng của hệ thống</div>
+      </div>
+    </div>
+
+    <!-- 1.1 Activity: Auth -->
+    <article class="diagram-article" id="s1-1">
+      <div class="diagram-label">
+        <span class="diagram-num">1.1</span>
+        <span class="diagram-title">Activity Diagram — Student Authentication (Microsoft SSO)</span>
+      </div>
+      <p class="diagram-desc">Luồng xác thực người dùng qua OAuth2 với Microsoft Azure AD. JWT được phát hành sau khi đồng bộ profile và tạo LoginSession.</p>
+      <div class="diagram-wrap">
+        <pre class="mermaid">
+flowchart TD
+    Start(["fa:fa-circle Start"]) --> A["User visits Portal"]
+    A --> B{"JWT valid\nin localStorage?"}
+    B -->|"Yes"| C["Load Home Page"]
+    B -->|"No"| D["Show Sign-in page"]
+    D --> E["Click 'Sign in with Microsoft'"]
+    E --> F["Redirect → Microsoft OAuth2\nAuthorization Endpoint"]
+    F --> G{"Credentials\nvalid?"}
+    G -->|"Fail"| H["Microsoft shows error"]
+    H --> D
+    G -->|"Success"| I["Callback with authorization code"]
+    I --> J["Exchange code for access token\nPOST /oauth2/token"]
+    J --> K["Fetch profile via MS Graph API\nGET /v1.0/me"]
+    K --> L{"User exists\nin DB?"}
+    L -->|"No"| M["INSERT User\n(authProvider = microsoft)"]
+    L -->|"Yes"| N["UPDATE lastLogin"]
+    M --> N
+    N --> O["INSERT LoginSession\n(ip, deviceInfo, userAgent)"]
+    O --> P["Issue JWT 24h\n(claims: userId, roles, jti)"]
+    P --> Q["Store JWT in localStorage"]
+    Q --> C
+    C --> End(["fa:fa-circle-stop End"])
+
+    style Start fill:#58A6FF,stroke:none,color:#0D1117
+    style End fill:#3FB950,stroke:none,color:#0D1117
+    style M fill:#21262D,stroke:#F78166
+    style N fill:#21262D,stroke:#58A6FF
+        </pre>
+      </div>
+    </article>
+
+    <!-- 1.2 Activity: Assignment -->
+    <article class="diagram-article" id="s1-2">
+      <div class="diagram-label">
+        <span class="diagram-num">1.2</span>
+        <span class="diagram-title">Activity Diagram — Assignment Submission & Grading Lifecycle</span>
+      </div>
+      <p class="diagram-desc">Vòng đời hoàn chỉnh từ khi sinh viên nộp bài đến khi giảng viên chấm điểm và gửi thông báo kết quả.</p>
+      <div class="diagram-wrap">
+        <pre class="mermaid">
+flowchart TD
+    S(["Start"]) --> A["Student opens Course"]
+    A --> B["GET /api/courses/{id}/posts"]
+    B --> C["Select Assignment post"]
+    C --> D{"Already\nsubmitted?"}
+    D -->|"Yes"| E["View submission + score"]
+    D -->|"No"| F["Click 'Submit Assignment'"]
+    F --> G["Upload file / enter text"]
+    G --> H["POST /api/storage/upload"]
+    H --> I["POST /api/assignment-submissions\n{ coursePostId, fileUrl }"]
+    I --> J{"@Valid\npasses?"}
+    J -->|"No"| K["Show field-level errors"]
+    K --> G
+    J -->|"Yes"| L["INSERT AssignmentSubmission\nstatus = submitted"]
+    L --> M["NotificationService.notifyLecturer()"]
+    M --> N["INSERT Notification for Lecturer\n+ STOMP WebSocket push"]
+    N --> O["Student sees 'Submitted' status"]
+    O --> P["Lecturer receives notification"]
+    P --> Q["GET /api/assignment-submissions\n?coursePostId=..."]
+    Q --> R["Lecturer enters score 0–100"]
+    R --> T["PUT /api/assignment-submissions/{id}/grade\n@PreAuthorize hasRole('lecturer')"]
+    T --> U["UPDATE score, gradedBy, gradedAt"]
+    U --> V["NotificationService.notifyStudent()"]
+    V --> W["INSERT Notification for Student\n+ STOMP WebSocket push"]
+    W --> E
+    E --> End(["End"])
+
+    style S fill:#58A6FF,stroke:none,color:#0D1117
+    style End fill:#3FB950,stroke:none,color:#0D1117
+    style L fill:#21262D,stroke:#3FB950
+    style T fill:#21262D,stroke:#58A6FF
+        </pre>
+      </div>
+    </article>
+
+    <!-- 1.3 Activity: Forms -->
+    <article class="diagram-article" id="s1-3">
+      <div class="diagram-label">
+        <span class="diagram-num">1.3</span>
+        <span class="diagram-title">Activity Diagram — Form Submission & Admin Approval</span>
+      </div>
+      <p class="diagram-desc">Quy trình nộp và xét duyệt biểu mẫu (học bổng, phúc khảo, miễn học...) với vòng duyệt qua Admin Panel.</p>
+      <div class="diagram-wrap">
+        <pre class="mermaid">
+flowchart TD
+    S(["Start"]) --> A["Student opens /forms"]
+    A --> B["GET /api/form/templates — list active templates"]
+    B --> C["Select form template"]
+    C --> D["Fill in dynamic fields\n(rendered from JSON schema)"]
+    D --> E{"Attach file?"}
+    E -->|"Yes"| F["POST /api/storage/upload"]
+    E -->|"No"| G
+    F --> G["POST /api/form/submissions\n{ templateId, data, attachmentUrl }"]
+    G --> H{"Validation\npasses?"}
+    H -->|"No"| I["Show inline errors"]
+    I --> D
+    H -->|"Yes"| J["INSERT FormSubmission\nstatus = pending (default column)"]
+    J --> K["Notification → Admin / Approver role"]
+    K --> L["Submission status: pending"]
+    L --> M["Admin sees list in Admin Panel"]
+    M --> N["Review content + attachments"]
+    N --> O{"Decision"}
+    O -->|"Approve"| P["PUT /submissions/{id}/status\nstatus = approved"]
+    O -->|"Reject"| Q["PUT /submissions/{id}/status\nstatus = rejected + rejectionReason"]
+    P --> T["Notify student of outcome"]
+    Q --> T
+    T --> U["Student views result in /forms"]
+    U --> End(["End"])
+
+    style S fill:#58A6FF,stroke:none,color:#0D1117
+    style End fill:#3FB950,stroke:none,color:#0D1117
+    style P fill:#21262D,stroke:#3FB950
+    style Q fill:#21262D,stroke:#F78166
+        </pre>
+      </div>
+    </article>
+
+    <!-- 1.4 Use Case -->
+    <article class="diagram-article" id="s1-4">
+      <div class="diagram-label">
+        <span class="diagram-num">1.4</span>
+        <span class="diagram-title">Use Case Diagram — Full System</span>
+      </div>
+      <p class="diagram-desc">Tổng quan tất cả actors và ca sử dụng của cả hai ứng dụng Portal và Admin Panel.</p>
+      <div class="diagram-wrap">
+        <pre class="mermaid">
+graph LR
+    SV((Student))
+    GV((Lecturer))
+    AD((Admin))
+    MS((Microsoft\nAzure AD))
+
+    subgraph Portal["Portal System — myIU (:8080)"]
+        direction TB
+        UC1["Sign in via Microsoft SSO"]
+        UC2["View timetable"]
+        UC3["Browse courses"]
+        UC4["View course materials"]
+        UC5["Submit assignment"]
+        UC6["View attendance records"]
+        UC7["Check grades"]
+        UC8["Social feed / Posts"]
+        UC9["Submit forms"]
+        UC10["File support ticket"]
+        UC11["Manage profile"]
+        UC12["Create course posts"]
+        UC13["Grade assignments"]
+        UC14["Mark attendance"]
+        UC15["Manage course groups"]
+        UC16["JWT logout"]
+    end
+
+    subgraph Admin["Admin Panel — myIU-admin (:8081)"]
+        direction TB
+        UC17["Sign in with email/password"]
+        UC18["Manage users (create/edit/deactivate/delete)"]
+        UC20["Manage courses"]
+        UC21["Moderate content"]
+        UC22["Handle support tickets"]
+        UC23["Broadcast notifications"]
+        UC24["Monitor login sessions + revoke"]
+        UC25["View dashboard stats"]
+        UC26["Review form submissions"]
+        UC27["Manage grades"]
+    end
+
+    SV --> UC1 & UC2 & UC3 & UC4 & UC5 & UC6 & UC7 & UC8 & UC9 & UC10 & UC11 & UC16
+    GV --> UC1 & UC3 & UC4 & UC8 & UC11 & UC12 & UC13 & UC14 & UC15 & UC16
+    AD --> UC17 & UC18 & UC20 & UC21 & UC22 & UC23 & UC24 & UC25 & UC26 & UC27
+    UC1 -.->|"OAuth2 callback"| MS
+        </pre>
+      </div>
+    </article>
+  </section>
+
+  <!-- ════════════════════════════════════════
+       SECTION 2 — SYSTEM ARCHITECTURE
+  ════════════════════════════════════════ -->
+  <section class="doc-section" id="s2">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <div>
+        <div class="section-title">System Architecture</div>
+        <div class="section-sub">Kiến trúc phân tầng và topology triển khai</div>
+      </div>
+    </div>
+
+    <!-- 2.1 Architecture -->
+    <article class="diagram-article" id="s2-1">
+      <div class="diagram-label">
+        <span class="diagram-num">2.1</span>
+        <span class="diagram-title">Architecture Diagram — C4 Container Level</span>
+      </div>
+      <p class="diagram-desc">Hai ứng dụng hoàn toàn độc lập, giao tiếp qua REST API và chia sẻ cùng một PostgreSQL instance. Không có shared code trực tiếp.</p>
+      <div class="diagram-wrap">
+        <pre class="mermaid">
+graph TB
+    subgraph Clients["Client Layer"]
+        B1["Student / Lecturer\nWeb Browser"]
+        B2["Admin\nWeb Browser"]
+    end
+
+    subgraph PortalApp["myIU Portal"]
+        direction LR
+        FE1["Portal Frontend\nReact 18 · Vite\nPort :5173"]
+        BE1["Portal Backend\nSpring Boot 3.4\nPort :8080\n\nJWT · SSO · WebSocket\nRate Limit · Cache\nFlyway · Actuator"]
+    end
+
+    subgraph AdminApp["myIU Admin Panel"]
+        direction LR
+        FE2["Admin Frontend\nReact 18 · Vite\nPort :3000"]
+        BE2["Admin Backend\nSpring Boot 3.4\nPort :8081\n\nJWT · Bucket4j\nCaffeine Cache\nActuator"]
+    end
+
+    subgraph DataLayer["Data Layer"]
+        PG[("PostgreSQL 16\nmyiu_{env}\nFlyway migrations\nby Portal")]
+    end
+
+    subgraph External["External Services"]
+        MS["Microsoft Azure AD\nOAuth2 / Graph API"]
+        SMTP["SMTP Server\nEmail notifications"]
+        FS["File Storage\n/uploads volume"]
+        GEO["ip-api.com\nIP → city/country"]
+        NOM["Nominatim (OSM)\nGPS → ward/district/province\nopt-in only"]
+    end
+
+    B1 -->|"HTTPS"| FE1
+    B2 -->|"HTTPS"| FE2
+    FE1 -->|"REST /api/**"| BE1
+    FE2 -->|"REST /api/**"| BE2
+    BE1 -->|"JDBC"| PG
+    BE2 -->|"JDBC"| PG
+    BE1 -->|"OAuth2"| MS
+    BE1 -->|"JavaMail"| SMTP
+    BE1 -->|"MultipartFile"| FS
+    BE2 -->|"MultipartFile"| FS
+    BE1 -->|"HTTP async"| GEO
+    BE1 -->|"HTTP async, opt-in"| NOM
+
+    style PortalApp fill:#161B22,stroke:#58A6FF,color:#E6EDF3
+    style AdminApp fill:#161B22,stroke:#3FB950,color:#E6EDF3
+    style DataLayer fill:#161B22,stroke:#F0A83A,color:#E6EDF3
+    style External fill:#161B22,stroke:#8B949E,color:#E6EDF3
+        </pre>
+      </div>
+    </article>
+
+    <!-- 2.2 Deployment -->
+    <article class="diagram-article" id="s2-2">
+      <div class="diagram-label">
+        <span class="diagram-num">2.2</span>
+        <span class="diagram-title">Deployment Diagram — Docker Compose Production</span>
+      </div>
+      <p class="diagram-desc">Tất cả services chạy trong Docker containers trên cùng một host, kết nối qua bridge network <code>myiu-net</code>. Nginx làm reverse proxy và xử lý SSL termination.</p>
+      <div class="diagram-wrap">
+        <pre class="mermaid">
+graph TB
+    subgraph Internet
+        U["End Users\nHTTPS :443"]
+    end
+
+    subgraph Host["Production Server"]
+        subgraph NginxProxy["Nginx Reverse Proxy — :80/:443"]
+            NG["SSL Termination\nPath-based Routing\n/api/** → backends\n/* → frontends"]
+        end
+
+        subgraph DockerNet["Docker Bridge: myiu-net"]
+            subgraph PortalStack["Portal Stack"]
+                P_FE["portal-frontend\nnginx:alpine\nStatic build :80\n→ host :5173"]
+                P_BE["portal-backend\nopenjdk:21-slim\nSpring Boot :8080"]
+            end
+
+            subgraph AdminStack["Admin Stack"]
+                A_FE["admin-frontend\nnginx:alpine\nStatic build :80\n→ host :3000"]
+                A_BE["admin-backend\nopenjdk:21-slim\nSpring Boot :8081"]
+            end
+
+            DB["postgres:16-alpine\n:5432\nmyiu_prod"]
+        end
+
+        subgraph Volumes["Named Volumes"]
+            V1[("postgres_data")]
+            V2[("portal_uploads")]
+            V3[("admin_uploads")]
+        end
+    end
+
+    subgraph ExtSrv["External Services"]
+        AZ["Azure AD\noauth2.windows.net"]
+        ML["SMTP\nmail server"]
+    end
+
+    U --> NG
+    NG --> P_FE & P_BE & A_FE & A_BE
+    P_BE --> DB
+    A_BE --> DB
+    DB -.->|"bind mount"| V1
+    P_BE -.->|"bind mount"| V2
+    A_BE -.->|"bind mount"| V3
+    P_BE --> AZ & ML
+
+    style PortalStack fill:#21262D,stroke:#58A6FF
+    style AdminStack fill:#21262D,stroke:#3FB950
+    style DockerNet fill:#161B22,stroke:#30363D
+        </pre>
+      </div>
+    </article>
+  </section>
+
+  <!-- ════════════════════════════════════════
+       SECTION 3 — DETAILED DESIGN
+  ════════════════════════════════════════ -->
+  <section class="doc-section" id="s3">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <div>
+        <div class="section-title">Detailed Design</div>
+        <div class="section-sub">Cấu trúc lớp domain và luồng tương tác giữa các thành phần</div>
+      </div>
+    </div>
+
+    <!-- 3.1 Class Diagram -->
+    <article class="diagram-article" id="s3-1">
+      <div class="diagram-label">
+        <span class="diagram-num">3.1</span>
+        <span class="diagram-title">Class Diagram — Core Academic Domain</span>
+      </div>
+      <p class="diagram-desc">Các entity và relationship cốt lõi trong domain học thuật: người dùng, khóa học, nhóm lớp, bài tập, điểm danh, và bảng điểm.</p>
+      <div class="diagram-wrap">
+        <pre class="mermaid">
+classDiagram
+    class User {
+        +UUID id
+        +String email
+        +String name
+        +String username
+        +Set~String~ roles
+        +String authProvider
+        +boolean isActive
+        +Instant provisionedAt
+        +String provisionedBy
+    }
+    class Course {
+        +UUID id
+        +String name
+        +String code
+        +String description
+        +int credits
+        +String semester
+        +boolean isActive
+        +UUID lecturerId
+    }
+    class CourseGroup {
+        +UUID id
+        +UUID courseId
+        +UUID lecturerId
+        +String name
+        +int maxStudents
+        +String room
+    }
+    class GroupMember {
+        +UUID id
+        +UUID groupId
+        +UUID courseId
+        +UUID studentId
+        +Instant enrolledAt
+    }
+    class CoursePost {
+        +UUID id
+        +UUID courseId
+        +UUID groupId
+        +UUID authorId
+        +String title
+        +String content
+        +String type
+        +Instant dueDate
+    }
+    class AssignmentSubmission {
+        +UUID id
+        +UUID coursePostId
+        +UUID studentId
+        +String content
+        +String attachmentUrl
+        +Double score
+        +UUID gradedBy
+        +Instant gradedAt
+        +Instant submittedAt
+    }
+    class Attendance {
+        +UUID id
+        +UUID groupId
+        +UUID courseId
+        +UUID studentId
+        +UUID markedBy
+        +LocalDate sessionDate
+        +String status
+    }
+    class CourseGrade {
+        +UUID id
+        +UUID courseId
+        +UUID studentId
+        +Double quiz
+        +Double exercise
+        +Double lab
+        +Double midterm
+        +Double project
+        +Double finalScore
+        +Instant updatedAt
+    }
+    class CourseSchedule {
+        +UUID id
+        +UUID courseId
+        +UUID groupId
+        +String dayOfWeek
+        +String startTime
+        +String endTime
+        +String room
+    }
+    class LoginSession {
+        +UUID id
+        +UUID userId
+        +String ipAddress
+        +String country
+        +String city
+        +String countryCode
+        +Double latitude
+        +Double longitude
+        +String province
+        +String district
+        +String ward
+        +String browser
+        +String browserVersion
+        +String os
+        +String deviceType
+        +boolean revoked
+        +Instant createdAt
+        +Instant lastActive
+    }
+    class Notification {
+        +UUID id
+        +UUID userId
+        +String type
+        +String title
+        +String message
+        +boolean isRead
+        +String relatedId
+    }
+    class SupportTicket {
+        +UUID id
+        +UUID submitterId
+        +String service
+        +String need
+        +String description
+        +String status
+        +String response
+        +UUID resolvedBy
+    }
+
+    User "1" --> "0..*" CourseGroup : "leads (lecturer)"
+    Course "1" --> "1..*" CourseGroup : "has sections"
+    CourseGroup "1" --> "0..*" GroupMember : "contains"
+    User "1" --> "0..*" GroupMember : "enrolled as student"
+    Course "1" --> "0..*" CoursePost : "publishes"
+    CoursePost "1" --> "0..*" AssignmentSubmission : "receives"
+    User "1" --> "0..*" AssignmentSubmission : "submits"
+    CourseGroup "1" --> "0..*" Attendance : "tracks"
+    User "1" --> "0..*" Attendance : "has records"
+    Course "1" --> "0..*" CourseGrade : "has"
+    User "1" --> "0..*" CourseGrade : "earns"
+    Course "1" --> "0..*" CourseSchedule : "runs on"
+    User "1" --> "0..*" LoginSession : "maintains"
+    User "1" --> "0..*" Notification : "receives"
+    User "1" --> "0..*" SupportTicket : "files"
+        </pre>
+      </div>
+    </article>
+
+    <!-- 3.2 Sequence: SSO Login -->
+    <article class="diagram-article" id="s3-2">
+      <div class="diagram-label">
+        <span class="diagram-num">3.2</span>
+        <span class="diagram-title">Sequence Diagram — Microsoft SSO Login</span>
+      </div>
+      <p class="diagram-desc">Luồng chi tiết xác thực OAuth2 PKCE với Azure AD, đồng bộ profile, và phát hành JWT tích hợp RequestIdFilter và LoginSession.</p>
+      <div class="diagram-wrap">
+        <pre class="mermaid">
+sequenceDiagram
+    actor U as User (Browser)
+    participant FE as Portal Frontend :5173
+    participant BE as Portal Backend :8080
+    participant RF as RequestIdFilter
+    participant JF as JwtAuthFilter
+    participant AZ as Microsoft Azure AD
+    participant DB as PostgreSQL
+    participant SS as SessionService
+
+    U->>FE: Navigate to portal URL
+    FE->>FE: Check JWT in localStorage
+    FE->>U: Render /sign-in page
+    U->>FE: Click "Sign in with Microsoft"
+    FE->>AZ: Redirect to /oauth2/authorize?response_type=code&client_id=...
+
+    AZ->>U: Show Microsoft login UI
+    U->>AZ: Enter credentials
+    AZ->>BE: GET /login/oauth2/code/azure?code=AUTH_CODE
+    Note over BE,AZ: Spring Security OAuth2 Login handles callback
+
+    BE->>RF: Request enters filter chain
+    RF->>RF: Generate or read X-Request-ID
+    RF->>RF: MDC.put("requestId", id)
+
+    BE->>AZ: POST /oauth2/token — exchange code
+    AZ->>BE: access_token + id_token
+    BE->>AZ: GET /v1.0/me (Graph API)
+    AZ->>BE: { email, displayName, id }
+
+    BE->>DB: findByEmail(email)
+    alt New user
+        DB-->>BE: empty
+        BE->>DB: INSERT user (authProvider=microsoft, roles=[student])
+        DB-->>BE: saved User entity
+    else Existing user
+        DB-->>BE: User entity
+    end
+
+    BE->>SS: createSession(userId, ip, userAgent)
+    SS->>DB: INSERT login_sessions
+    BE->>BE: JwtTokenProvider.generate(userId, roles, jti=UUID)
+    BE->>FE: Redirect with JWT in URL fragment / cookie
+    FE->>FE: Store JWT → localStorage
+    FE->>BE: GET /api/auth/me (Authorization: Bearer JWT)
+
+    BE->>JF: Validate JWT
+    JF->>JF: isRevoked(jti)? — JwtBlacklistService
+    JF->>JF: Verify signature + expiry
+    JF->>BE: Authentication set in SecurityContext
+
+    BE->>DB: findById(userId)
+    DB-->>BE: User
+    BE->>FE: 200 { id, name, email, roles }
+    FE->>U: Render Home page
+        </pre>
+      </div>
+    </article>
+
+    <!-- 3.3 Sequence: Assignment -->
+    <article class="diagram-article" id="s3-3">
+      <div class="diagram-label">
+        <span class="diagram-num">3.3</span>
+        <span class="diagram-title">Sequence Diagram — Assignment Submission & Grading</span>
+      </div>
+      <p class="diagram-desc">Tương tác đầy đủ giữa sinh viên, giảng viên, backend, và notification system trong vòng đời một bài tập.</p>
+      <div class="diagram-wrap">
+        <pre class="mermaid">
+sequenceDiagram
+    actor SV as Student
+    actor GV as Lecturer
+    participant FE as Frontend :5173
+    participant BE as Backend :8080
+    participant ST as StorageService
+    participant DB as PostgreSQL
+    participant NS as NotificationService
+    participant WS as WebSocket (STOMP)
+
+    SV->>FE: Open course → select assignment post
+    FE->>BE: GET /api/courses/{id}/posts (Bearer JWT)
+    BE->>DB: findByCourseId + joinFetch submissions by studentId
+    DB-->>BE: List CoursePost + submission status
+    BE-->>FE: 200 posts[]
+
+    FE->>SV: Show assignment with "Submit" button
+    SV->>FE: Select file + click Submit
+    FE->>BE: POST /api/storage/upload (multipart/form-data)
+    BE->>ST: store(file) → generate storedName
+    ST->>DB: INSERT stored_files
+    DB-->>ST: StoredFile
+    ST-->>BE: fileUrl
+    BE-->>FE: 200 { fileUrl }
+
+    FE->>BE: POST /api/assignment-submissions\n{ coursePostId, content, attachmentUrl }
+    Note over BE: @Valid — constraints checked\n@PreAuthorize authenticated
+    BE->>DB: INSERT assignment_submissions (status=submitted)
+    DB-->>BE: saved submission (id)
+    BE->>NS: notifyLecturer(post.authorId, submissionId)
+    NS->>DB: INSERT notifications (userId=lecturerId)
+    NS->>WS: convertAndSendToUser(lecturerId, payload)
+    WS-->>GV: Real-time notification
+    BE-->>FE: 201 Created { submission }
+    FE->>SV: Show "Submitted" badge
+
+    Note over GV: Lecturer reviews later
+    GV->>FE: Open submission list
+    FE->>BE: GET /api/assignment-submissions?coursePostId=X
+    BE->>DB: findByPostId
+    DB-->>BE: List submissions
+    BE-->>FE: 200 submissions[]
+    GV->>FE: Enter score 85 → click Grade
+    FE->>BE: PUT /api/assignment-submissions/{id}/grade\n{ score: 85.0 }
+    Note over BE: @PreAuthorize hasRole('lecturer')
+    BE->>DB: UPDATE score=85, gradedBy, gradedAt
+    DB-->>BE: updated
+    BE->>NS: notifyStudent(submission.studentId, score)
+    NS->>DB: INSERT notifications (userId=studentId)
+    NS->>WS: convertAndSendToUser(studentId, payload)
+    WS-->>SV: Real-time grade notification
+    BE-->>FE: 200 OK
+        </pre>
+      </div>
+    </article>
+  </section>
+
+  <!-- ════════════════════════════════════════
+       SECTION 4 — DATA DESIGN
+  ════════════════════════════════════════ -->
+  <section class="doc-section" id="s4">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <div>
+        <div class="section-title">Data Design</div>
+        <div class="section-sub">ERD và luồng dữ liệu qua các tiến trình hệ thống</div>
+      </div>
+    </div>
+
+    <!-- 4.1 ERD: Academic Core -->
+    <article class="diagram-article" id="s4-1">
+      <div class="diagram-label">
+        <span class="diagram-num">4.1</span>
+        <span class="diagram-title">ERD — Core Academic Domain</span>
+      </div>
+      <p class="diagram-desc">Các bảng liên quan đến quản lý học thuật: người dùng, khóa học, nhóm lớp, bài tập, điểm danh, và lịch học.</p>
+      <div class="diagram-wrap">
+        <pre class="mermaid">
+erDiagram
+    USER {
+        uuid id PK
+        string email UK
+        string name
+        string username UK
+        string roles
+        string auth_provider
+        boolean is_active
+        string provisioned_by
+        timestamp provisioned_at
+        timestamp created_at
+    }
+    COURSE {
+        uuid id PK
+        string name
+        string code UK
+        string description
+        int credits
+        string semester
+        boolean is_active
+        uuid lecturer_id FK
+        timestamp created_at
+    }
+    COURSE_GROUP {
+        uuid id PK
+        uuid course_id FK
+        uuid lecturer_id FK
+        string name
+        int max_students
+        string room
+        timestamp created_at
+    }
+    GROUP_MEMBER {
+        uuid id PK
+        uuid group_id FK
+        uuid course_id FK
+        uuid student_id FK
+        timestamp enrolled_at
+    }
+    COURSE_POST {
+        uuid id PK
+        uuid course_id FK
+        uuid group_id FK
+        uuid author_id FK
+        string title
+        text content
+        string type
+        timestamp due_date
+        timestamp created_at
+    }
+    ASSIGNMENT_SUBMISSION {
+        uuid id PK
+        uuid course_post_id FK
+        uuid student_id FK
+        text content
+        string attachment_url
+        decimal score
+        uuid graded_by FK
+        timestamp graded_at
+        timestamp submitted_at
+    }
+    ATTENDANCE {
+        uuid id PK
+        uuid group_id FK
+        uuid course_id FK
+        uuid student_id FK
+        uuid marked_by FK
+        date session_date
+        string status
+        timestamp created_at
+    }
+    COURSE_GRADE {
+        uuid id PK
+        uuid course_id FK
+        uuid student_id FK
+        decimal quiz
+        decimal exercise
+        decimal lab
+        decimal midterm
+        decimal project
+        decimal final_score
+        timestamp updated_at
+    }
+    COURSE_SCHEDULE {
+        uuid id PK
+        uuid course_id FK
+        uuid group_id FK
+        string day_of_week
+        string start_time
+        string end_time
+        string room
+    }
+
+    USER ||--o{ COURSE : "teaches"
+    USER ||--o{ COURSE_GROUP : "leads"
+    USER ||--o{ GROUP_MEMBER : "enrolled"
+    COURSE ||--|{ COURSE_GROUP : "sectioned into"
+    COURSE_GROUP ||--o{ GROUP_MEMBER : "contains"
+    COURSE ||--o{ COURSE_POST : "publishes"
+    COURSE_POST ||--o{ ASSIGNMENT_SUBMISSION : "receives"
+    USER ||--o{ ASSIGNMENT_SUBMISSION : "submits"
+    COURSE_GROUP ||--o{ ATTENDANCE : "tracks"
+    USER ||--o{ ATTENDANCE : "recorded for"
+    COURSE ||--o{ COURSE_GRADE : "grades"
+    USER ||--o{ COURSE_GRADE : "earns"
+    COURSE ||--o{ COURSE_SCHEDULE : "scheduled in"
+    COURSE_GROUP ||--o{ COURSE_SCHEDULE : "uses room"
+        </pre>
+      </div>
+    </article>
+
+    <!-- 4.2 ERD: Platform -->
+    <article class="diagram-article" id="s4-2">
+      <div class="diagram-label">
+        <span class="diagram-num">4.2</span>
+        <span class="diagram-title">ERD — Platform & Support Domain</span>
+      </div>
+      <p class="diagram-desc">Các bảng hạ tầng: social feed, thông báo, phiên đăng nhập, biểu mẫu, hỗ trợ kỹ thuật, và lưu trữ file.</p>
+      <div class="diagram-wrap">
+        <pre class="mermaid">
+erDiagram
+    USER {
+        uuid id PK
+        string email UK
+        string name
+        string roles
+    }
+    POST {
+        uuid id PK
+        uuid author_id FK
+        text caption
+        string location
+        int likes_count
+        timestamp created_at
+    }
+    POST_MEDIA {
+        uuid id PK
+        uuid post_id FK
+        string url
+        string type
+    }
+    COMMENT {
+        uuid id PK
+        uuid post_id FK
+        uuid author_id FK
+        text body
+        timestamp created_at
+    }
+    SAVE {
+        uuid id PK
+        uuid user_id FK
+        uuid post_id FK
+        timestamp saved_at
+    }
+    NOTIFICATION {
+        uuid id PK
+        uuid user_id FK
+        string type
+        string title
+        text message
+        boolean is_read
+        string related_id
+        timestamp created_at
+    }
+    LOGIN_SESSION {
+        uuid id PK
+        uuid user_id FK
+        string ip_address
+        string country
+        string city
+        string country_code
+        double latitude "opt-in GPS, nullable"
+        double longitude "opt-in GPS, nullable"
+        string province "reverse-geocoded, nullable"
+        string district "reverse-geocoded, nullable"
+        string ward "reverse-geocoded, nullable"
+        string browser
+        string browser_version
+        string os
+        string device_type
+        text raw_user_agent
+        boolean is_revoked
+        timestamp created_at
+        timestamp last_active
+    }
+    FORM_TEMPLATE {
+        uuid id PK
+        string title
+        text description
+        json fields
+        boolean is_active
+        uuid created_by FK
+        timestamp created_at
+    }
+    FORM_SUBMISSION {
+        uuid id PK
+        uuid template_id FK
+        uuid submitter_id FK
+        json data
+        string status
+        uuid reviewed_by FK
+        timestamp reviewed_at
+        timestamp created_at
+    }
+    SUPPORT_TICKET {
+        uuid id PK
+        uuid submitter_id FK
+        string service
+        string need
+        text description
+        string attachment_url
+        string status
+        text response
+        uuid resolved_by FK
+        timestamp created_at
+        timestamp updated_at
+    }
+    STORED_FILE {
+        uuid id PK
+        string original_name
+        string stored_name
+        string content_type
+        long size
+        uuid uploaded_by FK
+        timestamp uploaded_at
+    }
+
+    USER ||--o{ POST : "creates"
+    POST ||--o{ POST_MEDIA : "has"
+    POST ||--o{ COMMENT : "receives"
+    POST ||--o{ SAVE : "saved by"
+    USER ||--o{ COMMENT : "writes"
+    USER ||--o{ SAVE : "bookmarks"
+    USER ||--o{ NOTIFICATION : "receives"
+    USER ||--o{ LOGIN_SESSION : "opens"
+    FORM_TEMPLATE ||--o{ FORM_SUBMISSION : "receives"
+    USER ||--o{ FORM_SUBMISSION : "submits"
+    USER ||--o{ SUPPORT_TICKET : "files"
+    USER ||--o{ STORED_FILE : "uploads"
+        </pre>
+      </div>
+    </article>
+
+    <!-- 4.3 DFD Level 0 -->
+    <article class="diagram-article" id="s4-3">
+      <div class="diagram-label">
+        <span class="diagram-num">4.3</span>
+        <span class="diagram-title">DFD Level 0 — Context Diagram</span>
+      </div>
+      <p class="diagram-desc">Sơ đồ ngữ cảnh tổng quan: hệ thống myIU LMS như một black box với các luồng dữ liệu đến từ/đến external entities.</p>
+      <div class="diagram-wrap">
+        <pre class="mermaid">
+flowchart LR
+    SV["fa:fa-user Student"]
+    GV["fa:fa-chalkboard-teacher Lecturer"]
+    AD["fa:fa-user-shield Admin"]
+    MS["fa:fa-microsoft Microsoft\nAzure AD"]
+    SMTP["fa:fa-envelope SMTP\nServer"]
+
+    SYS(["myIU LMS\nSystem"])
+
+    SV -->|"Login request\nCourse access, Submissions\nForm requests, Support tickets"| SYS
+    SYS -->|"Course content, Grades\nAttendance, Notifications\nForm results"| SV
+
+    GV -->|"Login request\nCourse materials\nGrade entries, Attendance marks"| SYS
+    SYS -->|"Submission alerts\nCourse reports\nStudent data"| GV
+
+    AD -->|"Admin credentials\nUser account data\nSystem config"| SYS
+    SYS -->|"Analytics, Dashboard stats\nAudit logs, Session data"| AD
+
+    MS -->|"Authorization code\nAccess token, User profile"| SYS
+    SYS -->|"OAuth2 authorization request"| MS
+
+    SYS -->|"Notification emails\nPassword reset links"| SMTP
+
+    style SYS fill:#21262D,stroke:#58A6FF,color:#E6EDF3,font-size:14px
+        </pre>
+      </div>
+    </article>
+
+    <!-- 4.4 DFD Level 1 -->
+    <article class="diagram-article" id="s4-4">
+      <div class="diagram-label">
+        <span class="diagram-num">4.4</span>
+        <span class="diagram-title">DFD Level 1 — Process Decomposition</span>
+      </div>
+      <p class="diagram-desc">Phân rã hệ thống thành 7 tiến trình chính với các data stores được chia sẻ. Mỗi tiến trình tương ứng với một service cluster trong backend.</p>
+      <div class="diagram-wrap">
+        <pre class="mermaid">
+flowchart TD
+    SV(["Student"])
+    GV(["Lecturer"])
+    AD(["Admin"])
+    MS(["Microsoft AD"])
+
+    P1(["1.0\nAuth &\nSession Mgmt"])
+    P2(["2.0\nCourse &\nEnrollment"])
+    P3(["3.0\nLearning\nActivities"])
+    P4(["4.0\nContent &\nSocial"])
+    P5(["5.0\nNotification\nService"])
+    P6(["6.0\nUser\nManagement"])
+    P7(["7.0\nSupport &\nForms"])
+
+    D1[("D1\nUsers")]
+    D2[("D2\nCourses\n& Groups")]
+    D3[("D3\nSubmissions\n& Grades")]
+    D4[("D4\nNotifications")]
+    D5[("D5\nSessions")]
+    D6[("D6\nPosts &\nContent")]
+    D7[("D7\nForms &\nTickets")]
+
+    SV & GV -->|"Credentials"| P1
+    P1 <-->|"OAuth2"| MS
+    P1 -->|"Read/Write"| D1
+    P1 -->|"Write"| D5
+
+    AD -->|"Admin JWT"| P6
+    P6 -->|"Create/Update"| D1
+
+    AD & GV -->|"Course data"| P2
+    P2 <-->|"Read/Write"| D2
+    D1 -->|"User refs"| P2
+
+    SV & GV -->|"Submissions\nGrades, Attendance"| P3
+    P3 <-->|"Read/Write"| D3
+    D2 -->|"Course refs"| P3
+    D1 -->|"User refs"| P3
+
+    SV & GV -->|"Posts, Comments"| P4
+    P4 <-->|"Read/Write"| D6
+    D1 -->|"Author refs"| P4
+
+    P3 -->|"Grade events"| P5
+    P2 -->|"Enrollment events"| P5
+    P4 -->|"Comment events"| P5
+    P5 -->|"Write"| D4
+    D4 -->|"Pull"| SV
+    D4 -->|"Pull"| GV
+    P5 -->|"STOMP push"| SV & GV
+
+    SV -->|"Ticket, Form data"| P7
+    AD -->|"Review actions"| P7
+    P7 <-->|"Read/Write"| D7
+    D1 -->|"User refs"| P7
+
+    style P1 fill:#21262D,stroke:#58A6FF
+    style P2 fill:#21262D,stroke:#3FB950
+    style P3 fill:#21262D,stroke:#F78166
+    style P4 fill:#21262D,stroke:#D2A8FF
+    style P5 fill:#21262D,stroke:#F0A83A
+    style P6 fill:#21262D,stroke:#58A6FF
+    style P7 fill:#21262D,stroke:#8B949E
+        </pre>
+      </div>
+    </article>
+
+  </section>
+</main>
+
+<script>
+  // ── Mermaid init ───────────────────────────
+  const mermaidScript = document.createElement('script')
+  mermaidScript.src = 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js'
+  mermaidScript.onload = () => {
+    const dark = document.documentElement.getAttribute('data-theme') === 'dark' ||
+      (window.matchMedia('(prefers-color-scheme: dark)').matches &&
+       document.documentElement.getAttribute('data-theme') !== 'light')
+
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: dark ? 'dark' : 'default',
+      securityLevel: 'loose',
+      fontFamily: "ui-monospace,'Cascadia Code','Source Code Pro',Consolas,monospace",
+      fontSize: 13,
+      flowchart: { htmlLabels: true, curve: 'basis', padding: 20 },
+      sequence: { actorMargin: 60, messageMargin: 40, mirrorActors: false },
+      er: { diagramPadding: 30, layoutDirection: 'TB', minEntityWidth: 100 },
+      themeVariables: dark ? {
+        primaryColor: '#21262D',
+        primaryTextColor: '#E6EDF3',
+        primaryBorderColor: '#58A6FF',
+        lineColor: '#58A6FF',
+        secondaryColor: '#161B22',
+        tertiaryColor: '#0D1117',
+        background: '#0D1117',
+        mainBkg: '#21262D',
+        nodeBorder: '#30363D',
+        clusterBkg: '#161B22',
+        clusterBorder: '#30363D',
+        titleColor: '#E6EDF3',
+        edgeLabelBackground: '#21262D',
+        actorBkg: '#21262D',
+        actorBorder: '#58A6FF',
+        actorTextColor: '#E6EDF3',
+        activationBkgColor: '#30363D',
+        noteBorderColor: '#F0A83A',
+        noteBkgColor: '#21262D',
+        noteTextColor: '#E6EDF3',
+      } : {
+        primaryColor: '#EAF2FF',
+        primaryTextColor: '#0D1117',
+        primaryBorderColor: '#0969DA',
+        lineColor: '#0969DA',
+        secondaryColor: '#F6F8FA',
+        background: '#FFFFFF',
+        actorBkg: '#EAF2FF',
+        actorBorder: '#0969DA',
+        actorTextColor: '#0D1117',
+      }
+    })
+  }
+  document.head.appendChild(mermaidScript)
+
+  // ── Theme toggle ───────────────────────────
+  const btn = document.getElementById('themeBtn')
+  function getCurrentTheme() {
+    const attr = document.documentElement.getAttribute('data-theme')
+    if (attr) return attr
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+  }
+  btn.addEventListener('click', () => {
+    const next = getCurrentTheme() === 'dark' ? 'light' : 'dark'
+    document.documentElement.setAttribute('data-theme', next)
+    btn.textContent = next === 'dark' ? 'Light mode' : 'Dark mode'
+  })
+
+  // ── Active nav link on scroll ──────────────
+  const sections = document.querySelectorAll('[id]')
+  const navLinks = document.querySelectorAll('.nav-link')
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        navLinks.forEach(l => l.classList.remove('active'))
+        const a = document.querySelector(`.nav-link[href="#${e.target.id}"]`)
+        if (a) a.classList.add('active')
+      }
+    })
+  }, { rootMargin: '-56px 0px -70% 0px' })
+  sections.forEach(s => observer.observe(s))
+</script>
