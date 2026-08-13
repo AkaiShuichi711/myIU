@@ -32,13 +32,11 @@ All `/api/*` routes require `Authorization: Bearer <jwt>` unless noted as Public
 
 ---
 
-### Admin Auth (Email/Password)
+### Admin Auth
 
-| Method | Path | Auth | Description |
-|---|---|---|---|
-| POST | `/api/admin/auth/setup` | Public (first time only) | Create the first admin account |
-| POST | `/api/admin/auth/login` | Public | Admin login |
-| GET | `/api/admin/auth/me` | Admin Bearer JWT | Get current admin info |
+Not part of this backend. Admin login (email/password) is handled entirely by the separate
+**myIU-admin** app (its own repo, `POST /api/auth/login` on port 8081) — see
+[../../myIU-admin/README.md](../../myIU-admin/README.md#authentication).
 
 ---
 
@@ -79,27 +77,6 @@ All endpoints below require `Admin Bearer JWT` (`hasRole('admin')`).
 ```json
 { "response": "Your request has been processed.", "status": "resolved" }
 ```
-
-### User Provisioning
-
-| Method | Path | Description |
-|---|---|---|
-| POST | `/api/admin/provision` | Upload Excel to bulk create/deactivate users (field: `file`) |
-
-Response:
-```json
-{
-  "data": {
-    "createAttempted": 5, "createSucceeded": 4, "createSkipped": 1, "createLimitHit": false,
-    "deleteAttempted": 2, "deleteSucceeded": 2, "deleteSkipped": 0, "deleteLimitHit": false,
-    "created": ["student1@iu.edu.vn"],
-    "deactivated": ["old@iu.edu.vn"],
-    "errors": []
-  }
-}
-```
-
----
 
 ## Users
 
@@ -342,7 +319,9 @@ Meta-style "Where you're logged in" — view and revoke sessions.
 |---|---|---|---|
 | GET | `/api/sessions` | Bearer JWT | List all sessions for current user |
 | DELETE | `/api/sessions/:id` | Bearer JWT | Revoke a specific session |
-| DELETE | `/api/sessions` | Bearer JWT | Revoke all other sessions |
+| DELETE | `/api/sessions/others` | Bearer JWT | Revoke every session except the one used for this request |
+| PUT | `/api/sessions/heartbeat` | Bearer JWT | Bump `lastActive` on the current session |
+| PUT | `/api/sessions/current/location` | Bearer JWT | Report browser GPS coords for the current session (opt-in, fire-and-forget) |
 
 **GET /api/sessions** response:
 ```json
@@ -353,6 +332,9 @@ Meta-style "Where you're logged in" — view and revoke sessions.
     "country": "Vietnam",
     "city": "Ho Chi Minh City",
     "countryCode": "VN",
+    "province": "Thành phố Hồ Chí Minh",
+    "district": "Thành phố Thủ Đức",
+    "ward": "Phường Sài Gòn",
     "browser": "Chrome",
     "browserVersion": "125.0",
     "os": "Windows 11",
@@ -365,13 +347,21 @@ Meta-style "Where you're logged in" — view and revoke sessions.
 ```
 
 `current: true` = session used to make this request.
-`country`/`city` may be `"Resolving"` for a few seconds after login (async GeoIP).
+`country`/`city` show `"Resolving"` for a moment after login (async IP lookup), then settle to the
+real value or `"Local Network"`/`"Unknown"`.
+`province`/`district`/`ward` are `null` unless the user granted the browser's location permission
+prompt after login — see `frontend/src/hooks/geoLocation.ts`. When present, prefer them over
+country/city for display (they're the more precise value, not a duplicate of it).
 
-**DELETE /api/sessions** — revoke all other sessions:
+**PUT /api/sessions/current/location** request:
 ```json
-{ "revokedCount": 3 }
+{ "latitude": 10.7717843, "longitude": 106.7040446 }
 ```
+Always responds `200 OK` regardless of outcome (fire-and-forget by design — never surfaces an error
+to the user). Scoped to the caller's own current session; silently no-ops if the session doesn't
+belong to the caller.
 
+**DELETE /api/sessions/:id** and **DELETE /api/sessions/others** both respond `{ "message": "...", "data": null }`.
 Revoked sessions receive `401` on next request → frontend auto-redirects to `/sign-in?reason=session_expired`.
 
 ---
@@ -480,7 +470,7 @@ After a failed Microsoft login, the frontend receives `?error=<code>`:
 
 | Error Code | Meaning |
 |---|---|
-| `not_provisioned` | Email not in database — admin must add via Excel |
-| `account_inactive` | User was deactivated via Excel Delete sheet |
+| `not_provisioned` | Email not in database — admin must create the account first |
+| `account_inactive` | User was deactivated by an admin |
 | `no_email` | Microsoft didn't return an email address |
 | `oauth2` | Generic OAuth2 failure |

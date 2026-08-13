@@ -48,14 +48,6 @@ frontend/src/
   │   └── forms/
   │       └── SignInForm.tsx
   │
-  ├── _admin/                 # Admin panel — route /admin/* (JWT-protected)
-  │   ├── AdminLoginPage.tsx
-  │   ├── AdminLayout.tsx     # Sidebar nav: Dashboard · Users · Support · Provision
-  │   ├── AdminDashboard.tsx  # Live stats (users/courses/tickets) từ /api/admin/stats
-  │   ├── AdminUsersPage.tsx  # User list, search, activate/deactivate
-  │   ├── AdminProvisionPage.tsx  # Excel upload → /api/admin/provision
-  │   └── AdminSupportPage.tsx    # Ticket list, filter by status, respond
-  │
   ├── _root/
   │   ├── RootLayout.tsx      # Layout chính (sidebar + topbar)
   │   └── pages/
@@ -87,11 +79,13 @@ frontend/src/
   │   └── courses.ts          # INPUT_CLS và hằng số khóa học
   │
   ├── context/
-  │   ├── AuthContext.tsx          # User JWT + profile context
-  │   └── AdminAuthContext.tsx     # Admin JWT context
+  │   └── AuthContext.tsx          # User JWT + profile context
   │
   ├── hooks/
-  │   └── useNotificationSocket.ts  # WebSocket / STOMP hook
+  │   ├── useNotificationSocket.ts  # WebSocket / STOMP hook
+  │   ├── useDebounce.ts
+  │   └── geoLocation.ts            # requestAndReportGeoLocation() — xin quyền GPS 1 lần sau login,
+  │                                 #   gửi lên backend nếu người dùng đồng ý (từ chối thì bỏ qua)
   │
   ├── lib/
   │   ├── appwrite/
@@ -128,13 +122,12 @@ frontend/src/
 - **Đăng nhập Microsoft SSO** — MSAL + OAuth2 redirect flow
 - **Thông báo real-time** — WebSocket STOMP qua SockJS; bell icon với unread count
 - **Đa ngôn ngữ** — Tiếng Việt và English (i18next + Google Translate widget)
-- **Quản lý phiên** — Xem và thu hồi sessions (meta-style) trong Settings
+- **Quản lý phiên** — Xem và thu hồi sessions (meta-style) trong Settings. Sau khi login, xin quyền
+  vị trí browser 1 lần — nếu đồng ý, vị trí hiện tới phường/quận/tỉnh thay vì chỉ thành phố (IP-based)
 
-### Admin panel (`/admin`)
-- **Dashboard** — Live stats: tổng users, courses, tickets
-- **Quản lý người dùng** — Tìm kiếm, activate/deactivate tài khoản
-- **Support tickets** — Xem tất cả tickets, filter by status, respond và close
-- **Provisioning** — Upload Excel để tạo/vô hiệu hóa users hàng loạt
+> **Không có admin panel trong repo này.** Có tồn tại 1 thiết kế cũ nhúng admin ở route `/admin`
+> (`_admin/`, `AdminAuthContext.tsx`, endpoint `/api/admin/*`) nhưng đã bị thay thế hoàn toàn bởi app
+> riêng **myIU-admin** (repo khác, port 3000/8081) — không còn tồn tại trong source hiện tại.
 
 ## Build production
 
