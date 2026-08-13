@@ -402,6 +402,17 @@ export async function sessionHeartbeat() {
   try { await api.put('/api/sessions/heartbeat'); } catch { /* ignore */ }
 }
 
+/**
+ * Reports browser GPS coordinates for the current session so the backend
+ * can reverse-geocode down to province/district/ward (IP lookup alone only
+ * ever reaches city level). Silent no-op on any failure — this is a
+ * best-effort enrichment, never something that should surface an error to
+ * the user or block anything.
+ */
+export async function reportSessionLocation(latitude: number, longitude: number) {
+  try { await api.put('/api/sessions/current/location', { latitude, longitude }); } catch { /* ignore */ }
+}
+
 // ─── FORM TEMPLATES ───────────────────────────────────────────────────────────
 
 export async function getFormTemplates() {

@@ -30,4 +30,18 @@ public interface LoginSessionRepository extends JpaRepository<LoginSession, UUID
                            @Param("country") String country,
                            @Param("city") String city,
                            @Param("code") String countryCode);
+
+    @Modifying
+    @Query("""
+           UPDATE LoginSession s SET s.latitude = :lat, s.longitude = :lng,
+                  s.province = :province, s.district = :district, s.ward = :ward
+           WHERE s.id = :id AND s.userId = :userId
+           """)
+    int updatePreciseLocation(@Param("id") UUID id,
+                              @Param("userId") UUID userId,
+                              @Param("lat") double lat,
+                              @Param("lng") double lng,
+                              @Param("province") String province,
+                              @Param("district") String district,
+                              @Param("ward") String ward);
 }

@@ -15,6 +15,11 @@ type LoginSession = {
   country?: string;
   city?: string;
   countryCode?: string;
+  // Precise location — only present if the user granted browser GPS
+  // permission after login; reverse-geocoded down to province/district/ward.
+  province?: string;
+  district?: string;
+  ward?: string;
   browser?: string;
   browserVersion?: string;
   os?: string;
@@ -35,10 +40,19 @@ function SessionCard({ s, onRevoke, revoking }: { s: LoginSession; onRevoke: (id
   const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
 
-  const hasLocation = s.city && s.city !== 'Unknown' && s.city !== 'Local';
   const isLocal = s.city === 'Local' || s.country === 'Local Network';
-  const locationStr = isLocal
+  const isResolving = s.city === 'Resolving' || s.country === 'Resolving';
+  const hasLocation = s.city && s.city !== 'Unknown' && s.city !== 'Local';
+
+  // Precise (ward → district → province) wins over IP-based city/country
+  // whenever the user granted browser location permission after login.
+  const preciseParts = [s.ward, s.district, s.province].filter(Boolean);
+  const locationStr = preciseParts.length > 0
+    ? preciseParts.join(', ')
+    : isLocal
     ? 'Mạng nội bộ'
+    : isResolving
+    ? 'Đang xác định...'
     : hasLocation ? `${s.city}${s.countryCode ? `, ${s.country}` : ''}` : s.country || 'Không xác định';
 
   const timeStr = s.lastActive
