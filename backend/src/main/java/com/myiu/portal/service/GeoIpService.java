@@ -140,8 +140,13 @@ public class GeoIpService {
      */
     public AddressDetail reverseGeocode(double lat, double lng) {
         try {
+            // Locale.US pinned deliberately: String.format("%f", ...) is locale-sensitive
+            // and would emit "10,77" instead of "10.77" under a comma-decimal locale
+            // (e.g. a server running with LANG=vi_VN or de_DE), silently corrupting the
+            // query string. Never happened on this dev machine (JVM default is en_US)
+            // but would break reverse geocoding outright wherever it isn't.
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(String.format(
+                    .uri(URI.create(String.format(java.util.Locale.US,
                             "https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=%f&lon=%f&addressdetails=1&accept-language=vi&zoom=18",
                             lat, lng)))
                     .header("User-Agent", "myIU-Portal/1.0 (student university portal; contact: admin@iu.edu.vn)")
@@ -166,6 +171,18 @@ public class GeoIpService {
             String district = at(segments, segments.size() - 2);
             String ward = firstNonBlank(address, "suburb", "quarter", "neighbourhood", "village", "hamlet");
             if (ward == null) ward = at(segments, segments.size() - 3);
+
+            // Not every address actually has 3 real tiers — some wards sit
+            // directly under the province post-restructuring, with no
+            // separate "thành phố thuộc tỉnh" in between. When that happens,
+            // the positional read for district lands on the same segment as
+            // ward (confirmed with a real duplicate: "Phường Bình Thạnh,
+            // Phường Bình Thạnh, Thành phố Hồ Chí Minh"). Drop it rather than
+            // show the same value twice.
+            if (district != null && district.equalsIgnoreCase(ward)) district = null;
+            // Same guard, other direction — a 2-segment display_name (ward absent,
+            // just [district-ish, province]) can leave district == province instead.
+            if (district != null && district.equalsIgnoreCase(province)) district = null;
 
             return new AddressDetail(province, district, ward);
         } catch (Exception e) {
