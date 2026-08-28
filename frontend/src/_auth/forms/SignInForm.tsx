@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
@@ -36,31 +36,31 @@ const SignInForm = () => {
   };
 
   return (
-    <div className="flex flex-col items-center">
-      <div className="relative bg-white px-8 py-8 w-[400px] max-w-full rounded-2xl overflow-hidden" style={{ boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}>
+    <div className="flex w-full max-w-[400px] flex-col items-center">
+      <div className="w-full rounded-[28px] bg-white/90 px-9 py-10 shadow-[0_30px_80px_-20px_rgba(2,6,23,0.55)] ring-1 ring-black/[0.04] backdrop-blur-2xl">
         {/* Logo */}
-        <div className="flex justify-center mb-6">
-          <img src="/assets/images/logo_beforesignin.svg" alt="myIU" className="max-w-full h-auto" />
+        <div className="mb-6 flex justify-center">
+          <img src="/assets/images/logo_beforesignin.svg" alt="myIU" className="h-auto w-[190px] max-w-full" />
         </div>
 
         {/* Title */}
-        <p className="text-center text-[#000000] font-bold text-lg mb-1">
+        <p className="mb-1 text-center text-[19px] font-semibold tracking-tight text-[#0A1128]">
           {t("auth.signInTitle")}
         </p>
-        <p className="text-center text-gray-500 text-sm mb-8">
+        <p className="mb-8 text-center text-[13px] text-slate-500">
           {t("auth.microsoftOnly", "Use your IU Microsoft 365 account")}
         </p>
 
         {/* Info message (e.g. session revoked from another device) */}
         {infoMsg && (
-          <div className="mb-4 px-4 py-3 rounded-md bg-amber-50 border border-amber-200 text-amber-700 text-sm">
+          <div className="mb-4 rounded-xl bg-amber-50 px-4 py-2.5 text-center text-[13px] text-amber-700">
             {infoMsg}
           </div>
         )}
 
         {/* Error message */}
         {errorMsg && (
-          <div className="mb-4 px-4 py-3 rounded-md bg-red-50 border border-red-200 text-red-700 text-sm">
+          <div className="mb-4 rounded-xl bg-red-50 px-4 py-2.5 text-center text-[13px] text-red-600">
             {errorMsg}
           </div>
         )}
@@ -70,7 +70,8 @@ const SignInForm = () => {
           type="button"
           onClick={handleMicrosoftSignIn}
           disabled={isLoading}
-          className="w-full bg-gradient-to-r from-[#0068ff] to-[#0057A8] text-white h-12 flex items-center justify-center gap-3 text-[14px] font-semibold rounded-[6px] transition-all duration-200">
+          className="flex h-[46px] w-full items-center justify-center gap-2.5 rounded-[6px] bg-[#0A1128] text-[14.5px] font-medium text-white transition-colors duration-200 hover:bg-black disabled:opacity-60"
+        >
           {isLoading ? (
             <div className="flex items-center gap-2">
               <Loader />
@@ -78,20 +79,16 @@ const SignInForm = () => {
             </div>
           ) : (
             <>
-              <img
-                src="/assets/icons/microsoft-icon.svg"
-                alt="Microsoft"
-                className="h-5 w-5"
-              />
+              <img src="/assets/icons/microsoft-icon.svg" alt="Microsoft" className="h-[18px] w-[18px]" />
               <span>{t("auth.signInWithMicrosoft", "Sign in with Microsoft 365")}</span>
             </>
           )}
         </Button>
 
         {/* Contact */}
-        <div className="mt-8 text-center text-sm text-gray-500">
+        <div className="mt-7 text-center text-[12.5px] text-slate-400">
           <p>{t("auth.loginIssues")}</p>
-          <a href="mailto:support@pas.vn" className="text-[#0057A8] hover:underline">
+          <a href="mailto:support@pas.vn" className="font-medium text-[#0057A8] hover:underline">
             {t("auth.contactEmail")}
           </a>
         </div>
