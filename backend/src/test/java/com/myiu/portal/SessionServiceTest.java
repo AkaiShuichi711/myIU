@@ -38,8 +38,9 @@ class SessionServiceTest {
         User user = new User();
         user.setId(UUID.randomUUID());
 
-        when(request.getHeader("X-Forwarded-For")).thenReturn(null);
-        when(request.getHeader("X-Real-IP")).thenReturn(null);
+        // Peer is a public IP (untrusted) — IpUtils.extractIp() returns it
+        // directly without ever consulting X-Forwarded-For/X-Real-IP, so
+        // those headers are deliberately left unstubbed here.
         when(request.getRemoteAddr()).thenReturn("1.2.3.4");
         when(request.getHeader("User-Agent")).thenReturn(
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0"
@@ -63,10 +64,14 @@ class SessionServiceTest {
     }
 
     @Test
-    void createSession_uses_x_forwarded_for_header() {
+    void createSession_uses_x_forwarded_for_header_only_from_trusted_proxy() {
         User user = new User();
         user.setId(UUID.randomUUID());
 
+        // X-Forwarded-For is only honored when the direct TCP peer is itself
+        // our own trusted reverse proxy (loopback/private) — otherwise a
+        // client could forge any IP with a single header (see IpUtils).
+        when(request.getRemoteAddr()).thenReturn("127.0.0.1");
         when(request.getHeader("X-Forwarded-For")).thenReturn("203.0.113.5, 10.0.0.1");
         when(request.getHeader("User-Agent")).thenReturn("TestAgent/1.0");
         when(sessionRepo.save(any())).thenReturn(LoginSession.builder().id(UUID.randomUUID()).build());
@@ -75,6 +80,27 @@ class SessionServiceTest {
 
         // First IP from X-Forwarded-For chain is the real client IP
         verify(geoIpService).lookupAndEnrich(eq("203.0.113.5"), any());
+    }
+
+    @Test
+    void createSession_ignores_x_forwarded_for_from_untrusted_peer() {
+        User user = new User();
+        user.setId(UUID.randomUUID());
+
+        // Peer is a public IP reaching the app directly (not through our
+        // reverse proxy) — the forged header must be ignored, and the real
+        // peer address used instead. This is the regression test for the
+        // IP-spoofing fix in IpUtils.extractIp(). lenient(): the header is
+        // deliberately expected to go UNUSED — that's the behavior under test.
+        when(request.getRemoteAddr()).thenReturn("8.8.8.8");
+        lenient().when(request.getHeader("X-Forwarded-For")).thenReturn("203.0.113.5");
+        when(request.getHeader("User-Agent")).thenReturn("TestAgent/1.0");
+        when(sessionRepo.save(any())).thenReturn(LoginSession.builder().id(UUID.randomUUID()).build());
+
+        sessionService.createSession(user, request);
+
+        verify(geoIpService).lookupAndEnrich(eq("8.8.8.8"), any());
+        verify(geoIpService, never()).lookupAndEnrich(eq("203.0.113.5"), any());
     }
 
     @Test
