@@ -241,3 +241,15 @@ html.dark ::-webkit-scrollbar-thumb { background: #33485c; border-radius: 50px; 
            text-slate-700 dark:text-[#bfc6cc] hover:text-slate-900 dark:hover:text-white !important;
   }
 }
+
+/* ── Sign-in aurora background (iCloud-style) ────────────────────────────── */
+@keyframes aurora-drift {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  33%  { transform: translate3d(3%, -4%, 0) scale(1.08); }
+  66%  { transform: translate3d(-3%, 3%, 0) scale(0.96); }
+  100% { transform: translate3d(0, 0, 0) scale(1); }
+}
+.animate-aurora { animation: aurora-drift 22s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .animate-aurora { animation: none; }
+}
